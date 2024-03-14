@@ -1,28 +1,41 @@
-package co.nexlabs.betterhr.joblanding.android
+package co.nexlabs.betterhr.joblanding.android.screen.register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.theme.colorBlueGrey
+import co.nexlabs.betterhr.joblanding.android.theme.colorGreen
+import co.nexlabs.betterhr.joblanding.android.theme.colorWhite
+import co.nexlabs.betterhr.joblanding.android.theme.colorWhiteGrey
+import co.nexlabs.betterhr.joblanding.android.theme.dp_0
+import co.nexlabs.betterhr.joblanding.android.theme.dp_1
+import co.nexlabs.betterhr.joblanding.android.theme.dp_4
+import co.nexlabs.betterhr.joblanding.android.theme.dp_50
+import co.nexlabs.betterhr.joblanding.android.theme.fontWeight_400
+import co.nexlabs.betterhr.joblanding.android.theme.sp_12
+import co.nexlabs.betterhr.joblanding.android.theme.sp_14
 
 @Composable
 fun TextFieldWithCornerColor() {
@@ -33,45 +46,56 @@ fun TextFieldWithCornerColor() {
     ) {
         Box(
             modifier = Modifier
-                .height(50.dp)
+                .height(dp_50)
                 .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
         ) {
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
                 modifier = Modifier
-                    .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp, 0.dp, 0.dp, 4.dp)),
-                placeholder = { Text("Enter your number") },
+                    .border(dp_1, colorBlueGrey, RoundedCornerShape(dp_4, dp_0, dp_0, dp_4)),
+                placeholder = { Text("Enter your number", color = colorWhiteGrey) },
                 colors = TextFieldDefaults.textFieldColors(
-                    textColor = Color(0xFFAAAAAA),
+                    textColor = colorWhiteGrey,
                     backgroundColor = Color.Transparent,
-                    cursorColor = Color(0xFF1ED292),
+                    cursorColor = colorGreen,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
                 textStyle = TextStyle(
-                    fontWeight = FontWeight.W400,
-                    fontSize = 14.sp,
+                    fontWeight = fontWeight_400,
+                    fontSize = sp_14,
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    color = Color(0xFFAAAAAA)
+                    color = colorWhiteGrey
                 ),
                 visualTransformation = PhoneNumberMask(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        // Handle Done action if needed
+                    }
+                ),
             )
         }
 
-        Box(
+        Button(
+            onClick = { /*TODO*/ },
+            colors = ButtonDefaults.buttonColors(backgroundColor = colorGreen),
             modifier = Modifier
-                .height(50.dp)
-                .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.extraSmall),
-            contentAlignment = Alignment.Center
-        ) {
+                .height(dp_50)
+                .background(color = colorGreen, shape = MaterialTheme.shapes.medium)
+                .border(dp_1, colorGreen, RoundedCornerShape(dp_0, dp_4, dp_4, dp_0))
+        )
+        {
             Text(
                 text = "Send OTP",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = FontWeight.W400,
-                color = Color(0xFFFFFFFF),
-                fontSize = 14.sp,
-                modifier = Modifier.padding(8.dp, 0.dp).border(0.dp, Color(0xFF1ED292), RoundedCornerShape(0.dp, 0.dp, 0.dp, 0.dp))
+                fontWeight = fontWeight_400,
+                color = colorWhite,
+                fontSize = sp_12
             )
         }
     }

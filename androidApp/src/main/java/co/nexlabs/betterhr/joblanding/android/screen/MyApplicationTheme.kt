@@ -1,4 +1,4 @@
-package co.nexlabs.betterhr.joblanding.android
+package co.nexlabs.betterhr.joblanding.android.screen
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape

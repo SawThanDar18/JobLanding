@@ -1,4 +1,4 @@
-package co.nexlabs.betterhr.joblanding.android
+package co.nexlabs.betterhr.joblanding.android.screen.example
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

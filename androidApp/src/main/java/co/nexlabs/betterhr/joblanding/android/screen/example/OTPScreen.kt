@@ -1,16 +1,11 @@
-package co.nexlabs.betterhr.joblanding.android
+package co.nexlabs.betterhr.joblanding.android.screen.example
 
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,9 +14,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.nexlabs.betterhr.joblanding.android.R
 
 @Composable
 fun OTPScreen() {
@@ -71,7 +66,7 @@ fun OTPScreen() {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            OTPTextFields(
+            OTPTextField(
                 length = 4
             ) {
                     getOpt -> otpVal

@@ -1,3 +1,5 @@
+package co.nexlabs.betterhr.joblanding.android.screen
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,8 +9,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import co.nexlabs.betterhr.joblanding.android.RegisterScreen
-import co.nexlabs.betterhr.joblanding.android.UnregisterProfileScreen
+import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
+import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
+import co.nexlabs.betterhr.joblanding.android.theme.registerScreen
+import co.nexlabs.betterhr.joblanding.android.theme.unRegisterScreen
 
 @Composable
 fun MyApp() {
@@ -19,9 +23,9 @@ fun MyApp() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        NavHost(navController, startDestination = "unregister_profile_screen") {
-            composable("unregister_profile_screen") { UnregisterProfileScreen(navController) }
-            composable("register_screen") { RegisterScreen(navController) }
+        NavHost(navController, startDestination = unRegisterScreen) {
+            composable(unRegisterScreen) { UnregisterProfileScreen(navController) }
+            composable(registerScreen) { RegisterScreen(navController) }
         }
     }
 }

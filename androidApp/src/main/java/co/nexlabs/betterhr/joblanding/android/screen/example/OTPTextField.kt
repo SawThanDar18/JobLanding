@@ -1,37 +1,40 @@
-package co.nexlabs.betterhr.joblanding.android
+package co.nexlabs.betterhr.joblanding.android.screen.example
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun OTPTextFields(
+fun OTPTextField(
     modifier: Modifier = Modifier,
     length: Int,
     onFilled: (code: String) -> Unit
 ) {
+
+    var boxColor by remember { mutableStateOf(Color(0xFFD9D9D9)) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     var code: List<Char> by remember { mutableStateOf(listOf()) }
-    val focusRequesters: List<FocusRequester> = remember {
+    val focusRequesters = remember {
         val temp = mutableListOf<FocusRequester>()
         repeat(length) {
             temp.add(FocusRequester())
@@ -45,12 +48,19 @@ fun OTPTextFields(
     ) {
         (0 until length).forEach { index ->
             OutlinedTextField(
-                modifier = Modifier.size(50.dp),
-                    /*.focusOrder(focusRequester = focusRequesters[index]) {
-                        focusRequesters[index + 1].requestFocus()
-                    },*/
+                modifier = Modifier.size(50.dp)
+                    .focusRequester(focusRequesters[index])
+                    .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp, 0.dp, 0.dp, 4.dp)),
+                placeholder = { Text("-", color = Color(0xFFAAAAAA)) },
+                colors = TextFieldDefaults.textFieldColors(
+                    textColor = Color(0xFFAAAAAA),
+                    backgroundColor = Color.White,
+                    cursorColor = Color(0xFFAAAAAA),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
                 textStyle = MaterialTheme.typography.body2.copy(
-                    textAlign = TextAlign.Center, color = Color.Black
+                    textAlign = TextAlign.Center, color = Color(0xFFA7BAC5)
                 ),
                 singleLine = true,
                 value = code.getOrNull(index = index)?.takeIf {
@@ -80,9 +90,15 @@ fun OTPTextFields(
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
+                    imeAction = ImeAction.Done
                 ),
-                visualTransformation = PasswordVisualTransformation()
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        boxColor = Color(0xFF1ED292)
+                        keyboardController?.hide()
+                    }
+                ),
+                //visualTransformation = PasswordVisualTransformation()
             )
 
         }

@@ -48,6 +48,11 @@ dependencies {
     implementation("androidx.compose.material:material:1.4.3")
     implementation("androidx.activity:activity-compose:1.7.1")
 
+    val composeBom = platform("androidx.compose:compose-bom:2024.02.02")
+    implementation(composeBom)
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.3")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.3")
+
     implementation(NavigationCompose.navigationCompose)
     implementation(MaterialCompose.material)
     implementation(EdgeToEdge.edgeToEdgeJava)

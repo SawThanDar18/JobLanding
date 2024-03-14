@@ -1,4 +1,4 @@
-package co.nexlabs.betterhr.joblanding.android
+package co.nexlabs.betterhr.joblanding.android.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
