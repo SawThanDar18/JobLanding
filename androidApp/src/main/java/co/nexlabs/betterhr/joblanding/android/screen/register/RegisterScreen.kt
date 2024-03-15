@@ -44,30 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
-import co.nexlabs.betterhr.joblanding.android.theme.colorBlackGrey
-import co.nexlabs.betterhr.joblanding.android.theme.colorBlue
-import co.nexlabs.betterhr.joblanding.android.theme.colorBlueGrey
-import co.nexlabs.betterhr.joblanding.android.theme.colorGreen
-import co.nexlabs.betterhr.joblanding.android.theme.colorGrey
-import co.nexlabs.betterhr.joblanding.android.theme.colorWhite
-import co.nexlabs.betterhr.joblanding.android.theme.colorWhiteGrey
-import co.nexlabs.betterhr.joblanding.android.theme.dp_0
-import co.nexlabs.betterhr.joblanding.android.theme.dp_1
-import co.nexlabs.betterhr.joblanding.android.theme.dp_16
-import co.nexlabs.betterhr.joblanding.android.theme.dp_20
-import co.nexlabs.betterhr.joblanding.android.theme.dp_24
-import co.nexlabs.betterhr.joblanding.android.theme.dp_32
-import co.nexlabs.betterhr.joblanding.android.theme.dp_38
-import co.nexlabs.betterhr.joblanding.android.theme.dp_4
-import co.nexlabs.betterhr.joblanding.android.theme.dp_40
-import co.nexlabs.betterhr.joblanding.android.theme.dp_50
-import co.nexlabs.betterhr.joblanding.android.theme.dp_8
-import co.nexlabs.betterhr.joblanding.android.theme.fontWeight_400
-import co.nexlabs.betterhr.joblanding.android.theme.fontWeight_600
-import co.nexlabs.betterhr.joblanding.android.theme.sp_12
-import co.nexlabs.betterhr.joblanding.android.theme.sp_14
-import co.nexlabs.betterhr.joblanding.android.theme.sp_32
-import co.nexlabs.betterhr.joblanding.android.theme.unRegisterScreen
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -85,7 +61,7 @@ fun RegisterScreen(navController: NavController) {
     }
 
     Column(
-        modifier = Modifier.padding(dp_16, dp_38, dp_16, dp_0),
+        modifier = Modifier.padding(16.dp, 38.dp, 16.dp, 0.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
@@ -94,12 +70,12 @@ fun RegisterScreen(navController: NavController) {
                 painter = painterResource(id = R.drawable.arrow_left),
                 contentDescription = "Arrow Left Icon",
                 modifier = Modifier
-                    .size(dp_24)
-                    .clickable { navController.navigate(unRegisterScreen) },
+                    .size(24.dp)
+                    .clickable { navController.navigate("profile-unregister-screen") },
             )
         }
 
-        Spacer(modifier = Modifier.height(dp_40))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Box(
             contentAlignment = Alignment.Center
@@ -107,13 +83,13 @@ fun RegisterScreen(navController: NavController) {
             androidx.compose.material3.Text(
                 text = "Register",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = fontWeight_600,
-                color = colorGrey,
-                fontSize = sp_32
+                fontWeight = FontWeight.W600,
+                color = Color(0xFF6A6A6A),
+                fontSize = 32.sp
             )
         }
 
-        Spacer(modifier = Modifier.height(dp_20))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Box(
             contentAlignment = Alignment.Center
@@ -121,17 +97,17 @@ fun RegisterScreen(navController: NavController) {
             androidx.compose.material3.Text(
                 text = "Your phone number*",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = fontWeight_600,
-                color = colorBlackGrey,
-                fontSize = sp_14
+                fontWeight = FontWeight.W600,
+                color = Color(0xFF4A4A4A),
+                fontSize = 14.sp
             )
         }
 
-        Spacer(modifier = Modifier.height(dp_8))
+        Spacer(modifier = Modifier.height(8.dp))
 
         TextFieldWithCornerColor()
 
-        Spacer(modifier = Modifier.height(dp_8))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Box(
             contentAlignment = Alignment.Center
@@ -139,13 +115,13 @@ fun RegisterScreen(navController: NavController) {
             androidx.compose.material3.Text(
                 text = "lost your phone number?",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = fontWeight_400,
-                color = colorBlue,
-                fontSize = sp_12
+                fontWeight = FontWeight.W400,
+                color = Color(0xFF1082DE),
+                fontSize = 12.sp
             )
         }
 
-        Spacer(modifier = Modifier.height(dp_20))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Box(
             contentAlignment = Alignment.Center
@@ -153,13 +129,13 @@ fun RegisterScreen(navController: NavController) {
             androidx.compose.material3.Text(
                 text = "Enter OTP Code*",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = fontWeight_400,
-                color = colorBlackGrey,
-                fontSize = sp_14
+                fontWeight = FontWeight.W400,
+                color = Color(0xFF4A4A4A),
+                fontSize = 14.sp
             )
         }
 
-        Spacer(modifier = Modifier.height(dp_8))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -168,26 +144,26 @@ fun RegisterScreen(navController: NavController) {
             (0 until 6).forEach { index ->
                 OutlinedTextField(
                     modifier = Modifier
-                        .size(dp_50)
+                        .size(50.dp)
                         .focusRequester(focusRequesters[index])
-                        .border(1.dp, colorBlueGrey, RoundedCornerShape(dp_4)),
+                        .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp)),
                     placeholder = {
                         androidx.compose.material3.Text(
                             "—",
-                            color = colorWhiteGrey,
+                            color = Color(0xFFAAAAAA),
                             style = TextStyle(textAlign = TextAlign.Center),
                             modifier = Modifier.fillMaxWidth()
                         )
                     },
                     colors = TextFieldDefaults.textFieldColors(
-                        textColor = colorWhiteGrey,
+                        textColor = Color(0xFFAAAAAA),
                         backgroundColor = Color.Transparent,
-                        cursorColor = colorWhiteGrey,
+                        cursorColor = Color(0xFFAAAAAA),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
                     textStyle = androidx.compose.material.MaterialTheme.typography.body2.copy(
-                        textAlign = TextAlign.Center, color = colorBlueGrey
+                        textAlign = TextAlign.Center, color = Color(0xFFA7BAC5)
                     ),
                     singleLine = true,
                     value = code.getOrNull(index = index)?.takeIf {
@@ -220,7 +196,7 @@ fun RegisterScreen(navController: NavController) {
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            boxColor = colorGreen
+                            boxColor = Color(0xFF1ED292)
                             keyboardController?.hide()
                         }
                     ),
@@ -230,7 +206,7 @@ fun RegisterScreen(navController: NavController) {
             }
         }
 
-        Spacer(modifier = Modifier.height(dp_8))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier
@@ -240,16 +216,16 @@ fun RegisterScreen(navController: NavController) {
             Image(
                 painter = painterResource(id = R.drawable.alert_circle_outline),
                 contentDescription = null,
-                modifier = Modifier.size(dp_16),
+                modifier = Modifier.size(16.dp),
                 alignment = Alignment.Center
             )
-            Spacer(modifier = Modifier.width(dp_1))
+            Spacer(modifier = Modifier.width(1.dp))
             androidx.compose.material3.Text(
                 text = "Get instead OTP code",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = fontWeight_400,
-                color = colorWhiteGrey,
-                fontSize = sp_12,
+                fontWeight = FontWeight.W400,
+                color = Color(0xFFAAAAAA),
+                fontSize = 12.sp,
                 style = TextStyle(textAlign = TextAlign.Justify),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -260,7 +236,7 @@ fun RegisterScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(dp_0, dp_32)
+                .padding(0.dp, 32.dp)
                 .align(Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -271,8 +247,8 @@ fun RegisterScreen(navController: NavController) {
                 androidx.compose.material3.Text(
                     text = "Already have an account?",
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = fontWeight_400,
-                    color = colorGrey,
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFF6A6A6A),
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
                 )
@@ -284,14 +260,14 @@ fun RegisterScreen(navController: NavController) {
                     text = "log in",
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W600,
-                    color = colorGreen,
-                    fontSize = sp_14
+                    color = Color(0xFF1ED292),
+                    fontSize = 14.sp
                 )
             }
-            Spacer(modifier = Modifier.height(dp_16))
+            Spacer(modifier = Modifier.height(16.dp))
             Box(
                 modifier = Modifier
-                    .height(dp_50)
+                    .height(50.dp)
                     .fillMaxWidth()
                     .background(color = boxColor, shape = MaterialTheme.shapes.medium),
                 contentAlignment = Alignment.Center
@@ -299,9 +275,9 @@ fun RegisterScreen(navController: NavController) {
                 androidx.compose.material3.Text(
                     text = "Next",
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = fontWeight_600,
-                    color = colorWhite,
-                    fontSize = sp_14
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFFFFFFFF),
+                    fontSize = 14.sp
                 )
             }
 

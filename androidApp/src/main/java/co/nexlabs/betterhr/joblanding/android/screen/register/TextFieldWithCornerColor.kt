@@ -19,23 +19,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.nexlabs.betterhr.joblanding.android.R
-import co.nexlabs.betterhr.joblanding.android.theme.colorBlueGrey
-import co.nexlabs.betterhr.joblanding.android.theme.colorGreen
-import co.nexlabs.betterhr.joblanding.android.theme.colorWhite
-import co.nexlabs.betterhr.joblanding.android.theme.colorWhiteGrey
-import co.nexlabs.betterhr.joblanding.android.theme.dp_0
-import co.nexlabs.betterhr.joblanding.android.theme.dp_1
-import co.nexlabs.betterhr.joblanding.android.theme.dp_4
-import co.nexlabs.betterhr.joblanding.android.theme.dp_50
-import co.nexlabs.betterhr.joblanding.android.theme.fontWeight_400
-import co.nexlabs.betterhr.joblanding.android.theme.sp_12
-import co.nexlabs.betterhr.joblanding.android.theme.sp_14
 
 @Composable
 fun TextFieldWithCornerColor() {
@@ -46,27 +38,27 @@ fun TextFieldWithCornerColor() {
     ) {
         Box(
             modifier = Modifier
-                .height(dp_50)
+                .height(50.dp)
                 .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
         ) {
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
                 modifier = Modifier
-                    .border(dp_1, colorBlueGrey, RoundedCornerShape(dp_4, dp_0, dp_0, dp_4)),
-                placeholder = { Text("Enter your number", color = colorWhiteGrey) },
+                    .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp, 0.dp, 0.dp, 4.dp)),
+                placeholder = { Text("Enter your number", color = Color(0xFFAAAAAA)) },
                 colors = TextFieldDefaults.textFieldColors(
-                    textColor = colorWhiteGrey,
+                    textColor = Color(0xFFAAAAAA),
                     backgroundColor = Color.Transparent,
-                    cursorColor = colorGreen,
+                    cursorColor = Color(0xFF1ED292),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
                 textStyle = TextStyle(
-                    fontWeight = fontWeight_400,
-                    fontSize = sp_14,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp,
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    color = colorWhiteGrey
+                    color = Color(0xFFAAAAAA)
                 ),
                 visualTransformation = PhoneNumberMask(),
                 keyboardOptions = KeyboardOptions(
@@ -83,19 +75,19 @@ fun TextFieldWithCornerColor() {
 
         Button(
             onClick = { /*TODO*/ },
-            colors = ButtonDefaults.buttonColors(backgroundColor = colorGreen),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1ED292)),
             modifier = Modifier
-                .height(dp_50)
-                .background(color = colorGreen, shape = MaterialTheme.shapes.medium)
-                .border(dp_1, colorGreen, RoundedCornerShape(dp_0, dp_4, dp_4, dp_0))
+                .height(50.dp)
+                .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
+                .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(0.dp, 4.dp, 4.dp, 0.dp))
         )
         {
             Text(
                 text = "Send OTP",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = fontWeight_400,
-                color = colorWhite,
-                fontSize = sp_12
+                fontWeight = FontWeight.W400,
+                color = Color(0xFFFFFFFF),
+                fontSize = 12.sp
             )
         }
     }
