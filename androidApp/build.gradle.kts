@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("org.jetbrains.compose")
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -57,4 +58,17 @@ dependencies {
     implementation(MaterialCompose.material)
     implementation(EdgeToEdge.edgeToEdgeJava)
     implementation(EdgeToEdge.edgeToEdgeKotlin)
+
+    implementation(KTOR.clientCore)
+    implementation(KTOR.clientLogging)
+    implementation(KTOR.clientSerilization)
+    implementation(KTOR.serilization)
+    implementation(KTOR.clientNegotiation)
+    implementation(KTOR.clientEncoding)
+    implementation(KTOR.ktorSerialization)
+    implementation(KTOR.kotlinXSerialization)
+    implementation(KTOR.clientOKHttp)
+    implementation(KTOR.ktorJson)
+
+    implementation(CommonLibs.libPhoneNumber)
 }

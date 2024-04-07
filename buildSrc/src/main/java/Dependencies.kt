@@ -39,6 +39,24 @@ object MaterialCompose {
     const val materialAdaptiveSuite = "androidx.compose.material3:material3-adaptive-navigation-suite:${materialAdaptiveSuiteVersion}"
 }
 
+object KTOR {
+    const val version = "2.3.7"
+
+    const val clientCore = "io.ktor:ktor-client-core:${version}"
+    const val clientDarwin = "io.ktor:ktor-client-darwin:${version}"
+    const val clientEncoding = "io.ktor:ktor-client-encoding:${version}"
+    const val clientLogging = "io.ktor:ktor-client-logging:${version}"
+    const val clientOKHttp = "io.ktor:ktor-client-okhttp:${version}"
+    const val clientAndroid = "io.ktor:ktor-client-android:${version}"
+    const val clientiOS = "io.ktor:ktor-client-ios:${version}"
+    const val clientSerilization = "io.ktor:ktor-serialization-kotlinx-json:${version}"
+    const val serilization = "io.ktor:ktor-client-serialization:${version}"
+    const val clientNegotiation = "io.ktor:ktor-client-content-negotiation:${version}"
+    const val ktorSerialization = "io.ktor:ktor-client-serialization:${version}"
+    const val kotlinXSerialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0"
+    const val ktorJson = "io.ktor:ktor-client-json:${version}"
+}
+
 object CommonLibs {
     const val android_gradle_plugin = "com.android.tools.build:gradle:4.1.1"
 

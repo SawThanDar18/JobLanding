@@ -1,7 +1,11 @@
 package co.nexlabs.betterhr.joblanding.android.screen.register
 
+import android.app.Application
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -28,9 +34,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
+import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
+import io.michaelrocks.libphonenumber.android.Phonenumber
+import kotlinx.coroutines.launch
 
 @Composable
-fun TextFieldWithCornerColor() {
+fun TextFieldWithCornerColor(viewModel: RegisterViewModel) {
+
+    val applicationContext = LocalContext.current.applicationContext
+
+    val scope = rememberCoroutineScope()
+
     var text by remember { mutableStateOf("") }
 
     Row(
@@ -60,7 +75,7 @@ fun TextFieldWithCornerColor() {
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     color = Color(0xFFAAAAAA)
                 ),
-                visualTransformation = PhoneNumberMask(),
+                //visualTransformation = PhoneNumberMask(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Phone,
                     imeAction = ImeAction.Done
@@ -74,7 +89,11 @@ fun TextFieldWithCornerColor() {
         }
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                scope.launch {
+                    viewModel.requestOTP(text)
+                }
+            },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1ED292)),
             modifier = Modifier
                 .height(50.dp)
@@ -105,5 +124,21 @@ class PhoneNumberMask : VisualTransformation {
             out += raw[i]
         }
         return TransformedText(AnnotatedString(out), OffsetMapping.Identity)
+    }
+}
+
+
+fun formatPhoneNumber(context: Context, phoneNumber: String, countryCode: String): String {
+    val phoneNumberUtil = PhoneNumberUtil.createInstance(context)
+    try {
+        val numberProto: Phonenumber.PhoneNumber = phoneNumberUtil.parse(phoneNumber, countryCode)
+        Log.d("phone>>", numberProto.toString())
+        if (!phoneNumberUtil.isValidNumber(numberProto)) {
+            return "Invalid phone number"
+        }
+        return phoneNumberUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return "Error formatting phone number"
     }
 }

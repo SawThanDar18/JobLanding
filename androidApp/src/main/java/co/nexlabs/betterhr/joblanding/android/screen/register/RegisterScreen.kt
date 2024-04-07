@@ -1,5 +1,7 @@
 package co.nexlabs.betterhr.joblanding.android.screen.register
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,10 +23,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,9 +48,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
+
+    val scope = rememberCoroutineScope()
 
     var boxColor by remember { mutableStateOf(Color(0xFFD9D9D9)) }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -105,7 +113,7 @@ fun RegisterScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextFieldWithCornerColor()
+        TextFieldWithCornerColor(viewModel)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -267,6 +275,11 @@ fun RegisterScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             Box(
                 modifier = Modifier
+                    .clickable {
+                        scope.launch {
+                            viewModel.verifyOTP(code.joinToString(separator = ""))
+                        }
+                    }
                     .height(50.dp)
                     .fillMaxWidth()
                     .background(color = boxColor, shape = MaterialTheme.shapes.medium),

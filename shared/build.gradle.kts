@@ -5,11 +5,12 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     id("com.apollographql.apollo3")
+    kotlin("plugin.serialization")
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    targetHierarchy.default()
+    //targetHierarchy.default()
 
     android {
         compilations.all {
@@ -36,7 +37,6 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "shared"
-            isStatic = true
         }
     }
 
@@ -60,6 +60,16 @@ kotlin {
                 api("moe.tlaster:precompose:1.5.0")
                 api("moe.tlaster:precompose-viewmodel:1.5.0")
                 api("moe.tlaster:precompose-koin:1.5.0")
+
+                implementation(KTOR.clientCore)
+                implementation(KTOR.clientLogging)
+                implementation(KTOR.clientSerilization)
+                implementation(KTOR.serilization)
+                implementation(KTOR.clientNegotiation)
+                implementation(KTOR.clientEncoding)
+                implementation(KTOR.ktorSerialization)
+                implementation(KTOR.kotlinXSerialization)
+                implementation(KTOR.ktorJson)
             }
         }
         val androidMain by getting {
@@ -67,16 +77,30 @@ kotlin {
                 api("androidx.activity:activity-compose:1.7.2")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.10.1")
+
+                implementation(KTOR.clientCore)
+                implementation(KTOR.clientAndroid)
+                implementation(KTOR.clientOKHttp)
+                implementation(KTOR.kotlinXSerialization)
+                implementation(KTOR.ktorJson)
+                implementation(KTOR.clientLogging)
+                implementation(KTOR.clientSerilization)
+                implementation(KTOR.clientNegotiation)
+                implementation(KTOR.ktorSerialization)
             }
         }
         val iosX64Main by getting
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
-        val iosMain by getting{
+        val iosMain by creating{
             dependsOn(commonMain)
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
+            dependencies {
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
+            }
         }
     }
 }

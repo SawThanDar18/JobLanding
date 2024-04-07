@@ -11,9 +11,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
+import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
+import moe.tlaster.precompose.koin.koinViewModel
+import moe.tlaster.precompose.viewmodel.viewModel
+import org.koin.compose.getKoin
 
 @Composable
 fun MyApp() {
+
     val navController = rememberNavController()
 
     Box(
@@ -23,7 +28,10 @@ fun MyApp() {
     ) {
         NavHost(navController, startDestination = "profile-unregister-screen") {
             composable("profile-unregister-screen") { UnregisterProfileScreen(navController) }
-            composable("register-screen") { RegisterScreen(navController) }
+            composable("register-screen") {
+                val viewModel: RegisterViewModel = getKoin().get()
+                RegisterScreen(navController, viewModel)
+            }
         }
     }
 }
