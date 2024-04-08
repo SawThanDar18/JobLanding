@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.android.screen.register
 
-import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,11 +21,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -49,17 +58,73 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
+import co.nexlabs.betterhr.joblanding.network.register.UiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 
+    var timer by remember { mutableStateOf(0) }
+    var isTimerRunning by remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
+    val uiState = viewModel.uiState.collectAsState(initial = UiState.Loading)
+    val uiStateForVerify = viewModel.uiStateForVerify.collectAsState(initial = UiState.Loading)
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val applicationContext = LocalContext.current.applicationContext
+    var text by remember { mutableStateOf("") }
+
+    var timerText by remember { mutableStateOf("") }
+
+    when (val currentState = uiState.value) {
+        is UiState.Loading -> {
+
+        }
+
+        is UiState.Success -> {
+            isTimerRunning = true
+            if (isTimerRunning) {
+                LaunchedEffect(Unit) {
+                    for (i in 59 downTo 0) {
+                        timer = i
+                        delay(1000)
+                    }
+                    isTimerRunning = false
+                }
+            }
+            MyToast(message = currentState.data)
+
+        }
+
+        is UiState.Error -> {
+            MyToast(currentState.errorMessage)
+        }
+    }
+
+    timerText = if (timer == 0) {
+        "Send OTP"
+    } else {
+        timer.toString()
+    }
+
+    when (val currentState = uiStateForVerify.value) {
+        is UiState.Loading -> {
+        }
+
+        is UiState.Success -> {
+            MyToast(message = currentState.data)
+        }
+
+        is UiState.Error -> {
+            MyToast(currentState.errorMessage)
+        }
+    }
 
     var boxColor by remember { mutableStateOf(Color(0xFFD9D9D9)) }
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     var code: List<Char> by remember { mutableStateOf(listOf()) }
+
     val focusRequesters = remember {
         val temp = mutableListOf<FocusRequester>()
         repeat(6) {
@@ -73,6 +138,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
+
         Box(contentAlignment = Alignment.CenterStart) {
             Image(
                 painter = painterResource(id = R.drawable.arrow_left),
@@ -88,7 +154,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         Box(
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "Register",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W600,
@@ -102,7 +168,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         Box(
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "Your phone number*",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W600,
@@ -113,14 +179,120 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextFieldWithCornerColor(viewModel)
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .height(50.dp)
+                    .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+            ) {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = {
+                        text = it
+                    },
+                    modifier = Modifier
+                        .border(
+                            1.dp,
+                            Color(0xFFA7BAC5),
+                            RoundedCornerShape(4.dp, 0.dp, 0.dp, 4.dp)
+                        ),
+                    placeholder = { Text("Enter your number", color = Color(0xFFAAAAAA)) },
+                    colors = TextFieldDefaults.textFieldColors(
+                        textColor = Color(0xFFAAAAAA),
+                        backgroundColor = Color.Transparent,
+                        cursorColor = Color(0xFF1ED292),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    textStyle = TextStyle(
+                        fontWeight = FontWeight.W400,
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        color = Color(0xFFAAAAAA)
+                    ),
+                    //visualTransformation = PhoneNumberMask(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                            // Handle Done action if needed
+                        }
+                    ),
+                )
+            }
+
+            if (isTimerRunning) {
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFA7BAC5)),
+                    modifier = Modifier
+                        .height(50.dp)
+                        .background(color = Color(0xFFA7BAC5), shape = MaterialTheme.shapes.medium)
+                        .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(0.dp, 4.dp, 4.dp, 0.dp))
+                )
+                {
+                    Text(
+                        text = "$timer sec",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFFFFFFFF),
+                        fontSize = 12.sp
+                    )
+                }
+            } else {
+                Button(
+                    enabled = true,
+                    onClick = {
+                        if (text.isNotEmpty()) {
+                            if (android.util.Patterns.PHONE.matcher(text).matches()) {
+                                scope.launch {
+                                    viewModel.requestOTP(text)
+                                }
+                            } else {
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Phone Number is invalid..",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                applicationContext,
+                                "Please enter phone number",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1ED292)),
+                    modifier = Modifier
+                        .height(50.dp)
+                        .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
+                        .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(0.dp, 4.dp, 4.dp, 0.dp))
+                )
+                {
+                    Text(
+                        text = "Send OTP",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFFFFFFFF),
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Box(
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "lost your phone number?",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W400,
@@ -134,7 +306,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         Box(
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "Enter OTP Code*",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W400,
@@ -156,7 +328,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                         .focusRequester(focusRequesters[index])
                         .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp)),
                     placeholder = {
-                        androidx.compose.material3.Text(
+                        Text(
                             "—",
                             color = Color(0xFFAAAAAA),
                             style = TextStyle(textAlign = TextAlign.Center),
@@ -184,7 +356,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                                 if (temp.size > index) {
                                     temp.removeAt(index = index)
                                     code = temp
-                                    focusRequesters.getOrNull(index - 1)?.requestFocus()
+                                    focusRequesters.getOrNull(index)?.requestFocus()
                                 }
                             } else {
                                 if (code.size > index) {
@@ -228,7 +400,8 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 alignment = Alignment.Center
             )
             Spacer(modifier = Modifier.width(1.dp))
-            androidx.compose.material3.Text(
+
+            Text(
                 text = "Get instead OTP code",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W400,
@@ -237,8 +410,6 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 style = TextStyle(textAlign = TextAlign.Justify),
                 modifier = Modifier.fillMaxWidth()
             )
-
-
         }
 
         Column(
@@ -252,7 +423,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
             Box(
                 contentAlignment = Alignment.Center
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     text = "Already have an account?",
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W400,
@@ -264,7 +435,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
             Box(
                 contentAlignment = Alignment.Center
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     text = "log in",
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W600,
@@ -285,7 +456,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                     .background(color = boxColor, shape = MaterialTheme.shapes.medium),
                 contentAlignment = Alignment.Center
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     text = "Next",
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W600,
@@ -297,4 +468,69 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         }
 
     }
+
+
+
+    DisposableEffect(Unit) {
+        onDispose {
+            focusRequesters.forEach { it.freeFocus() }
+        }
+    }
 }
+
+
+@Composable
+fun Content(data: String) {
+    // UI content
+    Text(text = data)
+}
+
+@Composable
+fun ErrorView(error: String) {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = error)
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { /* Retry API call */ }) {
+            Text("Retry")
+        }
+    }
+}
+
+@Composable
+fun MyToast(message: String) {
+    Toast.makeText(LocalContext.current.applicationContext, message, Toast.LENGTH_SHORT).show()
+    /*var isVisible by remember { mutableStateOf(true) }
+
+    LaunchedEffect(isVisible) {
+        delay(durationMillis)
+        isVisible = false
+    }
+
+    if (isVisible) {
+        Surface(
+            color = Color.Black.copy(alpha = 0.8f),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Text(
+                    text = message,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+            }
+        }
+    }*/
+}
+
+

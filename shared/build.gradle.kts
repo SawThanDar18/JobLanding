@@ -70,6 +70,12 @@ kotlin {
                 implementation(KTOR.ktorSerialization)
                 implementation(KTOR.kotlinXSerialization)
                 implementation(KTOR.ktorJson)
+
+                implementation(ReactiveX.rxjava)
+                implementation(ReactiveX.rxandroid)
+                implementation(ReactiveX.rxKotlin)
+
+                implementation(AndroidArchLifeCycle.livedata)
             }
         }
         val androidMain by getting {
@@ -87,6 +93,12 @@ kotlin {
                 implementation(KTOR.clientSerilization)
                 implementation(KTOR.clientNegotiation)
                 implementation(KTOR.ktorSerialization)
+
+                implementation(ReactiveX.rxjava)
+                implementation(ReactiveX.rxandroid)
+                implementation(ReactiveX.rxKotlin)
+
+                implementation(AndroidArchLifeCycle.livedata)
             }
         }
         val iosX64Main by getting
@@ -118,6 +130,9 @@ android {
     kotlin {
         jvmToolchain(17)
     }
+}
+dependencies {
+    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0")
 }
 
 apollo {

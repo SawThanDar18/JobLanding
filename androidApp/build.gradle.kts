@@ -71,4 +71,10 @@ dependencies {
     implementation(KTOR.ktorJson)
 
     implementation(CommonLibs.libPhoneNumber)
+
+    implementation(ReactiveX.rxjava)
+    implementation(ReactiveX.rxandroid)
+    implementation(ReactiveX.rxKotlin)
+
+    implementation(AndroidArchLifeCycle.livedata)
 }

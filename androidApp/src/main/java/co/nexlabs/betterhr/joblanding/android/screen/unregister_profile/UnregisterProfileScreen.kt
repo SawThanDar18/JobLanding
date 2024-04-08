@@ -62,7 +62,10 @@ fun UnregisterProfileScreen(navController: NavController) {
                 contentDescription = "Setting Icon",
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { showMenu = true },
+                    .clickable {
+                        navController.navigate("choose-country-screen")
+                        //showMenu = true
+                               },
                 alignment = Alignment.Center
             )
 
