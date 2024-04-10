@@ -1,9 +1,5 @@
 package co.nexlabs.betterhr.joblanding.android.data
 
-import co.nexlabs.betterhr.joblanding.network.sms.SendVerificationCodeRequest
-import co.nexlabs.betterhr.joblanding.network.sms.SmsServiceImpl
-import co.nexlabs.betterhr.joblanding.network.sms.VerifyOTPRequest
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.runBlocking
 
 fun exampleUsage() = runBlocking {

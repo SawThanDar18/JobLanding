@@ -33,17 +33,21 @@ fun MyApp() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        NavHost(navController, startDestination = "profile-unregister-screen") {
-            composable("profile-unregister-screen") {
+        NavHost(navController, startDestination = "choose-country-screen") {
+            /*composable("profile-unregister-screen") {
                 //val text = it.arguments?.getString("text") ?: ""
                 UnregisterProfileScreen(navController)
             }
             composable("register-screen") {
                 val viewModel: RegisterViewModel = getKoin().get()
                 RegisterScreen(navController, viewModel)
-            }
+            }*/
             composable("choose-country-screen") {
-                ChooseCountryScreen(navController)
+                val viewModel: ChooseCountryViewModel = getKoin().get()
+                ChooseCountryScreen(viewModel, navController)
+            }
+            composable("bottom-navigation-screen") {
+                BottomNavigation()
             }
         }
     }

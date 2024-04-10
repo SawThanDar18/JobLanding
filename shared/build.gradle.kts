@@ -70,6 +70,7 @@ kotlin {
                 implementation(KTOR.ktorSerialization)
                 implementation(KTOR.kotlinXSerialization)
                 implementation(KTOR.ktorJson)
+                implementation(KTOR.ktorAuth)
 
                 implementation(ReactiveX.rxjava)
                 implementation(ReactiveX.rxandroid)

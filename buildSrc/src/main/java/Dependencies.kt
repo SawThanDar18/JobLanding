@@ -55,6 +55,8 @@ object KTOR {
     const val ktorSerialization = "io.ktor:ktor-client-serialization:${version}"
     const val kotlinXSerialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0"
     const val ktorJson = "io.ktor:ktor-client-json:${version}"
+    const val ktorAuth = "io.ktor:ktor-server-auth:${version}"
+
 }
 
 object CommonLibs {

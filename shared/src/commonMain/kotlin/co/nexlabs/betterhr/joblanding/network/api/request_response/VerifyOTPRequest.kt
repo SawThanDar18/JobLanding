@@ -1,4 +1,4 @@
-package co.nexlabs.betterhr.joblanding.network.sms
+package co.nexlabs.betterhr.joblanding.network.api.request_response
 
 import kotlinx.serialization.Serializable
 

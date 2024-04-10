@@ -18,15 +18,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.BottomNavigation
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,21 +51,26 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
-
-data class ListItem(var text: String, val image: Painter)
+import co.nexlabs.betterhr.joblanding.network.choose_country.data.CountriesListUIModel
+import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
+import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
+import kotlinx.coroutines.launch
 
 @Composable
-fun ChooseCountryScreen(navController: NavController) {
+fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavController) {
+
+    var items by remember { mutableStateOf(mutableListOf<Item>()) }
+    var selectedItem by remember { mutableStateOf(Item("", "Select your country")) }
+
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
 
-    val items = listOf(
-        ListItem("Myanmar", painterResource(id = R.drawable.myanmar_flag)),
-        ListItem("Sri Lanka", painterResource(id = R.drawable.srilanka_flag)),
-        ListItem("Vietnam", painterResource(id = R.drawable.vietnam_flag)),
-        ListItem("Thailand", painterResource(id = R.drawable.thailand_flag)),
-    )
-    var selectedItem by remember { mutableStateOf(items.first()) }
+    scope.launch {
+        viewModel.getCountriesList()
+        items = uiState.items
+    }
 
     Column(
         modifier = Modifier
@@ -114,12 +123,13 @@ fun ChooseCountryScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable {
+                        items = uiState.items
                         expanded = true
                     },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = selectedItem.text,
+                    text = selectedItem.countryName,
                     modifier = Modifier.padding(start = 8.dp),
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W400,
@@ -156,13 +166,14 @@ fun ChooseCountryScreen(navController: NavController) {
                             horizontalArrangement = Arrangement.Start,
                         ) {
                             Image(
-                                painter = item.image,
-                                contentDescription = item.text,
+                                //painter = item.image,
+                                painter = painterResource(id = R.drawable.myanmar_flag),
+                                contentDescription = item.countryName,
                                 modifier = Modifier.size(20.dp),
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = item.text,
+                                text = item.countryName,
                                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                 fontWeight = FontWeight.W400,
                                 color = Color(0xFF757575),
@@ -176,10 +187,14 @@ fun ChooseCountryScreen(navController: NavController) {
 
         Row(
             verticalAlignment = Alignment.Bottom,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             Box(
                 modifier = Modifier
+                    .clickable {
+                        navController.navigate("bottom-navigation-screen")
+                    }
                     .height(40.dp)
                     .fillMaxWidth()
                     .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
@@ -192,10 +207,6 @@ fun ChooseCountryScreen(navController: NavController) {
                     fontWeight = FontWeight.W600,
                     color = Color(0xFFFFFFFF),
                     fontSize = 14.sp,
-                    modifier = Modifier.clickable {
-                        navController.navigate("profile-unregister-screen")
-                        //viewModel.setData(selectedItem.text)
-                    }
                 )
             }
         }
