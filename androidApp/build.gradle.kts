@@ -77,4 +77,6 @@ dependencies {
     implementation(ReactiveX.rxKotlin)
 
     implementation(AndroidArchLifeCycle.livedata)
+
+    implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.10.0")
 }

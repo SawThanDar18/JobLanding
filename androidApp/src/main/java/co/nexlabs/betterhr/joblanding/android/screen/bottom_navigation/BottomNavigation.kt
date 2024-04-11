@@ -1,8 +1,7 @@
-package co.nexlabs.betterhr.joblanding.android.screen
+package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -15,6 +14,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
+import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -72,14 +73,9 @@ fun BottomNavigation() {
             composable("application") { ApplicationScreen() }
             composable("inbox") { InboxScreen() }
             composable("interviews") { InterviewsScreen() }
-            composable("profile") { ProfileScreen() }
+            composable("profile") { UnregisterProfileScreen(navController) }
         }
     }
-}
-
-@Composable
-fun HomeScreen() {
-    //Text(text = "Home", modifier = Modifier.padding(16.dp))
 }
 
 @Composable
@@ -95,11 +91,6 @@ fun InboxScreen() {
 @Composable
 fun InterviewsScreen() {
     //Text(text = "Interviews", modifier = Modifier.padding(16.dp))
-}
-
-@Composable
-fun ProfileScreen() {
-    //Text(text = "Profile", modifier = Modifier.padding(16.dp))
 }
 
 data class BottomNavItem(val title: String, val selectedIcon: Int, val unselectedIcon: Int, val route: String)
