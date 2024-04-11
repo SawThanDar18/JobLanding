@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.BottomNavigation
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionListsDetail
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.JobDetailsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.choose_country.ChooseCountryScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
@@ -45,6 +46,9 @@ fun MyApp() {
             }
             composable("collection-lists-detail") {
                 CollectionListsDetail(navController)
+            }
+            composable("job-details") {
+                JobDetailsScreen(navController)
             }
         }
     }

@@ -88,7 +88,7 @@ fun HomeScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable { navController.navigate("collection-lists-detail") },
+                    .clickable { navController.navigate("job-details") },
                 horizontalArrangement = Arrangement.Start,
             ) {
                 Image(
