@@ -39,18 +39,17 @@ fun JobDetailsScreen(navController: NavController) {
     val items = (0..4).toList()
 
     Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            verticalAlignment = Alignment.Top,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 16.dp),
-            verticalArrangement = Arrangement.Top,
-            //horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth().height(160.dp),
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp),
-            ) {
                     Image(
                         painter = painterResource(id = R.drawable.yoma_cover),
                         contentDescription = "Background Image",
@@ -58,13 +57,13 @@ fun JobDetailsScreen(navController: NavController) {
                             .fillMaxSize()
                     )
 
-                   /* Image(
+                    Image(
                         painter = painterResource(id = R.drawable.back),
                         contentDescription = "Back Image",
                         modifier = Modifier
-                            .padding(top = 30.dp)
+                            .padding(top = 50.dp, start = 16.dp)
                             .size(24.dp)
-                    )*/
+                    )
             }
 
         }
