@@ -9,17 +9,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
-import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.HomeScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun BottomNavigation() {
+fun BottomNavigation(nav: NavController) {
     val navController = rememberNavController()
     val items = listOf(
         BottomNavItem("Home", R.drawable.home_selected_icon, R.drawable.home_icon, "home"),
@@ -69,11 +70,11 @@ fun BottomNavigation() {
         }
     ) {
         NavHost(navController, startDestination = "home") {
-            composable("home") { HomeScreen() }
+            composable("home") { HomeScreen(nav) }
             composable("application") { ApplicationScreen() }
             composable("inbox") { InboxScreen() }
             composable("interviews") { InterviewsScreen() }
-            composable("profile") { UnregisterProfileScreen(navController) }
+            composable("profile") { UnregisterProfileScreen(nav) }
         }
     }
 }
