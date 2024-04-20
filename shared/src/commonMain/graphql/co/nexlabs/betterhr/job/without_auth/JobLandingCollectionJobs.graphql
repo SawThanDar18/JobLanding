@@ -1,0 +1,58 @@
+query JobLandingCollectionJobs($collection_id: String!, $search_key: String, $is_paginate: Boolean!, $limit: Int, $page: Int){
+    jobLandingCollectionJobs(
+        collection_id: $collection_id,
+        search_key: $search_key,
+        is_paginate: $is_paginate,
+        limit: $limit,
+        page: $page,
+    ){
+        data {
+            id
+            company_id
+            title
+            department_id
+            location_id
+            country_id
+            created_by
+            state_id
+            city_name
+            city_id
+            state_name
+            hiring_date
+            seniority_level
+#            employment_type
+            workplace_type
+            office_address
+            currency_code
+            min_salary
+            max_salary
+            description
+            requirement
+            benefits_and_perks
+            overview
+            status
+            published_date
+            last3_view_count
+            last3_conversation_rate
+            last3_cv_count
+            last1_view_count
+            last1_conversation_rate
+            last1_cv_count
+            company{
+                id
+                subdomain
+                country
+                name
+                description
+                company_mail
+                company_link
+            }
+        }
+        paginatorInfo{
+            total
+            per_page
+            has_page
+            current_page
+        }
+    }
+}

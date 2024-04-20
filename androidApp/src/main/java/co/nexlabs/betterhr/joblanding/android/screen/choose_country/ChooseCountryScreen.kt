@@ -69,8 +69,9 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
 
     scope.launch {
         viewModel.getCountriesList()
-        items = uiState.items
     }
+
+    items = uiState.items
 
     Column(
         modifier = Modifier
@@ -112,7 +113,7 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
 
         Box(
             modifier = Modifier
-                .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+                .background(color = Color.Transparent)
                 .height(40.dp)
                 .fillMaxWidth()
                 .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
@@ -148,7 +149,11 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
             }
 
             DropdownMenu(
-                //modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .background(color = Color.Transparent)
+                    .fillMaxWidth()
+                    .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {

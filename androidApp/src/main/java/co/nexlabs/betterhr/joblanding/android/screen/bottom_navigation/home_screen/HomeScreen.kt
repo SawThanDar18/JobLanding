@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
+import android.text.Layout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,9 +16,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,7 +57,7 @@ fun HomeScreen(navController: NavController) {
 
     val items = (0..4).toList()
 
-    var style by remember { mutableStateOf("style-1") }
+    var style by remember { mutableStateOf("style-7") }
 
     Column(
         modifier = Modifier
@@ -59,59 +65,169 @@ fun HomeScreen(navController: NavController) {
             .padding(16.dp, 0.dp, 16.dp, 65.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Box(
-            contentAlignment = Alignment.CenterStart,
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 50.dp)
-                .height(32.dp),
+                .padding(top = 50.dp),
+            horizontalArrangement = Arrangement.Start,
         ) {
             Image(
-                painter = painterResource(id = R.drawable.home_screen_header),
+                painter = painterResource(id = R.drawable.better_icon),
                 contentDescription = "Home Screen Header Logo",
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .width(26.dp)
+                    .height(32.dp),
+            )
+
+            Text(
+                text = "Better Job",
+                modifier = Modifier.padding(start = 8.dp),
+                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                fontWeight = FontWeight.W600,
+                color = Color(0xFF757575),
+                fontSize = 24.sp,
             )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Box(
-            modifier = Modifier
-                .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-                .height(50.dp)
-                .fillMaxWidth()
-                .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
-        ) {
+        NestedLazyColumn(style, items, navController)
+    }
+}
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable { navController.navigate("job-details") },
-                horizontalArrangement = Arrangement.Start,
+@Composable
+fun StyleSevenCollectionListLayoutItem(item: String) {
+    Box(
+        modifier = Modifier
+            .background(
+                color = Color.Transparent,
+                shape = MaterialTheme.shapes.medium
+            )
+            .fillMaxWidth()
+            .height(80.dp)
+            .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Image(
+                    painter = painterResource(id = R.drawable.company_logo),
+                    contentDescription = "Company Logo",
+                    modifier = Modifier
+                        .size(48.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                Text(
+                    text = "Designer",
+                    maxLines = 2,
+                    softWrap = true,
+                    overflow = TextOverflow.Ellipsis,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFF6A6A6A),
+                    fontSize = 13.sp,
+                )
+
+                Text(
+                    modifier = Modifier.padding(top = 3.dp),
+                    text = "Yoma Bank",
+                    maxLines = 2,
+                    softWrap = true,
+                    overflow = TextOverflow.Ellipsis,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFF757575),
+                    fontSize = 12.sp,
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        text = "MMK 400k-600k",
+                        maxLines = 1,
+                        softWrap = true,
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFF757575),
+                        fontSize = 12.sp,
+                    )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.grey_line),
+                        contentDescription = "Grey Space Line",
+                        modifier = Modifier
+                            .size(1.dp, 8.dp),
+                        contentScale = ContentScale.Fit
+                    )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Text(
+                        text = "Yangon",
+                        maxLines = 1,
+                        softWrap = true,
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFF757575),
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.wrapContentHeight()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.search),
-                    contentDescription = "Arrow Down",
+                    painter = painterResource(id = R.drawable.save_unselected_icon),
+                    contentDescription = "Save Unselected Icon",
                     modifier = Modifier
-                        .padding(start = 8.dp)
-                        .size(24.dp),
+                        .size(11.dp, 15.dp),
                     contentScale = ContentScale.Fit
                 )
 
                 Text(
-                    text = "Search jobs, companies...",
-                    modifier = Modifier.padding(start = 8.dp),
+                    text = "",
+                    maxLines = 1,
+                    softWrap = true,
+                    overflow = TextOverflow.Ellipsis,
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W400,
-                    color = Color(0xFF757575),
-                    fontSize = 14.sp,
+                    color = Color(0xFFF8CB2E),
+                    fontSize = 10.sp,
+                )
+
+                Text(
+                    text = "2 days left",
+                    maxLines = 1,
+                    softWrap = true,
+                    overflow = TextOverflow.Ellipsis,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFFF8CB2E),
+                    fontSize = 10.sp,
                 )
             }
         }
-
-        NestedLazyColumn(style, items)
     }
 }
 
@@ -127,7 +243,8 @@ fun StyleSixCollectionListLayoutItem(item: String) {
         Image(
             painter = painterResource(id = R.drawable.campaign),
             contentDescription = "Campaigns",
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .clip(RoundedCornerShape(8.dp)),
             contentScale = ContentScale.Fit
         )
@@ -607,16 +724,68 @@ fun CollectionLabelLayoutItem(index: String) {
 }
 
 @Composable
-fun NestedLazyColumn(style: String, items: List<Int>) {
-    LazyColumn {
+fun NestedLazyColumn(style: String, items: List<Int>, navController: NavController) {
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        item {
+            Box(
+                modifier = Modifier
+                    .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+                    .height(50.dp)
+                    .fillMaxWidth()
+                    .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
+            ) {
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { navController.navigate("company-lists-detail") },
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.search),
+                        contentDescription = "Arrow Down",
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .size(24.dp),
+                        contentScale = ContentScale.Fit
+                    )
+
+                    Text(
+                        text = "Search jobs, companies...",
+                        modifier = Modifier.padding(start = 8.dp),
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFF757575),
+                        fontSize = 14.sp,
+                    )
+                }
+            }
+        }
+
         items(items.size) { index ->
             CollectionLabelLayoutItem(index = index.toString())
-            //StyleOneLazyLayout()
-            //StyleTwoLazyLayout()
-            StyleThreeLazyLayout()
-            //StyleFourLazyLayout()
-            //StyleFiveLazyLayout()
-            //StyleSixLazyLayout()
+            when (style) {
+                "style-1" -> StyleOneLazyLayout()
+                "style-2" -> Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)) {
+                    StyleTwoLazyLayout()
+                }
+                "style-3" -> StyleThreeLazyLayout()
+                "style-4" -> Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)) {
+                    StyleFourLazyLayout()
+                }
+                "style-5" -> StyleFiveLazyLayout()
+                "style-6" -> StyleSixLazyLayout()
+                "style-7" -> Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)) {
+                    StyleSevenLazyLayout()
+                }
+            }
         }
     }
 }
@@ -635,14 +804,17 @@ fun StyleOneLazyLayout() {
 
 @Composable
 fun StyleTwoLazyLayout() {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxWidth()
+    LazyVerticalGrid(
+        modifier = Modifier.fillMaxWidth(),
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(5) { subIndex ->
+        items(6) { subIndex ->
             StyleTwoCollectionListLayoutItem(item = subIndex.toString())
         }
     }
+
 }
 
 @Composable
@@ -651,7 +823,7 @@ fun StyleThreeLazyLayout() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        items(2) { subIndex ->
+        items(5) { subIndex ->
             StyleThreeCollectionListLayoutItem(item = subIndex.toString())
         }
     }
@@ -659,11 +831,13 @@ fun StyleThreeLazyLayout() {
 
 @Composable
 fun StyleFourLazyLayout() {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxWidth()
+    LazyVerticalGrid(
+        modifier = Modifier.fillMaxWidth(),
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(3) { subIndex ->
+        items(4) { subIndex ->
             StyleFourCollectionListLayoutItem(item = subIndex.toString())
         }
     }
@@ -689,6 +863,18 @@ fun StyleSixLazyLayout() {
     ) {
         items(10) { subIndex ->
             StyleSixCollectionListLayoutItem(item = subIndex.toString())
+        }
+    }
+}
+
+@Composable
+fun StyleSevenLazyLayout() {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        items(10) { subIndex ->
+            StyleSevenCollectionListLayoutItem(item = subIndex.toString())
         }
     }
 }

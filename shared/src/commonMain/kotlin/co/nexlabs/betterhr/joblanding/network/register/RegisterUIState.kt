@@ -1,6 +1,5 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
-import co.nexlabs.betterhr.joblanding.ContinentQuery
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 
 data class RegisterUIState(

@@ -1,0 +1,13 @@
+query JobLandingCompanyList{
+    jobLandingCompanyList
+    {
+        id
+        subdomain
+        country
+        name
+        description
+        company_mail
+        company_link
+        jobs_count
+    }
+}

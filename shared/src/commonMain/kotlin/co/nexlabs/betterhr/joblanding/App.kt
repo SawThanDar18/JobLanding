@@ -10,7 +10,7 @@ import co.nexlabs.betterhr.joblanding.theme.EarthTheme
 fun App() {
     EarthTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.surface) {
-            Nav()
+            //Nav()
         }
     }
 }

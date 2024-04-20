@@ -5,11 +5,17 @@ import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryU
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
 import co.nexlabs.betterhr.joblanding.viewmodel.CountriesListViewModelMapper
+import com.apollographql.apollo3.exception.ApolloException
+import com.apollographql.apollo3.exception.ApolloHttpException
+import com.apollographql.apollo3.exception.ApolloNetworkException
+import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -40,6 +46,34 @@ class ChooseCountryViewModel(private val chooseCountryRepository: ChooseCountryR
                     )
                 }
             }
+
+            /*chooseCountryRepository.getDynamicPages().toFlow()
+                .catch { e ->
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                            // Handle HTTP-specific errors
+                        }
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                            // Handle network-related errors
+                        }
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                            // Handle parsing errors
+                        }
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest {
+                    if (!it.hasErrors()) {
+                        it.data?.dynamicPages!!.map {
+                            println("data>>" + it.name)
+                        }
+                    }
+                }*/
         }
 
         _uiState.update {
