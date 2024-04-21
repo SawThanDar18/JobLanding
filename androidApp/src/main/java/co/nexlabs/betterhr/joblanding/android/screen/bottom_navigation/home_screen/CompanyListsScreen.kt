@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -52,6 +53,7 @@ fun CompanyListsScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(top = 50.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -85,197 +87,193 @@ fun CompanyListsScreen(navController: NavController) {
             )
         }
 
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            item {
-                LazyVerticalGrid(
+        LazyVerticalGrid(
+            modifier = Modifier.weight(1f),
+            state = rememberLazyGridState(),
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            items(items.size) { index ->
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    columns = GridCells.Fixed(3),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                        .width(100.dp)
+                        .height(169.dp)
+                        .background(
+                            color = Color.Transparent,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
                 ) {
-                    items(items.size) { index ->
-                        Box(
-                            modifier = Modifier
-                                .width(100.dp)
-                                .height(169.dp)
-                                .background(
-                                    color = Color.Transparent,
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Transparent),
-                                verticalArrangement = Arrangement.SpaceEvenly,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.aia_logo),
-                                    contentDescription = "Company Logo",
-                                    modifier = Modifier
-                                        .size(80.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-
-                                Text(
-                                    textAlign = TextAlign.Center,
-                                    text = "Alibaba",
-                                    maxLines = 1,
-                                    softWrap = true,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W500,
-                                    color = Color(0xFF4A4A4A),
-                                    fontSize = 14.sp,
-                                )
-
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(Color.Transparent),
-                                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        textAlign = TextAlign.Center,
-                                        text = "3 job",
-                                        maxLines = 1,
-                                        softWrap = true,
-                                        overflow = TextOverflow.Ellipsis,
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFF6A6A6A),
-                                        fontSize = 12.sp,
-                                    )
-
-                                    Text(
-                                        textAlign = TextAlign.Center,
-                                        text = "openings",
-                                        maxLines = 1,
-                                        softWrap = true,
-                                        overflow = TextOverflow.Ellipsis,
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFF6A6A6A),
-                                        fontSize = 12.sp,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.gradient_line),
-                        contentDescription = "Gradient Line",
+                    Column(
                         modifier = Modifier
-                            .size(4.dp, 18.dp),
-                        contentScale = ContentScale.Fit
-                    )
-
-                    Text(
-                        text = "Recommended companies",
-                        modifier = Modifier.padding(start = 4.dp),
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 14.sp,
-                    )
-                }
-
-                LazyVerticalGrid(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    columns = GridCells.Fixed(3),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(items.size) { index ->
-                        Box(
+                            .fillMaxSize()
+                            .background(Color.Transparent),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.aia_logo),
+                            contentDescription = "Company Logo",
                             modifier = Modifier
-                                .width(100.dp)
-                                .height(169.dp)
-                                .background(
-                                    color = Color.Transparent,
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
+                                .size(80.dp),
+                            contentScale = ContentScale.Fit
+                        )
+
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = "Alibaba",
+                            maxLines = 1,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W500,
+                            color = Color(0xFF4A4A4A),
+                            fontSize = 14.sp,
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Transparent),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Transparent),
-                                verticalArrangement = Arrangement.SpaceEvenly,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.aia_logo),
-                                    contentDescription = "Company Logo",
-                                    modifier = Modifier
-                                        .size(80.dp),
-                                    contentScale = ContentScale.Fit
-                                )
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = "3 job",
+                                maxLines = 1,
+                                softWrap = true,
+                                overflow = TextOverflow.Ellipsis,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W400,
+                                color = Color(0xFF6A6A6A),
+                                fontSize = 12.sp,
+                            )
 
-                                Text(
-                                    textAlign = TextAlign.Center,
-                                    text = "Alibaba",
-                                    maxLines = 1,
-                                    softWrap = true,
-                                    overflow = TextOverflow.Ellipsis,
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W500,
-                                    color = Color(0xFF4A4A4A),
-                                    fontSize = 14.sp,
-                                )
-
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(Color.Transparent),
-                                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        textAlign = TextAlign.Center,
-                                        text = "3 job",
-                                        maxLines = 1,
-                                        softWrap = true,
-                                        overflow = TextOverflow.Ellipsis,
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFF6A6A6A),
-                                        fontSize = 12.sp,
-                                    )
-
-                                    Text(
-                                        textAlign = TextAlign.Center,
-                                        text = "openings",
-                                        maxLines = 1,
-                                        softWrap = true,
-                                        overflow = TextOverflow.Ellipsis,
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFF6A6A6A),
-                                        fontSize = 12.sp,
-                                    )
-                                }
-                            }
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = "openings",
+                                maxLines = 1,
+                                softWrap = true,
+                                overflow = TextOverflow.Ellipsis,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W400,
+                                color = Color(0xFF6A6A6A),
+                                fontSize = 12.sp,
+                            )
                         }
                     }
-
                 }
             }
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.gradient_line),
+                contentDescription = "Gradient Line",
+                modifier = Modifier
+                    .size(4.dp, 18.dp),
+                contentScale = ContentScale.Fit
+            )
+
+            Text(
+                text = "Recommended companies",
+                modifier = Modifier.padding(start = 4.dp),
+                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                fontWeight = FontWeight.W600,
+                color = Color(0xFF6A6A6A),
+                fontSize = 14.sp,
+            )
+        }
+
+        LazyVerticalGrid(
+            modifier = Modifier.weight(1f),
+            state = rememberLazyGridState(),
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(items.size) { index ->
+                Box(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(169.dp)
+                        .background(
+                            color = Color.Transparent,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Transparent),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.aia_logo),
+                            contentDescription = "Company Logo",
+                            modifier = Modifier
+                                .size(80.dp),
+                            contentScale = ContentScale.Fit
+                        )
+
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = "Alibaba",
+                            maxLines = 1,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W500,
+                            color = Color(0xFF4A4A4A),
+                            fontSize = 14.sp,
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Transparent),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = "3 job",
+                                maxLines = 1,
+                                softWrap = true,
+                                overflow = TextOverflow.Ellipsis,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W400,
+                                color = Color(0xFF6A6A6A),
+                                fontSize = 12.sp,
+                            )
+
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = "openings",
+                                maxLines = 1,
+                                softWrap = true,
+                                overflow = TextOverflow.Ellipsis,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W400,
+                                color = Color(0xFF6A6A6A),
+                                fontSize = 12.sp,
+                            )
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
