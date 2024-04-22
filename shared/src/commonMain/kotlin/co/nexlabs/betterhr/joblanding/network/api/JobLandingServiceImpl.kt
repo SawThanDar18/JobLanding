@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
 import co.nexlabs.betterhr.joblanding.DynamicPagesQuery
+import co.nexlabs.betterhr.joblanding.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
@@ -32,6 +33,28 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
 class JobLandingServiceImpl(private val client: HttpClient) : JobLandingService {
+    val headerInterceptor = Interceptor { chain ->
+        val request = chain.request().newBuilder()
+            .addHeader(API_KEY, API_VALUE_JOB)
+            .build()
+        chain.proceed(request)
+    }
+
+    val loggingInterceptor = HttpLoggingInterceptor().apply {
+        val logger = HttpLoggingInterceptor.Logger.DEFAULT
+        level = HttpLoggingInterceptor.Level.HEADERS
+        HttpLoggingInterceptor.Logger { message -> println("message>>$logger") }
+    }
+
+    val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .addInterceptor(headerInterceptor)
+        .build()
+
+    val apolloClient = ApolloClient.Builder()
+        .okHttpClient(okHttpClient)
+        .serverUrl(baseUrlForJob)
+        .build()
 
     override suspend fun sendVerification(body: SendVerificationCodeRequest): SendVerificationResponse {
 
@@ -112,28 +135,6 @@ class JobLandingServiceImpl(private val client: HttpClient) : JobLandingService 
         countryId: String,
         platform: String
     ): ApolloCall<DynamicPagesQuery.Data> {
-        val headerInterceptor = Interceptor { chain ->
-            val request = chain.request().newBuilder()
-                .addHeader(API_KEY, API_VALUE_JOB)
-                .build()
-            chain.proceed(request)
-        }
-
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            val logger = HttpLoggingInterceptor.Logger.DEFAULT
-            level = HttpLoggingInterceptor.Level.HEADERS
-            HttpLoggingInterceptor.Logger { message -> println("message>>$logger") }
-        }
-
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .addInterceptor(headerInterceptor)
-            .build()
-
-        val apolloClient = ApolloClient.Builder()
-            .okHttpClient(okHttpClient)
-            .serverUrl(baseUrlForJob)
-            .build()
 
         try {
             val response = apolloClient.query(DynamicPagesQuery(countryId, platform))
@@ -144,5 +145,17 @@ class JobLandingServiceImpl(private val client: HttpClient) : JobLandingService 
             println("Error: ${e.message}")
         }
         return apolloClient.query(DynamicPagesQuery(countryId, platform))
+    }
+
+    override suspend fun getJobLandingSections(pageId: String): ApolloCall<JobLandingSectionsQuery.Data> {
+        try {
+            val response = apolloClient.query(JobLandingSectionsQuery(pageId))
+            println("mm>>${response.execute().data!!.jobLandingSections.size}")
+        } catch (e: ApolloException) {
+            println("ApolloClient error: ${e.message}")
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }
+        return apolloClient.query(JobLandingSectionsQuery(pageId))
     }
 }

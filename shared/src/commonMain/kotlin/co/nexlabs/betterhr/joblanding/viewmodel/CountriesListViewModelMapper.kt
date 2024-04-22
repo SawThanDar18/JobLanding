@@ -1,11 +1,7 @@
 package co.nexlabs.betterhr.joblanding.viewmodel
 
-import co.nexlabs.betterhr.joblanding.network.api.home.DynamicPagesListData
-import co.nexlabs.betterhr.joblanding.network.api.home.DynamicPagesUIModel
 import co.nexlabs.betterhr.joblanding.network.api.request_response.DataResponse
-import co.nexlabs.betterhr.joblanding.network.api.request_response.DynamicPagesResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
-import co.nexlabs.betterhr.joblanding.network.api.request_response.GetDynamicPagesResponse
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
 
 object CountriesListViewModelMapper {
@@ -20,19 +16,4 @@ object CountriesListViewModelMapper {
             countryName = data.name,
         )
     }
-
-    fun mapResponse(response: GetDynamicPagesResponse): List<DynamicPagesListData> {
-        return response.data.dynamicPages.map {
-            mapDataToDynamic(it)
-        }
-    }
-
-    private fun mapDataToDynamic(data: DynamicPagesResponse): DynamicPagesListData {
-        return DynamicPagesListData(
-            id = data.id,
-            name = data.name,
-        )
-    }
-
-
 }

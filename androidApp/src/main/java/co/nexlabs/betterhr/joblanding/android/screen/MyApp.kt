@@ -17,6 +17,7 @@ import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scre
 import co.nexlabs.betterhr.joblanding.android.screen.choose_country.ChooseCountryScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
+import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import org.koin.compose.getKoin
@@ -43,8 +44,11 @@ fun MyApp() {
                 val viewModel: ChooseCountryViewModel = getKoin().get()
                 ChooseCountryScreen(viewModel, navController)
             }
-            composable("bottom-navigation-screen") {
-                BottomNavigation(navController)
+            composable("bottom-navigation-screen/{pageId}") {
+                val sharedViewModel: SharedViewModel = getKoin().get()
+                if (it.arguments?.getString("pageId") != "") {
+                    BottomNavigation(sharedViewModel, navController, it.arguments?.getString("pageId") ?: "")
+                }
             }
             composable("collection-lists-detail") {
                 CollectionListsDetail(navController)

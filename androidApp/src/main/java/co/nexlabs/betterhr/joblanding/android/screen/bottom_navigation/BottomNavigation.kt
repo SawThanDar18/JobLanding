@@ -17,11 +17,18 @@ import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.HomeScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
+import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
+import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
+import kotlinx.coroutines.launch
+import org.koin.compose.getKoin
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun BottomNavigation(nav: NavController) {
+fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageId: String) {
+    val scope = rememberCoroutineScope()
     val navController = rememberNavController()
+
     val items = listOf(
         BottomNavItem("Home", R.drawable.home_selected_icon, R.drawable.home_icon, "home"),
         BottomNavItem("Application", R.drawable.application_selected_icon, R.drawable.application_icon, "application"),
@@ -70,7 +77,10 @@ fun BottomNavigation(nav: NavController) {
         }
     ) {
         NavHost(navController, startDestination = "home") {
-            composable("home") { HomeScreen(nav) }
+            composable("home") {
+                val viewModel: HomeViewModel = getKoin().get()
+                HomeScreen(viewModel, nav, pageId)
+            }
             composable("application") { ApplicationScreen() }
             composable("inbox") { InboxScreen() }
             composable("interviews") { InterviewsScreen() }

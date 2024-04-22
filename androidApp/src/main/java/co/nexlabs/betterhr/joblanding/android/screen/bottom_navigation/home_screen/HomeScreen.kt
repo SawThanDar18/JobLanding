@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
 import android.text.Layout
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,12 +52,29 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: String) {
 
     var text by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val scope = rememberCoroutineScope()
+    scope.launch {
+        if (pageId != null && pageId != "") {
+            viewModel.getJobLandingSections(pageId)
+        }
+
+        if (viewModel.jobLandingSectionList.isNotEmpty()) {
+            Log.d("list>>", viewModel.jobLandingSectionList.size.toString())
+            viewModel.jobLandingSectionList.map {
+                Log.d("list>>", it.title)
+            }
+        }
+    }
 
     val items = (0..4).toList()
 

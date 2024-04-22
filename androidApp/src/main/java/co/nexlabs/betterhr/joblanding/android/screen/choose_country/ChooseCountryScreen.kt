@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding.android.screen.choose_country
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.CountriesListUIModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
@@ -198,7 +201,12 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
             Box(
                 modifier = Modifier
                     .clickable {
-                        navController.navigate("bottom-navigation-screen")
+                        val pageId = viewModel.dynamicPagesID.value
+                        if(pageId != null && pageId != "") {
+                            scope.launch {
+                                navController.navigate("bottom-navigation-screen/${viewModel.dynamicPagesID.value}")
+                            }
+                        }
                     }
                     .height(40.dp)
                     .fillMaxWidth()
