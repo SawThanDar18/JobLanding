@@ -47,7 +47,7 @@ fun initKoin() {
                             level = LogLevel.ALL
                             logger = object: Logger {
                                 override fun log(message: String) {
-                                    println("message>>$message")
+                                    println("msg>>$message")
                                 }
                             }
                         }

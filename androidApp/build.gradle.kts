@@ -54,6 +54,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.3")
     implementation("androidx.compose.ui:ui-tooling-preview:1.6.3")
 
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
     implementation(NavigationCompose.navigationCompose)
     implementation(MaterialCompose.material)
     implementation(EdgeToEdge.edgeToEdgeJava)

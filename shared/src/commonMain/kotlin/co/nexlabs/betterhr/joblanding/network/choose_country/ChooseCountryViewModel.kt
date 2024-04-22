@@ -1,5 +1,8 @@
 package co.nexlabs.betterhr.joblanding.network.choose_country
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
@@ -29,8 +32,36 @@ class ChooseCountryViewModel(private val chooseCountryRepository: ChooseCountryR
     var countriesList: MutableList<Data> = ArrayList()
     var itemList: MutableList<Item> = ArrayList()
 
+    var dynamicPagesID: MutableLiveData<String> = MutableLiveData()
+
     fun getCountriesList() {
         viewModelScope.launch(Dispatchers.IO) {
+            chooseCountryRepository.getDynamicPages().toFlow()
+                .catch { e ->
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest {
+                    if (!it.hasErrors()) {
+                       if (it.data?.dynamicPages!![0].id != null && it.data?.dynamicPages!![0].id != "") {
+                           dynamicPagesID.postValue(it.data?.dynamicPages!![0].id)
+                       }
+                    }
+                }
+
+
             countriesList.clear()
             countriesList.addAll(
                 CountriesListViewModelMapper.mapResponseToViewModel(
@@ -46,34 +77,6 @@ class ChooseCountryViewModel(private val chooseCountryRepository: ChooseCountryR
                     )
                 }
             }
-
-            /*chooseCountryRepository.getDynamicPages().toFlow()
-                .catch { e ->
-                    when (e) {
-                        is ApolloHttpException -> {
-                            println("HTTP error: ${e.message}")
-                            // Handle HTTP-specific errors
-                        }
-                        is ApolloNetworkException -> {
-                            println("Network error: ${e.message}")
-                            // Handle network-related errors
-                        }
-                        is ApolloParseException -> {
-                            println("Parse error: ${e.message}")
-                            // Handle parsing errors
-                        }
-                        else -> {
-                            println("An error occurred: ${e.message}")
-                            e.printStackTrace()
-                        }
-                    }
-                }.collectLatest {
-                    if (!it.hasErrors()) {
-                        it.data?.dynamicPages!!.map {
-                            println("data>>" + it.name)
-                        }
-                    }
-                }*/
         }
 
         _uiState.update {

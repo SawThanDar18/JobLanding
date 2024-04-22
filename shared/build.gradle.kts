@@ -30,15 +30,15 @@ kotlin {
         }
     }*/
     
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.binaries.framework {
-            baseName = "shared"
-        }
-    }
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach {
+//        it.binaries.framework {
+//            baseName = "shared"
+//        }
+//    }
 
     sourceSets {
         val commonMain by getting {
@@ -50,6 +50,9 @@ kotlin {
                 implementation(compose.animation)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+
+                implementation("com.squareup.okhttp3:okhttp:4.9.1")
+                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
 
                 api("com.apollographql.apollo3:apollo-runtime:3.8.2")
                 api("com.apollographql.apollo3:apollo-normalized-cache:3.8.2")
@@ -85,6 +88,9 @@ kotlin {
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.10.1")
 
+                implementation("com.squareup.okhttp3:okhttp:4.9.1")
+                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
                 implementation(KTOR.clientCore)
                 implementation(KTOR.clientAndroid)
                 implementation(KTOR.clientOKHttp)
@@ -102,15 +108,14 @@ kotlin {
                 implementation(AndroidArchLifeCycle.livedata)
             }
         }
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
+
         val iosMain by creating{
-            dependsOn(commonMain)
-            iosX64Main.dependsOn(this)
-            iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
+            //dependsOn(commonMain)
+            //iosX64Main.dependsOn(this)
+            //iosArm64Main.dependsOn(this)
+            //iosSimulatorArm64Main.dependsOn(this)
             dependencies {
+                implementation(KTOR.clientOKHttp)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }

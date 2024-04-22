@@ -2,8 +2,6 @@ package co.nexlabs.betterhr.joblanding.network.api
 
 import co.nexlabs.betterhr.joblanding.DynamicPagesQuery
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
-import co.nexlabs.betterhr.joblanding.network.api.request_response.GetDynamicPagesRequest
-import co.nexlabs.betterhr.joblanding.network.api.request_response.GetDynamicPagesResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyOTPRequest
@@ -17,8 +15,6 @@ interface JobLandingService {
     suspend fun validateCode(body: VerifyOTPRequest): VerifyPhoneNumResponse
 
     suspend fun getCountriesList(): GetCountriesListResponse
-
-    suspend fun getDynamicPages(body: GetDynamicPagesRequest): GetDynamicPagesResponse
 
     suspend fun getDynamicPagesQuery(countryId: String, platform: String): ApolloCall<DynamicPagesQuery.Data>
 }
