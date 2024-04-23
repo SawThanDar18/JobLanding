@@ -145,7 +145,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 contentDescription = "Arrow Left Icon",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { navController.navigate("profile-unregister-screen") },
+                    .clickable { navController.popBackStack() },
             )
         }
 
