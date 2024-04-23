@@ -62,7 +62,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavController) {
 
-    var items by remember { mutableStateOf(mutableListOf<Item>()) }
+    //var items by remember { mutableStateOf(mutableListOf<Item>()) }
     var selectedItem by remember { mutableStateOf(Item("", "Select your country")) }
 
     val scope = rememberCoroutineScope()
@@ -73,8 +73,6 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
     scope.launch {
         viewModel.getCountriesList()
     }
-
-    items = uiState.items
 
     Column(
         modifier = Modifier
@@ -127,7 +125,7 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable {
-                        items = uiState.items
+                        //items = uiState.items
                         expanded = true
                     },
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -160,7 +158,7 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                items.forEach { item ->
+                uiState.items.forEach { item ->
                     DropdownMenuItem(
                         onClick = {
                             selectedItem = item

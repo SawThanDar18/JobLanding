@@ -5,8 +5,16 @@ import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingServiceImpl
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesRepository
+import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsRepository
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailRepository
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRepository
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import io.ktor.client.HttpClient
@@ -55,10 +63,18 @@ fun initKoin() {
                 single { RegisterRepository(get()) }
                 single { ChooseCountryRepository(get()) }
                 single { HomeRepository(get()) }
+                single { CollectionJobsRepository(get()) }
+                single { CollectionCompaniesRepository(get()) }
+                single { JobDetailRepository(get()) }
+                single { CompanyDetailRepository(get()) }
                 factory { RegisterViewModel(get()) }
                 factory { ChooseCountryViewModel(get()) }
                 factory { HomeViewModel(get()) }
                 factory { SharedViewModel() }
+                factory { CollectionJobsViewModel(get()) }
+                factory { CollectionCompaniesViewModel(get()) }
+                factory { JobDetailViewModel(get()) }
+                factory { CompanyDetailViewModel(get()) }
             }
         )
     }

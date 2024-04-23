@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,14 +50,35 @@ import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.style.TextOverflow
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailJobs
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun CompanyDetailsScreen(navController: NavController) {
+fun CompanyDetailsScreen(viewModel: CompanyDetailViewModel, navController: NavController, companyId: String) {
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+
     var isChecked by remember { mutableStateOf(true) }
 
     var tabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Jobs", "About")
+
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
+
+    scope.launch {
+        if (companyId != null && companyId != "") {
+            viewModel.getCompanyDetail(companyId)
+        }
+    }
+
+    val item = uiState.companyDetail
 
     Column(
         modifier = Modifier
@@ -114,7 +136,7 @@ fun CompanyDetailsScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 10.dp),
-            text = "Yoma strategic holdings Ltd.",
+            text = item.name,
             fontFamily = FontFamily(Font(R.font.poppins_regular)),
             fontWeight = FontWeight.W600,
             color = Color(0xFF4A4A4A),
@@ -125,7 +147,7 @@ fun CompanyDetailsScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 6.dp),
-            text = "Bank company",
+            text = "Company",
             fontFamily = FontFamily(Font(R.font.poppins_regular)),
             fontWeight = FontWeight.W400,
             color = Color(0xFF4A4A4A),
@@ -160,8 +182,8 @@ fun CompanyDetailsScreen(navController: NavController) {
             }
         }
         when (tabIndex) {
-            0 -> JobsScreen()
-            1 -> AboutScreen()
+            0 -> JobsScreen(uiState.companyDetail.jobs, navController)
+            1 -> AboutScreen(uiState.companyDetail, uriHandler)
         }
 
 
@@ -175,23 +197,28 @@ fun CompanyDetailsScreen(navController: NavController) {
                 .padding(top = 50.dp, start = 16.dp)
                 .size(24.dp)
                 .clickable {
-                    navController.navigate("bottom-navigation-screen")
+                    navController.popBackStack()
                 }
         )
     }
 }
 
 @Composable
-fun JobsScreen() {
-    val items = (0..19).toList()
-
+fun JobsScreen(jobList: List<CompanyDetailJobs>, navController: NavController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(items.size) { index ->
+        items(jobList.size) { index ->
+            var item = jobList[index]
+
+            var currencyCode = ""
+            if (item.currencyCode == "MMK") {
+                currencyCode = "k"
+            }
+
             Box(
                 modifier = Modifier
                     .background(
@@ -200,7 +227,10 @@ fun JobsScreen() {
                     )
                     .fillMaxWidth()
                     .height(80.dp)
-                    .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
+                    .clickable {
+                               navController.navigate("job-details/${item.id}")
+                    },
             ) {
                 Row(
                     modifier = Modifier
@@ -221,7 +251,7 @@ fun JobsScreen() {
 
                     Column(modifier = Modifier.padding(start = 8.dp)) {
                         Text(
-                            text = "Designer",
+                            text = item.position,
                             maxLines = 2,
                             softWrap = true,
                             overflow = TextOverflow.Ellipsis,
@@ -233,7 +263,7 @@ fun JobsScreen() {
 
                         Text(
                             modifier = Modifier.padding(top = 3.dp),
-                            text = "Yoma Bank",
+                            text = item.company.name,
                             maxLines = 2,
                             softWrap = true,
                             overflow = TextOverflow.Ellipsis,
@@ -248,7 +278,7 @@ fun JobsScreen() {
                         ) {
 
                             Text(
-                                text = "MMK 400k-600k",
+                                text = "${item.currencyCode} ${item.miniSalary}${currencyCode}-${item.maxiSalary}${currencyCode}",
                                 maxLines = 1,
                                 softWrap = true,
                                 overflow = TextOverflow.Ellipsis,
@@ -271,7 +301,7 @@ fun JobsScreen() {
                             Spacer(modifier = Modifier.width(4.dp))
 
                             Text(
-                                text = "Yangon",
+                                text = item.cityName,
                                 maxLines = 1,
                                 softWrap = true,
                                 overflow = TextOverflow.Ellipsis,
@@ -327,7 +357,7 @@ fun JobsScreen() {
 }
 
 @Composable
-fun AboutScreen() {
+fun AboutScreen(uiModel: CompanyDetailUIModel, uriHandler: UriHandler) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -349,7 +379,7 @@ fun AboutScreen() {
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
-                text = "Contact@yomamyanmar.org",
+                text = uiModel.companyMail,
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W400,
                 color = Color(0xFF6191FC),
@@ -372,22 +402,27 @@ fun AboutScreen() {
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
-                text = "https://www.yomabank.com.mm",
+                text = uiModel.companyLink,
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W400,
                 color = Color(0xFF6191FC),
                 fontSize = 12.sp,
+                modifier = Modifier.clickable {
+                    uriHandler.openUri(uiModel.companyLink)
+                }
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,\n" +
+           /* text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,\n" +
                     "\n" +
                     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,\n" +
                     "\n"+
                     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries,\n",
+            */
+            text = uiModel.description,
             fontFamily = FontFamily(Font(R.font.poppins_regular)),
             fontWeight = FontWeight.W400,
             color = Color(0xFF757575),

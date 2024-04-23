@@ -1,10 +1,7 @@
-query JobLandingCollectionCompanies($collection_id: String!, $search_key: String, $is_paginate: Boolean!, $limit: Int, $page: Int){
+query JobLandingCollectionCompanies($collection_id: String!, $is_paginate: Boolean!){
     jobLandingCollectionCompanies(
         collection_id: $collection_id,
-        search_key: $search_key,
-        is_paginate: $is_paginate,
-        limit: $limit,
-        page: $page)
+        is_paginate: $is_paginate)
     {
         data {
             id

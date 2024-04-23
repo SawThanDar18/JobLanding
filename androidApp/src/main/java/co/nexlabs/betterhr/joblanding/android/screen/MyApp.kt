@@ -10,14 +10,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.BottomNavigation
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionListsDetail
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionCompaniesListsScreen
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionJobsListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CompanyDetailsScreen
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CompanyListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.JobDetailsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.choose_country.ChooseCountryScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import org.koin.compose.getKoin
@@ -50,17 +55,29 @@ fun MyApp() {
                     BottomNavigation(sharedViewModel, navController, it.arguments?.getString("pageId") ?: "")
                 }
             }
-            composable("collection-lists-detail") {
-                CollectionListsDetail(navController)
+            composable("jobs-lists-screen/{collectionId}/{collectionName}") {
+                val viewModel: CollectionJobsViewModel = getKoin().get()
+                if (it.arguments?.getString("collectionId") != "" && it.arguments?.getString("collectionName") != "") {
+                    CollectionJobsListsScreen(viewModel, navController, it.arguments?.getString("collectionId") ?: "", it.arguments?.getString("collectionName") ?: "")
+                }
             }
-            composable("company-lists-detail") {
-                CompanyListsScreen(navController)
+            composable("companies-lists-screen/{collectionId}/{collectionName}") {
+                val viewModel: CollectionCompaniesViewModel = getKoin().get()
+                if (it.arguments?.getString("collectionId") != "" && it.arguments?.getString("collectionName") != "") {
+                    CollectionCompaniesListsScreen(viewModel, navController, it.arguments?.getString("collectionId") ?: "", it.arguments?.getString("collectionName") ?: "")
+                }
             }
-            composable("job-details") {
-                JobDetailsScreen(navController)
+            composable("job-details/{jobId}") {
+                val viewModel: JobDetailViewModel = getKoin().get()
+                if (it.arguments?.getString("jobId") != "") {
+                    JobDetailsScreen(viewModel, navController, it.arguments?.getString("jobId") ?: "")
+                }
             }
-            composable("company-details") {
-                CompanyDetailsScreen(navController)
+            composable("company-details/{companyId}") {
+                val viewModel: CompanyDetailViewModel = getKoin().get()
+                if (it.arguments?.getString("companyId") != "") {
+                    CompanyDetailsScreen(viewModel, navController, it.arguments?.getString("companyId") ?: "")
+                }
             }
         }
     }

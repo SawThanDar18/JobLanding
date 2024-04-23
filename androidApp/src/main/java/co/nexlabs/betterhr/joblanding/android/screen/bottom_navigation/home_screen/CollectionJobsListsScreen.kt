@@ -3,6 +3,7 @@ package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scr
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,35 +18,38 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun CollectionListsDetail(navController: NavController) {
+fun CollectionJobsListsScreen(viewModel: CollectionJobsViewModel, navController: NavController, collectionId: String, collectionName: String) {
 
-    val items = (0..10).toList()
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
+
+    scope.launch {
+        viewModel.getCollectionJobs(collectionId, false)
+    }
 
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -71,11 +75,12 @@ fun CollectionListsDetail(navController: NavController) {
                     Image(
                         painter = painterResource(id = R.drawable.arrow_left),
                         contentDescription = "Arrow Left",
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(24.dp)
+                            .clickable { navController.popBackStack() },
                     )
 
                     Text(
-                        text = "Recent Jobs",
+                        text = collectionName,
                         modifier = Modifier.padding(start = 8.dp),
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W600,
@@ -105,7 +110,13 @@ fun CollectionListsDetail(navController: NavController) {
             }
         }
 
-        items(items.size) { index ->
+        items(uiState.collectionJobsList.size) { index ->
+
+            val item = uiState.collectionJobsList[index]
+            var currencyCode = ""
+            if(item.currencyCode == "MMK") {
+                currencyCode = "k"
+            }
 
             Column(
                 modifier = Modifier
@@ -125,7 +136,10 @@ fun CollectionListsDetail(navController: NavController) {
                             )
                             .fillMaxWidth()
                             .height(80.dp)
-                            .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
+                            .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
+                            .clickable {
+                                       navController.navigate("job-details/${item.id}")
+                            },
                     ) {
                         Row(
                             modifier = Modifier
@@ -146,7 +160,7 @@ fun CollectionListsDetail(navController: NavController) {
 
                             Column(modifier = Modifier.padding(start = 8.dp)) {
                                 Text(
-                                    text = "Designer",
+                                    text = item.position,
                                     maxLines = 2,
                                     softWrap = true,
                                     overflow = TextOverflow.Ellipsis,
@@ -158,7 +172,7 @@ fun CollectionListsDetail(navController: NavController) {
 
                                 Text(
                                     modifier = Modifier.padding(top = 3.dp),
-                                    text = "Yoma Bank",
+                                    text = item.company.name,
                                     maxLines = 2,
                                     softWrap = true,
                                     overflow = TextOverflow.Ellipsis,
@@ -173,7 +187,7 @@ fun CollectionListsDetail(navController: NavController) {
                                 ) {
 
                                     Text(
-                                        text = "MMK 400k-600k",
+                                        text = "${item.currencyCode} ${item.miniSalary}${currencyCode}-${item.maxiSalary}${currencyCode}",
                                         maxLines = 1,
                                         softWrap = true,
                                         overflow = TextOverflow.Ellipsis,
@@ -196,7 +210,7 @@ fun CollectionListsDetail(navController: NavController) {
                                     Spacer(modifier = Modifier.width(4.dp))
 
                                     Text(
-                                        text = "Yangon",
+                                        text = item.cityName,
                                         maxLines = 1,
                                         softWrap = true,
                                         overflow = TextOverflow.Ellipsis,

@@ -56,6 +56,7 @@ import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionCompaniesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.JobsListUIModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
@@ -259,6 +260,7 @@ fun StyleSevenCollectionListLayoutItem(item: String) {
         }
     }
 }
+
 @Composable
 fun StyleSixCollectionListLayoutItem(item: String) {
     Box(
@@ -278,6 +280,7 @@ fun StyleSixCollectionListLayoutItem(item: String) {
         )
     }
 }
+
 @Composable
 fun StyleFiveCollectionListLayoutItem(item: String) {
     Box(
@@ -381,13 +384,26 @@ fun StyleFiveCollectionListLayoutItem(item: String) {
         }
     }
 }
+
 @Composable
-fun CollectionLabelLayoutItem(title: String, count: Int) {
+fun CollectionLabelLayoutItem(
+    collection: CollectionUIModel,
+    title: String,
+    count: Int,
+    navController: NavController
+) {
 
     Row(
         modifier = Modifier
             .padding(top = 20.dp, bottom = 14.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                if (collection.type == "job_collection") {
+                    navController.navigate("jobs-lists-screen/${collection.id}/${collection.name}")
+                } else {
+                    navController.navigate("companies-lists-screen/${collection.id}/${collection.name}")
+                }
+            },
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -478,35 +494,51 @@ fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: Nav
         }
 
         items(items.size) { index ->
-            CollectionLabelLayoutItem(title = items[index].title, count = items[index].dataCount)
+            CollectionLabelLayoutItem(
+                collection = items[index].collection,
+                title = items[index].title,
+                count = items[index].dataCount,
+                navController
+            )
 
             when (items[index].collectionType) {
                 "job_collection" -> {
-                    when(items[index].postStyle) {
+                    when (items[index].postStyle) {
                         "style_1" -> StyleThreeLazyLayout(
                             collectionId = items[index].collection.id,
-                            collectionJobList = items[index].jobs ?: emptyList()
+                            collectionJobList = items[index].jobs ?: emptyList(),
+                            navController = navController
                         )
-                        "style_2" -> Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)) {
+
+                        "style_2" -> Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        ) {
                             StyleTwoLazyLayout(
                                 collectionId = items[index].collection.id,
-                                collectionJobList = items[index].jobs ?: emptyList())
+                                collectionJobList = items[index].jobs ?: emptyList(),
+                                navController = navController
+                            )
                         }
+
                         "style_3" -> StyleOneLazyLayout(
                             collectionId = items[index].collection.id,
-                            collectionJobList = items[index].jobs ?: emptyList()
+                            collectionJobList = items[index].jobs ?: emptyList(),
+                            navController = navController
                         )
                     }
                 }
 
-                "company_collection" -> Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)) {
+                "company_collection" -> Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                ) {
                     StyleFourLazyLayout(
                         collectionId = items[index].collection.id,
-                        collectionCompanyList = items[index].collectionCompanies
+                        collectionCompanyList = items[index].collectionCompanies,
+                        navController = navController
                     )
                 }
             }
@@ -537,7 +569,7 @@ fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: Nav
 }
 
 @Composable
-fun StyleOneLazyLayout(collectionId: String, collectionJobList: List<JobsListUIModel>) {
+fun StyleOneLazyLayout(collectionId: String, collectionJobList: List<JobsListUIModel>, navController: NavController) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.fillMaxWidth()
@@ -553,7 +585,10 @@ fun StyleOneLazyLayout(collectionId: String, collectionJobList: List<JobsListUIM
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
                     .width(259.dp)
                     .height(119.dp)
-                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
+                    .clickable {
+                        navController.navigate("job-details/${collectionJobList[index].id}")
+                    },
             ) {
                 Column(
                     modifier = Modifier
@@ -659,7 +694,11 @@ fun StyleOneLazyLayout(collectionId: String, collectionJobList: List<JobsListUIM
 }
 
 @Composable
-fun StyleTwoLazyLayout(collectionId: String, collectionJobList: List<JobsListUIModel>) {
+fun StyleTwoLazyLayout(
+    collectionId: String,
+    collectionJobList: List<JobsListUIModel>,
+    navController: NavController
+) {
     LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
@@ -672,7 +711,10 @@ fun StyleTwoLazyLayout(collectionId: String, collectionJobList: List<JobsListUIM
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
                     .width(156.dp)
                     .height(71.dp)
-                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
+                    .clickable {
+                        navController.navigate("job-details/${collectionJobList[index].id}")
+                    },
             ) {
                 Row(
                     modifier = Modifier
@@ -730,10 +772,14 @@ fun StyleTwoLazyLayout(collectionId: String, collectionJobList: List<JobsListUIM
 }
 
 @Composable
-fun StyleThreeLazyLayout(collectionId: String, collectionJobList: List<JobsListUIModel>) {
+fun StyleThreeLazyLayout(
+    collectionId: String,
+    collectionJobList: List<JobsListUIModel>,
+    navController: NavController
+) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         items(collectionJobList.size) { index ->
             var currencyCode = ""
@@ -746,7 +792,10 @@ fun StyleThreeLazyLayout(collectionId: String, collectionJobList: List<JobsListU
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
                     .width(142.dp)
                     .height(173.dp)
-                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
+                    .clickable {
+                        navController.navigate("job-details/${collectionJobList[index].id}")
+                    },
             ) {
                 Column(
                     modifier = Modifier
@@ -834,7 +883,11 @@ fun StyleThreeLazyLayout(collectionId: String, collectionJobList: List<JobsListU
 }
 
 @Composable
-fun StyleFourLazyLayout(collectionId: String, collectionCompanyList: List<CollectionCompaniesUIModel>) {
+fun StyleFourLazyLayout(
+    collectionId: String,
+    collectionCompanyList: List<CollectionCompaniesUIModel>,
+    navController: NavController
+) {
     LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
@@ -847,7 +900,10 @@ fun StyleFourLazyLayout(collectionId: String, collectionCompanyList: List<Collec
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
                     .width(156.dp)
                     .height(68.dp)
-                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
+                    .clickable {
+                        navController.navigate("company-details/${collectionCompanyList[index].company.id}")
+                    },
             ) {
                 Row(
                     modifier = Modifier

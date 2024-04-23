@@ -1,13 +1,10 @@
-package co.nexlabs.betterhr.joblanding.network.api.home
+package co.nexlabs.betterhr.joblanding.network.api.home.home_details
 
 import android.util.Log
-import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeRepository
-import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
-import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIState
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
-import co.nexlabs.betterhr.joblanding.viewmodel.HomeViewModelMapper
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRepository
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIState
+import co.nexlabs.betterhr.joblanding.viewmodel.CompanyDetailViewModelMapper
+import co.nexlabs.betterhr.joblanding.viewmodel.JobDetailViewModelMapper
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
@@ -21,14 +18,13 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class HomeViewModel(private val homeRepository: HomeRepository): ViewModel() {
-
-    private val _uiState = MutableStateFlow(HomeUIState())
+class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailRepository): ViewModel() {
+    private val _uiState = MutableStateFlow(CompanyDetailUIState())
     val uiState = _uiState.asStateFlow()
 
-    fun getJobLandingSections(pageId: String) {
+    fun getCompanyDetail(companyId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            homeRepository.getJobLandingSections(pageId).toFlow()
+            companyDetailRepository.getCompanyDetail(companyId).toFlow()
                 .catch { e ->
                     when (e) {
                         is ApolloHttpException -> {
@@ -52,13 +48,9 @@ class HomeViewModel(private val homeRepository: HomeRepository): ViewModel() {
                     if (!data.hasErrors()) {
                         _uiState.update {
                             it.copy(
-                                jobLandingSectionsList = HomeViewModelMapper.mapResponseToViewModel(data.data!!)
+                                companyDetail = CompanyDetailViewModelMapper.mapDataToViewModel(data.data!!.jobLandingCompany)
                             )
                         }
-                        /*jobLandingSectionList.clear()
-                        jobLandingSectionList.addAll(
-                            HomeViewModelMapper.mapResponseToViewModel(it.data!!)
-                        )*/
                     } else {
                         Log.d("result>>", "it.hasErrors")
                     }

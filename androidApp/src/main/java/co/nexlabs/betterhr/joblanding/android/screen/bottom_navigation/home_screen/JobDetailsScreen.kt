@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,15 +43,29 @@ import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextOverflow
+import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun JobDetailsScreen(navController: NavController) {
+fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController, jobId: String) {
     val items = (0..4).toList()
+
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
+
+    scope.launch {
+        if (jobId != null && jobId != "") {
+            viewModel.getJobDetail(jobId)
+        }
+    }
+
+    var item = uiState.jobDetail
 
     Column(
         modifier = Modifier
@@ -84,7 +99,7 @@ fun JobDetailsScreen(navController: NavController) {
         }
 
         Text(
-            text = "Product Designer",
+            text = item.position,
             fontFamily = FontFamily(Font(R.font.poppins_regular)),
             fontWeight = FontWeight.W600,
             color = Color(0xFF4A4A4A),
@@ -101,7 +116,7 @@ fun JobDetailsScreen(navController: NavController) {
                 .padding(top = 6.dp),
         ) {
             Text(
-                text = "Yoma strategic holdings Ltd.",
+                text = item.company.name,
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W400,
                 color = Color(0xFF1082DE),
@@ -155,7 +170,7 @@ fun JobDetailsScreen(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "300,000-400,000MMK",
+                        text = "${item.miniSalary}-${item.maxiSalary}${item.currencyCode}",
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF6A6A6A),
@@ -197,7 +212,7 @@ fun JobDetailsScreen(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Yangon, Myanmar",
+                        text = "${item.cityName}, ${item.stateName}",
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF6A6A6A),
@@ -239,7 +254,7 @@ fun JobDetailsScreen(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "11 Applicants",
+                        text = "${item.lastCVCount} Applicants",
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF6A6A6A),
@@ -287,7 +302,7 @@ fun JobDetailsScreen(navController: NavController) {
                         .padding(top = 10.dp),
                 ) {
                     Text(
-                        text = "Design, implement and manage e-commerce website page layout and templates. Design the User Experience of different software and apps.",
+                        text = item.description,
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF757575),
@@ -335,7 +350,7 @@ fun JobDetailsScreen(navController: NavController) {
                         .padding(top = 10.dp),
                 ) {
                     Text(
-                        text = "Effective at communicating conceptual ideas and design rationale. Strategic, solutions-based thinker.",
+                        text = item.requirement,
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF757575),
@@ -383,7 +398,7 @@ fun JobDetailsScreen(navController: NavController) {
                         .padding(top = 10.dp),
                 ) {
                     Text(
-                        text = "Life Insurance. Paid Vacation and Sick Time. Paid Holidays. Paid Medical Leave.",
+                        text = item.benefitsAndPerks,
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF757575),
@@ -577,7 +592,7 @@ fun JobDetailsScreen(navController: NavController) {
                 .padding(top = 50.dp, start = 16.dp)
                 .size(24.dp)
                 .clickable {
-                    navController.navigate("bottom-navigation-screen")
+                    navController.popBackStack()
                 }
         )
     }

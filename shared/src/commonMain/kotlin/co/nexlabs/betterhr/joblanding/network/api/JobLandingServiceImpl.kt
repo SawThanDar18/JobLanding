@@ -1,6 +1,10 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
 import co.nexlabs.betterhr.joblanding.DynamicPagesQuery
+import co.nexlabs.betterhr.joblanding.JobLandingCollectionCompaniesQuery
+import co.nexlabs.betterhr.joblanding.JobLandingCollectionJobsQuery
+import co.nexlabs.betterhr.joblanding.JobLandingCompanyDetailQuery
+import co.nexlabs.betterhr.joblanding.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.joblanding.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
@@ -148,14 +152,25 @@ class JobLandingServiceImpl(private val client: HttpClient) : JobLandingService 
     }
 
     override suspend fun getJobLandingSections(pageId: String): ApolloCall<JobLandingSectionsQuery.Data> {
-        try {
-            val response = apolloClient.query(JobLandingSectionsQuery(pageId))
-            println("mm>>${response.execute().data!!.jobLandingSections.size}")
-        } catch (e: ApolloException) {
-            println("ApolloClient error: ${e.message}")
-        } catch (e: Exception) {
-            println("Error: ${e.message}")
-        }
         return apolloClient.query(JobLandingSectionsQuery(pageId))
+    }
+
+    override suspend fun getJobLandingCollectionCompanies(
+        collectionId: String,
+        isPaginate: Boolean
+    ): ApolloCall<JobLandingCollectionCompaniesQuery.Data> {
+        return apolloClient.query(JobLandingCollectionCompaniesQuery(collectionId, isPaginate))
+    }
+
+    override suspend fun getJobLandingCollectionJobs(collectionId: String, isPaginate: Boolean): ApolloCall<JobLandingCollectionJobsQuery.Data> {
+        return apolloClient.query(JobLandingCollectionJobsQuery(collectionId, isPaginate))
+    }
+
+    override suspend fun getJobDetail(jobId: String): ApolloCall<JobLandingJobDetailQuery.Data> {
+        return apolloClient.query(JobLandingJobDetailQuery(jobId))
+    }
+
+    override suspend fun getCompanyDetail(companyId: String): ApolloCall<JobLandingCompanyDetailQuery.Data> {
+        return apolloClient.query(JobLandingCompanyDetailQuery(companyId))
     }
 }

@@ -3,38 +3,34 @@ package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scr
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -45,15 +41,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun CompanyListsScreen(navController: NavController) {
-    val items = (0..5).toList()
+fun CollectionCompaniesListsScreen(viewModel: CollectionCompaniesViewModel, navController: NavController, collectionId: String, collectionName: String) {
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
+
+    scope.launch {
+        viewModel.getCollectionCompanies(collectionId, false)
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            //.verticalScroll(rememberScrollState())
             .padding(top = 50.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -68,11 +71,12 @@ fun CompanyListsScreen(navController: NavController) {
             Image(
                 painter = painterResource(id = R.drawable.arrow_left),
                 contentDescription = "Arrow Left",
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(24.dp)
+                    .clickable { navController.popBackStack() },
             )
 
             Text(
-                text = "Top Companies",
+                text = collectionName,
                 modifier = Modifier.padding(start = 8.dp),
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W600,
@@ -88,14 +92,16 @@ fun CompanyListsScreen(navController: NavController) {
         }
 
         LazyVerticalGrid(
-            modifier = Modifier.weight(1f),
-            state = rememberLazyGridState(),
+            modifier = Modifier.fillMaxWidth(),
+            //state = rememberLazyGridState(),
             columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(items.size) { index ->
+            items(uiState.collectionCompaniesList.size) { index ->
+                val item = uiState.collectionCompaniesList[index]
+
                 Box(
                     modifier = Modifier
                         .width(100.dp)
@@ -105,6 +111,9 @@ fun CompanyListsScreen(navController: NavController) {
                             shape = MaterialTheme.shapes.medium
                         )
                         .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
+                        .clickable {
+                            navController.navigate("company-details/${item.company.id}")
+                        },
                 ) {
                     Column(
                         modifier = Modifier
@@ -123,7 +132,7 @@ fun CompanyListsScreen(navController: NavController) {
 
                         Text(
                             textAlign = TextAlign.Center,
-                            text = "Alibaba",
+                            text = item.company.name,
                             maxLines = 1,
                             softWrap = true,
                             overflow = TextOverflow.Ellipsis,
@@ -131,6 +140,7 @@ fun CompanyListsScreen(navController: NavController) {
                             fontWeight = FontWeight.W500,
                             color = Color(0xFF4A4A4A),
                             fontSize = 14.sp,
+                            modifier = Modifier.padding(horizontal = 14.dp)
                         )
 
                         Column(
@@ -142,7 +152,7 @@ fun CompanyListsScreen(navController: NavController) {
                         ) {
                             Text(
                                 textAlign = TextAlign.Center,
-                                text = "3 job",
+                                text = "${item.jobOpeningCount} job",
                                 maxLines = 1,
                                 softWrap = true,
                                 overflow = TextOverflow.Ellipsis,
@@ -169,7 +179,7 @@ fun CompanyListsScreen(navController: NavController) {
             }
         }
 
-        Row(
+        /*Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
@@ -274,7 +284,7 @@ fun CompanyListsScreen(navController: NavController) {
                 }
             }
 
-        }
+        }*/
     }
 }
 

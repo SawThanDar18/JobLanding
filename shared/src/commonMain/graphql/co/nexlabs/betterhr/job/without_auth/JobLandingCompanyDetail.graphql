@@ -1,9 +1,15 @@
-query JobLandingCollectionJobs($collection_id: String!, $is_paginate: Boolean!){
-    jobLandingCollectionJobs(
-        collection_id: $collection_id,
-        is_paginate: $is_paginate
-    ){
-        data {
+query JobLandingCompanyDetail($company_id: String!){
+    jobLandingCompany(company_id: $company_id)
+    {
+        id
+        subdomain
+        country
+        name
+        description
+        company_mail
+        company_link
+        jobs_count
+        jobs{
             id
             company_id
             title
@@ -28,7 +34,6 @@ query JobLandingCollectionJobs($collection_id: String!, $is_paginate: Boolean!){
             benefits_and_perks
             overview
             status
-            published_date
             last3_view_count
             last3_conversation_rate
             last3_cv_count
@@ -37,19 +42,8 @@ query JobLandingCollectionJobs($collection_id: String!, $is_paginate: Boolean!){
             last1_cv_count
             company{
                 id
-                subdomain
-                country
                 name
-                description
-                company_mail
-                company_link
             }
-        }
-        paginatorInfo{
-            total
-            per_page
-            has_page
-            current_page
         }
     }
 }
