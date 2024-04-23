@@ -30,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,10 @@ import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionCompaniesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
+import co.nexlabs.betterhr.joblanding.network.api.home.data.JobsListUIModel
+import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,17 +68,20 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
+
     scope.launch {
         if (pageId != null && pageId != "") {
             viewModel.getJobLandingSections(pageId)
         }
+    }
 
-        if (viewModel.jobLandingSectionList.isNotEmpty()) {
-            Log.d("list>>", viewModel.jobLandingSectionList.size.toString())
-            viewModel.jobLandingSectionList.map {
-                Log.d("list>>", it.title)
-            }
+    if (uiState.jobLandingSectionsList != null && uiState.jobLandingSectionsList.isNotEmpty()) {
+        uiState.jobLandingSectionsList.map {
+            Log.d("list>>", it.title)
         }
+    } else {
+        Log.d("list>>", "list empty")
     }
 
     val items = (0..4).toList()
@@ -114,7 +122,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        NestedLazyColumn(style, items, navController)
+        NestedLazyColumn(style, uiState.jobLandingSectionsList, navController)
     }
 }
 
@@ -251,7 +259,6 @@ fun StyleSevenCollectionListLayoutItem(item: String) {
         }
     }
 }
-
 @Composable
 fun StyleSixCollectionListLayoutItem(item: String) {
     Box(
@@ -271,7 +278,6 @@ fun StyleSixCollectionListLayoutItem(item: String) {
         )
     }
 }
-
 @Composable
 fun StyleFiveCollectionListLayoutItem(item: String) {
     Box(
@@ -375,321 +381,8 @@ fun StyleFiveCollectionListLayoutItem(item: String) {
         }
     }
 }
-
 @Composable
-fun StyleFourCollectionListLayoutItem(item: String) {
-    Box(
-        modifier = Modifier
-            .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-            .width(156.dp)
-            .height(68.dp)
-            .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.company_logo),
-                    contentDescription = "Company Logo",
-                    modifier = Modifier
-                        .size(48.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
-
-            Column(
-                modifier = Modifier.padding(start = 2.dp),
-                horizontalAlignment = Alignment.Start,
-            ) {
-                Text(
-                    text = "Yoma strategic holdings Ltd.",
-                    maxLines = 2,
-                    softWrap = true,
-                    overflow = TextOverflow.Ellipsis,
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W500,
-                    color = Color(0xFF454545),
-                    fontSize = 12.sp,
-                )
-
-                Text(
-                    text = "8 opening",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W300,
-                    color = Color(0xFF454545),
-                    fontSize = 10.sp,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StyleThreeCollectionListLayoutItem(item: String) {
-    Box(
-        modifier = Modifier
-            .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-            .width(142.dp)
-            .height(173.dp)
-            .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-
-                Text(
-                    maxLines = 2,
-                    text = "Myanmar Now",
-                    softWrap = true,
-                    overflow = TextOverflow.Ellipsis,
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFF6A6A6A),
-                    fontSize = 14.sp,
-                    modifier = Modifier.width(60.dp)
-                )
-
-                Image(
-                    painter = painterResource(id = R.drawable.company_logo),
-                    contentDescription = "Company Logo",
-                    modifier = Modifier
-                        .padding(start = 2.dp)
-                        .size(32.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
-
-            Row(
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Front-end Developer",
-                    maxLines = 2,
-                    softWrap = true,
-                    overflow = TextOverflow.Ellipsis,
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 14.sp,
-                )
-            }
-
-            Column(
-                horizontalAlignment = Alignment.Start,
-            ) {
-                Text(
-                    text = "Full time",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFF757575),
-                    fontSize = 12.sp,
-                )
-
-                Text(
-                    text = "MMK 300K-400K",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFF757575),
-                    fontSize = 12.sp,
-                )
-
-                Text(
-                    text = "Yangon, Myanmar",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFF757575),
-                    fontSize = 12.sp,
-                )
-            }
-        }
-    }
-}
-
-
-@Composable
-fun StyleTwoCollectionListLayoutItem(item: String) {
-    Box(
-        modifier = Modifier
-            .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-            .width(156.dp)
-            .height(71.dp)
-            .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                //verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Text(
-                    text = "UI Designer",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 12.sp,
-                )
-
-                Text(
-                    text = "Alibaba",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 12.sp,
-                )
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.company_logo),
-                    contentDescription = "Company Logo",
-                    modifier = Modifier
-                        .size(42.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StyleOneCollectionListLayoutItem(item: String) {
-    Box(
-        modifier = Modifier
-            .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-            .width(259.dp)
-            .height(119.dp)
-            .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.bank_logo),
-                    contentDescription = "Company Logo",
-                    modifier = Modifier
-                        .size(32.dp),
-                    contentScale = ContentScale.Fit
-                )
-
-                Text(
-                    text = "Yoma strategic holding Ltd.",
-                    maxLines = 1,
-                    softWrap = true,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 4.dp),
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W500,
-                    color = Color(0xFF6A6A6A),
-                    fontSize = 12.sp,
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.save_unselected_icon),
-                        contentDescription = "Save Unselected Icon",
-                        modifier = Modifier
-                            .size(9.dp, 12.dp),
-                        contentScale = ContentScale.Fit
-                    )
-                }
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp, top = 16.dp, bottom = 4.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Product Designers",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 14.sp,
-                )
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp, 0.dp, 10.dp, 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.salary_icon),
-                    contentDescription = "Salary",
-                    modifier = Modifier
-                        .size(16.dp),
-                    contentScale = ContentScale.Fit
-                )
-
-                Text(
-                    text = "300k - 400k",
-                    modifier = Modifier.padding(start = 4.dp),
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFF757575),
-                    fontSize = 13.sp,
-                )
-
-                Text(
-                    text = "Yangon, Myanmar",
-                    modifier = Modifier.padding(start = 4.dp),
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFF757575),
-                    fontSize = 12.sp,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun CollectionLabelLayoutItem(index: String) {
+fun CollectionLabelLayoutItem(title: String, count: Int) {
 
     Row(
         modifier = Modifier
@@ -711,7 +404,7 @@ fun CollectionLabelLayoutItem(index: String) {
             )
 
             Text(
-                text = "Recent jobs",
+                text = title,
                 modifier = Modifier.padding(start = 4.dp),
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W600,
@@ -727,7 +420,7 @@ fun CollectionLabelLayoutItem(index: String) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "See all $index jobs",
+                text = "See all $count jobs",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W500,
                 color = Color(0xFF1ED292),
@@ -745,7 +438,7 @@ fun CollectionLabelLayoutItem(index: String) {
 }
 
 @Composable
-fun NestedLazyColumn(style: String, items: List<Int>, navController: NavController) {
+fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: NavController) {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         item {
             Box(
@@ -785,26 +478,180 @@ fun NestedLazyColumn(style: String, items: List<Int>, navController: NavControll
         }
 
         items(items.size) { index ->
-            CollectionLabelLayoutItem(index = index.toString())
-            when (style) {
-                "style-1" -> StyleOneLazyLayout()
-                "style-2" -> Box(modifier = Modifier
+            CollectionLabelLayoutItem(title = items[index].title, count = items[index].dataCount)
+
+            when (items[index].collectionType) {
+                "job_collection" -> {
+                    when(items[index].postStyle) {
+                        "style_1" -> StyleThreeLazyLayout(
+                            collectionId = items[index].collection.id,
+                            collectionJobList = items[index].jobs ?: emptyList()
+                        )
+                        "style_2" -> Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)) {
+                            StyleTwoLazyLayout(
+                                collectionId = items[index].collection.id,
+                                collectionJobList = items[index].jobs ?: emptyList())
+                        }
+                        "style_3" -> StyleOneLazyLayout(
+                            collectionId = items[index].collection.id,
+                            collectionJobList = items[index].jobs ?: emptyList()
+                        )
+                    }
+                }
+
+                "company_collection" -> Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)) {
+                    StyleFourLazyLayout(
+                        collectionId = items[index].collection.id,
+                        collectionCompanyList = items[index].collectionCompanies
+                    )
+                }
+            }
+
+            /*when (items[index].postStyle) {
+                "style_1" -> StyleOneLazyLayout(items[index].collection.id, items[index].collectionType, )
+                "style_2" -> Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)) {
                     StyleTwoLazyLayout()
                 }
-                "style-3" -> StyleThreeLazyLayout()
-                "style-4" -> Box(modifier = Modifier
+                "style_3" -> StyleThreeLazyLayout()
+                "style_4" -> Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)) {
                     StyleFourLazyLayout()
                 }
-                "style-5" -> StyleFiveLazyLayout()
-                "style-6" -> StyleSixLazyLayout()
-                "style-7" -> Box(modifier = Modifier
+                "style_5" -> StyleFiveLazyLayout()
+                "style_6" -> StyleSixLazyLayout()
+                "style_7" -> Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)) {
                     StyleSevenLazyLayout()
+                }
+            }*/
+        }
+    }
+}
+
+@Composable
+fun StyleOneLazyLayout(collectionId: String, collectionJobList: List<JobsListUIModel>) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        items(collectionJobList.size) { index ->
+            var currencyCode = ""
+            if (collectionJobList[index].currencyCode == "MMK") {
+                currencyCode = "K"
+            }
+
+            Box(
+                modifier = Modifier
+                    .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+                    .width(259.dp)
+                    .height(119.dp)
+                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = Modifier
+                            .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.bank_logo),
+                            contentDescription = "Company Logo",
+                            modifier = Modifier
+                                .size(32.dp),
+                            contentScale = ContentScale.Fit
+                        )
+
+                        Text(
+                            text = collectionJobList[index].company.name,
+                            maxLines = 1,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(start = 4.dp),
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W500,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 12.sp,
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.save_unselected_icon),
+                                contentDescription = "Save Unselected Icon",
+                                modifier = Modifier
+                                    .size(9.dp, 12.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = Modifier
+                            .padding(start = 10.dp, end = 10.dp, top = 16.dp, bottom = 4.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = collectionJobList[index].position,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFFAAAAAA),
+                            fontSize = 14.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp, 0.dp, 10.dp, 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.salary_icon),
+                            contentDescription = "Salary",
+                            modifier = Modifier
+                                .size(16.dp),
+                            contentScale = ContentScale.Fit
+                        )
+
+                        Text(
+                            text = "${collectionJobList[index].miniSalary}${currencyCode} - ${collectionJobList[index].maxiSalary}${currencyCode}",
+                            modifier = Modifier.padding(start = 4.dp),
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 13.sp,
+                        )
+
+                        Text(
+                            text = "${collectionJobList[index].cityName}, ${collectionJobList[index].stateName}",
+                            modifier = Modifier.padding(start = 4.dp),
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 12.sp,
+                        )
+                    }
                 }
             }
         }
@@ -812,54 +659,241 @@ fun NestedLazyColumn(style: String, items: List<Int>, navController: NavControll
 }
 
 @Composable
-fun StyleOneLazyLayout() {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        items(5) { subIndex ->
-            StyleOneCollectionListLayoutItem(item = subIndex.toString())
-        }
-    }
-}
-
-@Composable
-fun StyleTwoLazyLayout() {
+fun StyleTwoLazyLayout(collectionId: String, collectionJobList: List<JobsListUIModel>) {
     LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(6) { subIndex ->
-            StyleTwoCollectionListLayoutItem(item = subIndex.toString())
+        items(collectionJobList.size) { index ->
+            Box(
+                modifier = Modifier
+                    .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+                    .width(156.dp)
+                    .height(71.dp)
+                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        //verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(
+                            maxLines = 2,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis,
+                            text = collectionJobList[index].position,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFFAAAAAA),
+                            fontSize = 12.sp,
+                            modifier = Modifier.width(80.dp)
+                        )
+
+                        Text(
+                            maxLines = 2,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis,
+                            text = collectionJobList[index].company.name,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFFAAAAAA),
+                            fontSize = 12.sp,
+                            modifier = Modifier.width(80.dp)
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.company_logo),
+                            contentDescription = "Company Logo",
+                            modifier = Modifier
+                                .size(42.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+                }
+            }
         }
     }
 
 }
 
 @Composable
-fun StyleThreeLazyLayout() {
+fun StyleThreeLazyLayout(collectionId: String, collectionJobList: List<JobsListUIModel>) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        items(5) { subIndex ->
-            StyleThreeCollectionListLayoutItem(item = subIndex.toString())
+        items(collectionJobList.size) { index ->
+            var currencyCode = ""
+            if (collectionJobList[index].currencyCode == "MMK") {
+                currencyCode = "K"
+            }
+
+            Box(
+                modifier = Modifier
+                    .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+                    .width(142.dp)
+                    .height(173.dp)
+                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+
+                        Text(
+                            maxLines = 2,
+                            text = collectionJobList[index].company.name,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 14.sp,
+                            modifier = Modifier.width(60.dp)
+                        )
+
+                        Image(
+                            painter = painterResource(id = R.drawable.company_logo),
+                            contentDescription = "Company Logo",
+                            modifier = Modifier
+                                .padding(start = 2.dp)
+                                .size(32.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = collectionJobList[index].position,
+                            maxLines = 2,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFFAAAAAA),
+                            fontSize = 14.sp,
+                        )
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        Text(
+                            text = collectionJobList[index].employmentType,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 12.sp,
+                        )
+
+                        Text(
+                            text = "${collectionJobList[index].currencyCode} ${collectionJobList[index].miniSalary}${currencyCode} - ${collectionJobList[index].maxiSalary}${currencyCode}",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 12.sp,
+                        )
+
+                        Text(
+                            text = "${collectionJobList[index].cityName}, ${collectionJobList[index].stateName}",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 12.sp,
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun StyleFourLazyLayout() {
+fun StyleFourLazyLayout(collectionId: String, collectionCompanyList: List<CollectionCompaniesUIModel>) {
     LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(4) { subIndex ->
-            StyleFourCollectionListLayoutItem(item = subIndex.toString())
+        items(collectionCompanyList.size) { index ->
+            Box(
+                modifier = Modifier
+                    .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+                    .width(156.dp)
+                    .height(68.dp)
+                    .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp)),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.company_logo),
+                            contentDescription = "Company Logo",
+                            modifier = Modifier
+                                .size(48.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.padding(start = 2.dp),
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        Text(
+                            text = collectionCompanyList[index].company.name,
+                            maxLines = 2,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W500,
+                            color = Color(0xFF454545),
+                            fontSize = 12.sp,
+                        )
+
+                        Text(
+                            text = "${collectionCompanyList[index].jobOpeningCount} opening",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W300,
+                            color = Color(0xFF454545),
+                            fontSize = 10.sp,
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -899,62 +933,3 @@ fun StyleSevenLazyLayout() {
         }
     }
 }
-
-/*Row(
-            //horizontalArrangement = Arrangement.Start,
-            //verticalAlignment = Alignment.CenterVertically,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-                .fillMaxWidth()
-                .height(50.dp)
-                .padding(16.dp, 0.dp)
-                .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.search),
-                contentDescription = "Search",
-                modifier = Modifier
-                    .padding(8.dp, 0.dp)
-                    .size(24.dp),
-                contentScale = ContentScale.Fit
-            )
-
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = text,
-                onValueChange = {
-                    text = it
-                },
-                placeholder = {
-                    Text(
-                        "Search job, companies...",
-                        color = Color(0xFFAAAAAA)
-                    )
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = Color(0xFFAAAAAA),
-                    backgroundColor = Color.Transparent,
-                    cursorColor = Color(0xFF1ED292),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                textStyle = TextStyle(
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.W400,
-                    fontSize = 13.sp,
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    color = Color(0xFFAAAAAA)
-                ),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        keyboardController?.hide()
-                        // Handle Done action if needed
-                    }
-                ),
-            )
-        }*/

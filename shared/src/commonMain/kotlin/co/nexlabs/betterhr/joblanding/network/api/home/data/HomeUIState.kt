@@ -5,5 +5,5 @@ import co.nexlabs.betterhr.joblanding.util.UIErrorType
 data class HomeUIState(
     val isLoading: Boolean = true,
     val error: UIErrorType = UIErrorType.Nothing,
-    val countries: MutableList<HomeUIModel> = ArrayList(),
+    val jobLandingSectionsList: List<HomeUIModel> = ArrayList(),
 )

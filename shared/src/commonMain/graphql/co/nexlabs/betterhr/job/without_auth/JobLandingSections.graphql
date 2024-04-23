@@ -44,6 +44,10 @@ query JobLandingSections($page_id: String!){
             last1_view_count
             last1_conversation_rate
             last1_cv_count
+            company{
+                id
+                name
+            }
         }
         collectionCompanies {
             id
