@@ -9,9 +9,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowColumn
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -453,6 +457,7 @@ fun CollectionLabelLayoutItem(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: NavController) {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
@@ -512,8 +517,7 @@ fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: Nav
 
                         "style_2" -> Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
+                                .fillMaxWidth(),
                         ) {
                             StyleTwoLazyLayout(
                                 collectionId = items[index].collection.id,
@@ -532,8 +536,7 @@ fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: Nav
 
                 "company_collection" -> Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
+                        .fillMaxWidth(),
                 ) {
                     StyleFourLazyLayout(
                         collectionId = items[index].collection.id,
@@ -693,23 +696,31 @@ fun StyleOneLazyLayout(collectionId: String, collectionJobList: List<JobsListUIM
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StyleTwoLazyLayout(
     collectionId: String,
     collectionJobList: List<JobsListUIModel>,
     navController: NavController
 ) {
-    LazyVerticalGrid(
+    /*LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {*/
+    FlowRow(
+        maxItemsInEachRow = 2,
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(collectionJobList.size) { index ->
+        repeat(collectionJobList.size) { index ->
             Box(
                 modifier = Modifier
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-                    .width(156.dp)
+                    .weight(1f)
+                   // .width(156.dp)
                     .height(71.dp)
                     .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
                     .clickable {
@@ -784,7 +795,7 @@ fun StyleThreeLazyLayout(
         items(collectionJobList.size) { index ->
             var currencyCode = ""
             if (collectionJobList[index].currencyCode == "MMK") {
-                currencyCode = "K"
+                currencyCode = "k"
             }
 
             Box(
@@ -882,23 +893,31 @@ fun StyleThreeLazyLayout(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StyleFourLazyLayout(
     collectionId: String,
     collectionCompanyList: List<CollectionCompaniesUIModel>,
     navController: NavController
 ) {
-    LazyVerticalGrid(
+    FlowRow(
+        modifier = Modifier.fillMaxSize(),
+        maxItemsInEachRow = 2,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+   /* LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(collectionCompanyList.size) { index ->
+    ) {*/
+        repeat(collectionCompanyList.size) { index ->
             Box(
                 modifier = Modifier
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-                    .width(156.dp)
+                    .weight(1f)
+                    //.width(156.dp)
                     .height(68.dp)
                     .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
                     .clickable {
