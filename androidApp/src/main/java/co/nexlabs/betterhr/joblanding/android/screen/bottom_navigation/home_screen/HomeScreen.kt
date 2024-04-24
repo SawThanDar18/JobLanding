@@ -2,6 +2,9 @@ package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scr
 
 import android.text.Layout
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,9 +34,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionCompaniesUIModel
@@ -64,16 +71,32 @@ import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.JobsListUIModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
+import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: String) {
 
+    var refreshing by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            scope.launch {
+                if (pageId != null && pageId != "") {
+                    viewModel.getJobLandingSections(pageId)
+                }
+            }
+            refreshing = false
+        }
+    }
 
     scope.launch {
         if (pageId != null && pageId != "") {
@@ -81,53 +104,74 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
         }
     }
 
-    if (uiState.jobLandingSectionsList != null && uiState.jobLandingSectionsList.isNotEmpty()) {
-        uiState.jobLandingSectionsList.map {
-            Log.d("list>>", it.title)
-        }
-    } else {
-        Log.d("list>>", "list empty")
-    }
-
-    val items = (0..4).toList()
-
     var style by remember { mutableStateOf("style-7") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp, 0.dp, 16.dp, 65.dp),
-        horizontalAlignment = Alignment.Start
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = refreshing),
+        onRefresh = { refreshing = true },
     ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            AnimatedVisibility(
+                uiState.isLoading,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                CircularProgressIndicator(
+                    color = Color(0xFF1ED292)
+                )
+            }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 50.dp),
-            horizontalArrangement = Arrangement.Start,
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.better_icon),
-                contentDescription = "Home Screen Header Logo",
-                modifier = Modifier
-                    .width(26.dp)
-                    .height(32.dp),
-            )
+            AnimatedVisibility(
+                uiState.error != UIErrorType.Nothing,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                ErrorLayout(uiState.error)
+            }
 
-            Text(
-                text = "Better Job",
-                modifier = Modifier.padding(start = 8.dp),
-                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = FontWeight.W600,
-                color = Color(0xFF757575),
-                fontSize = 24.sp,
-            )
+            AnimatedVisibility(
+                uiState.jobLandingSectionsList.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp, 0.dp, 16.dp, 65.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 50.dp),
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.better_icon),
+                            contentDescription = "Home Screen Header Logo",
+                            modifier = Modifier
+                                .width(26.dp)
+                                .height(32.dp),
+                        )
+
+                        Text(
+                            text = "Better Job",
+                            modifier = Modifier.padding(start = 8.dp),
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF757575),
+                            fontSize = 24.sp,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    NestedLazyColumn(style, uiState.jobLandingSectionsList, navController)
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        NestedLazyColumn(style, uiState.jobLandingSectionsList, navController)
     }
 }
 
@@ -572,7 +616,11 @@ fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: Nav
 }
 
 @Composable
-fun StyleOneLazyLayout(collectionId: String, collectionJobList: List<JobsListUIModel>, navController: NavController) {
+fun StyleOneLazyLayout(
+    collectionId: String,
+    collectionJobList: List<JobsListUIModel>,
+    navController: NavController
+) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.fillMaxWidth()
@@ -720,7 +768,7 @@ fun StyleTwoLazyLayout(
                 modifier = Modifier
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
                     .weight(1f)
-                   // .width(156.dp)
+                    // .width(156.dp)
                     .height(71.dp)
                     .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
                     .clickable {
@@ -906,12 +954,12 @@ fun StyleFourLazyLayout(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-   /* LazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
-        columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {*/
+        /* LazyVerticalGrid(
+             modifier = Modifier.fillMaxSize(),
+             columns = GridCells.Fixed(2),
+             verticalArrangement = Arrangement.spacedBy(16.dp),
+             horizontalArrangement = Arrangement.spacedBy(16.dp)
+         ) {*/
         repeat(collectionCompanyList.size) { index ->
             Box(
                 modifier = Modifier

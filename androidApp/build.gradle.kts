@@ -83,5 +83,6 @@ dependencies {
 
     implementation("com.github.nanihadesuka:LazyColumnScrollbar:1.10.0")
     implementation("androidx.compose.foundation:foundation:1.4.3")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.24.13-rc")
 
 }

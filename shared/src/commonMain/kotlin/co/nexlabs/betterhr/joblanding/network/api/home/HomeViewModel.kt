@@ -7,7 +7,9 @@ import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIState
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
+import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.HomeViewModelMapper
+import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
@@ -30,6 +32,14 @@ class HomeViewModel(private val homeRepository: HomeRepository): ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             homeRepository.getJobLandingSections(pageId).toFlow()
                 .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException })
+                                UIErrorType.Network else UIErrorType.Other()
+                        )
+                    }
                     when (e) {
                         is ApolloHttpException -> {
                             println("HTTP error: ${e.message}")
@@ -49,16 +59,20 @@ class HomeViewModel(private val homeRepository: HomeRepository): ViewModel() {
                         }
                     }
                 }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing
+                        )
+                    }
                     if (!data.hasErrors()) {
                         _uiState.update {
                             it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                                 jobLandingSectionsList = HomeViewModelMapper.mapResponseToViewModel(data.data!!)
                             )
                         }
-                        /*jobLandingSectionList.clear()
-                        jobLandingSectionList.addAll(
-                            HomeViewModelMapper.mapResponseToViewModel(it.data!!)
-                        )*/
                     } else {
                         Log.d("result>>", "it.hasErrors")
                     }

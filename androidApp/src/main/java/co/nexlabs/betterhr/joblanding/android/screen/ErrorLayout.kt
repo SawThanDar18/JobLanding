@@ -15,7 +15,8 @@ import co.nexlabs.betterhr.joblanding.util.UIErrorType
 
 @Composable
 fun ErrorLayout(
-    errorType: UIErrorType
+    errorType: UIErrorType,
+    //onClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -28,7 +29,7 @@ fun ErrorLayout(
             }
         }
 
-       /* TextButton(onClick) {
+        /*TextButton(onClick) {
             Text(
                 "Retry?",
                 color = MaterialTheme.colors.error,

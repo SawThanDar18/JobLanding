@@ -7,6 +7,7 @@ import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryR
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
+import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CountriesListViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
@@ -29,15 +30,59 @@ class ChooseCountryViewModel(private val chooseCountryRepository: ChooseCountryR
     private val _uiState = MutableStateFlow(ChooseCountryUIState())
     val uiState = _uiState.asStateFlow()
 
-    var countriesList: MutableList<Data> = ArrayList()
-    var itemList: MutableList<Item> = ArrayList()
-
-    var dynamicPagesID: MutableLiveData<String> = MutableLiveData()
+    //var dynamicPagesID: MutableLiveData<String> = MutableLiveData()
 
     fun getCountriesList() {
         viewModelScope.launch(Dispatchers.IO) {
-            chooseCountryRepository.getDynamicPages().toFlow()
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing
+                )
+            }
+
+
+            var countriesList: MutableList<Data> = ArrayList()
+            countriesList.addAll(
+                CountriesListViewModelMapper.mapResponseToViewModel(
+                    chooseCountryRepository.getCountriesList()
+                )
+            )
+
+            var itemList: MutableList<Item> = ArrayList()
+            if (countriesList.isNotEmpty() || countriesList != null) {
+                countriesList.map {
+                    itemList.add(
+                        Item(it.id, it.countryName)
+                    )
+                }
+            }
+
+            if (itemList.isNotEmpty() || itemList != null) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = UIErrorType.Nothing,
+                        countries = countriesList,
+                        items = itemList
+                    )
+                }
+            }
+        }
+    }
+
+    fun getDynamicPagesId(countryId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            chooseCountryRepository.getDynamicPages(countryId).toFlow()
                 .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException })
+                                UIErrorType.Network else UIErrorType.Other()
+                        )
+                    }
                     when (e) {
                         is ApolloHttpException -> {
                             println("HTTP error: ${e.message}")
@@ -53,37 +98,25 @@ class ChooseCountryViewModel(private val chooseCountryRepository: ChooseCountryR
                             e.printStackTrace()
                         }
                     }
-                }.collectLatest {
-                    if (!it.hasErrors()) {
-                       if (it.data?.dynamicPages!![0].id != null && it.data?.dynamicPages!![0].id != "") {
-                           dynamicPagesID.postValue(it.data?.dynamicPages!![0].id)
-                       }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        if (data.data?.dynamicPages!![0].id != null && data.data?.dynamicPages!![0].id != "") {
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                    dynamicPageId = data.data?.dynamicPages!![0].id,
+                                )
+                            }
+                        }
                     }
                 }
-
-
-            countriesList.clear()
-            countriesList.addAll(
-                CountriesListViewModelMapper.mapResponseToViewModel(
-                    chooseCountryRepository.getCountriesList()
-                )
-            )
-
-            if (countriesList.isNotEmpty() || countriesList != null) {
-                itemList.clear()
-                countriesList.map {
-                    itemList.add(
-                        Item(it.id, it.countryName)
-                    )
-                }
-            }
-        }
-
-        _uiState.update {
-            it.copy(
-                countries = countriesList,
-                items = itemList
-            )
         }
     }
 }

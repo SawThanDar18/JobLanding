@@ -2,6 +2,9 @@ package co.nexlabs.betterhr.joblanding.android.screen.choose_country
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -62,8 +66,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavController) {
 
-    //var items by remember { mutableStateOf(mutableListOf<Item>()) }
-    var selectedItem by remember { mutableStateOf(Item("", "Select your country")) }
+    var items by remember { mutableStateOf(mutableListOf<Item>()) }
+    var selectedItem by remember { mutableStateOf(Item("ab18de52-e946-4925-83ab-46f804846034", "Select your country")) }
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
@@ -72,6 +76,7 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
 
     scope.launch {
         viewModel.getCountriesList()
+        viewModel.getDynamicPagesId(selectedItem.id)
     }
 
     Column(
@@ -119,7 +124,6 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                 .fillMaxWidth()
                 .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
         ) {
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -158,33 +162,46 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                uiState.items.forEach { item ->
-                    DropdownMenuItem(
-                        onClick = {
-                            selectedItem = item
-                            expanded = false
-                        }
+                if (uiState.items.isEmpty()) {
+                    AnimatedVisibility(
+                        uiState.items.isEmpty(),
+                        enter = fadeIn(),
+                        exit = fadeOut()
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start,
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            color = Color(0xFF1ED292)
+                        )
+                    }
+                } else {
+                    uiState.items.forEach { item ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedItem = item
+                                expanded = false
+                            }
                         ) {
-                            Image(
-                                //painter = item.image,
-                                painter = painterResource(id = R.drawable.myanmar_flag),
-                                contentDescription = item.countryName,
-                                modifier = Modifier.size(20.dp),
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = item.countryName,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFF757575),
-                                fontSize = 14.sp,
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                            ) {
+                                Image(
+                                    //painter = item.image,
+                                    painter = painterResource(id = R.drawable.myanmar_flag),
+                                    contentDescription = item.countryName,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = item.countryName,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFF757575),
+                                    fontSize = 14.sp,
+                                )
+                            }
                         }
                     }
                 }
@@ -197,29 +214,29 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                 .fillMaxSize()
         ) {
             Box(
-                modifier = Modifier
-                    .clickable {
-                        val pageId = viewModel.dynamicPagesID.value
-                        if(pageId != null && pageId != "") {
-                            scope.launch {
-                                navController.navigate("bottom-navigation-screen/${viewModel.dynamicPagesID.value}")
+                    modifier = Modifier
+                        .clickable {
+                            val pageId = uiState.dynamicPageId
+                            if (pageId != null && pageId != "") {
+                                scope.launch {
+                                    navController.navigate("bottom-navigation-screen/${pageId}")
+                                }
                             }
                         }
-                    }
-                    .height(40.dp)
-                    .fillMaxWidth()
-                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                    .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = "Get Started",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFFFFFFFF),
-                    fontSize = 14.sp,
-                )
-            }
+                        .height(40.dp)
+                        .fillMaxWidth()
+                        .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                        .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "Get Started",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W600,
+                        color = Color(0xFFFFFFFF),
+                        fontSize = 14.sp,
+                    )
+                }
         }
     }
 }
