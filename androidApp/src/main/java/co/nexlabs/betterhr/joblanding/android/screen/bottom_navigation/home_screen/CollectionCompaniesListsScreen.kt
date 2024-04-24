@@ -57,7 +57,7 @@ fun CollectionCompaniesListsScreen(viewModel: CollectionCompaniesViewModel, navC
         modifier = Modifier
             .fillMaxSize()
             //.verticalScroll(rememberScrollState())
-            .padding(top = 50.dp, bottom = 16.dp),
+            .padding(top = 16.dp, bottom = 32.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

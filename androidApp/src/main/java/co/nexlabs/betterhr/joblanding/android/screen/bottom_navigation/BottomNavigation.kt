@@ -2,13 +2,20 @@ package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,10 +38,25 @@ fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageI
 
     val items = listOf(
         BottomNavItem("Home", R.drawable.home_selected_icon, R.drawable.home_icon, "home"),
-        BottomNavItem("Application", R.drawable.application_selected_icon, R.drawable.application_icon, "application"),
+        BottomNavItem(
+            "Application",
+            R.drawable.application_selected_icon,
+            R.drawable.application_icon,
+            "application"
+        ),
         BottomNavItem("Inbox", R.drawable.inbox_selected_icon, R.drawable.inbox_icon, "inbox"),
-        BottomNavItem("Interviews", R.drawable.interview_selected_icon, R.drawable.interview_icon, "interviews"),
-        BottomNavItem("Profile", R.drawable.profile_selected_icon, R.drawable.profile_icon, "profile")
+        BottomNavItem(
+            "Interviews",
+            R.drawable.interview_selected_icon,
+            R.drawable.interview_icon,
+            "interviews"
+        ),
+        BottomNavItem(
+            "Profile",
+            R.drawable.profile_selected_icon,
+            R.drawable.profile_icon,
+            "profile"
+        )
     )
 
     Scaffold(
@@ -48,6 +70,7 @@ fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageI
 
                 items.forEach { item ->
                     BottomNavigationItem(
+                        modifier = Modifier.padding(bottom = 0.dp).weight(1f),
                         icon = {
                             val image = if (currentRoute == item.route) {
                                 painterResource(id = item.selectedIcon)
@@ -60,7 +83,18 @@ fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageI
                                 modifier = Modifier.size(24.dp)
                             )
                         },
-                        label = { Text(text = item.title) },
+                        label = {
+                            Text(
+                                overflow = TextOverflow.Ellipsis,
+                                softWrap = true,
+                                maxLines = 1,
+                                text = item.title,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W400,
+                                color = Color(0xFF999999),
+                                fontSize = 12.sp,
+                            )
+                        },
                         selected = currentRoute == item.route,
                         onClick = {
                             navController.navigate(item.route) {
@@ -104,4 +138,9 @@ fun InterviewsScreen() {
     //Text(text = "Interviews", modifier = Modifier.padding(16.dp))
 }
 
-data class BottomNavItem(val title: String, val selectedIcon: Int, val unselectedIcon: Int, val route: String)
+data class BottomNavItem(
+    val title: String,
+    val selectedIcon: Int,
+    val unselectedIcon: Int,
+    val route: String
+)

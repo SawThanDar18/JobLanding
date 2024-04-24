@@ -44,7 +44,7 @@ fun UnregisterProfileScreen(navController: NavController) {
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp, 38.dp, 16.dp, 0.dp)
+                .padding(16.dp, 16.dp, 16.dp, 0.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
@@ -63,7 +63,6 @@ fun UnregisterProfileScreen(navController: NavController) {
                 modifier = Modifier
                     .size(20.dp)
                     .clickable {
-                        navController.navigate("choose-country-screen")
                         //showMenu = true
                                },
                 alignment = Alignment.Center

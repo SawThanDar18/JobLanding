@@ -48,7 +48,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import kotlinx.coroutines.launch
 
@@ -121,6 +127,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                 fontWeight = FontWeight.W400,
                 color = Color(0xFF1082DE),
                 fontSize = 12.sp,
+                modifier = Modifier.clickable {
+                    navController.navigate("company-details/${item.company.id}")
+                }
             )
             Image(
                 painter = painterResource(id = R.drawable.arrow_right_up),

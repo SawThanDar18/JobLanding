@@ -9,6 +9,7 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
         <activity
+            android:theme="@style/AppTheme"
             android:name=".screen.MainActivity"
             android:screenOrientation="portrait"
             android:exported="true">

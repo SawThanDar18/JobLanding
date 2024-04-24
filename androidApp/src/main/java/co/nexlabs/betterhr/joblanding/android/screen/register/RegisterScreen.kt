@@ -134,7 +134,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
     }
 
     Column(
-        modifier = Modifier.padding(16.dp, 38.dp, 16.dp, 0.dp),
+        modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {

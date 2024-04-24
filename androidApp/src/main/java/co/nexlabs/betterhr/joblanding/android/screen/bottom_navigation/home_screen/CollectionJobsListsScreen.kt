@@ -55,7 +55,7 @@ fun CollectionJobsListsScreen(viewModel: CollectionJobsViewModel, navController:
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 50.dp, bottom = 16.dp),
+            .padding(top = 16.dp, bottom = 32.dp),
     ) {
         item {
             Column(

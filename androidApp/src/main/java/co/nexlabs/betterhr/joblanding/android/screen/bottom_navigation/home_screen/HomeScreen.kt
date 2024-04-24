@@ -76,6 +76,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.internal.wait
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: String) {
@@ -137,15 +138,14 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp, 0.dp, 16.dp, 65.dp),
+                        .padding(16.dp, 16.dp, 16.dp, 72.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 50.dp),
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start,
                     ) {
                         Image(
@@ -518,7 +518,7 @@ fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: Nav
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxSize()
-                        .clickable { navController.navigate("company-lists-detail") },
+                        .clickable { },
                     horizontalArrangement = Arrangement.Start,
                 ) {
                     Image(
