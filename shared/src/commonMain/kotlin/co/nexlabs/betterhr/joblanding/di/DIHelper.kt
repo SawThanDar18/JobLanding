@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.di
 
+import android.app.Application
 import co.nexlabs.betterhr.joblanding.network.register.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
@@ -13,8 +14,9 @@ import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewMo
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailRepository
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRepository
+import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import io.ktor.client.HttpClient
@@ -29,7 +31,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import io.ktor.serialization.kotlinx.json.json
 
-fun initKoin() {
+fun initKoin(application: Application) {
     startKoin {
         modules(
             module {
@@ -67,9 +69,10 @@ fun initKoin() {
                 single { CollectionCompaniesRepository(get()) }
                 single { JobDetailRepository(get()) }
                 single { CompanyDetailRepository(get()) }
-                factory { RegisterViewModel(get()) }
-                factory { ChooseCountryViewModel(get()) }
-                factory { HomeViewModel(get()) }
+                factory { ScreenPortalViewModel(application) }
+                factory { RegisterViewModel(application, get()) }
+                factory { ChooseCountryViewModel(application, get()) }
+                factory { HomeViewModel(application, get()) }
                 factory { SharedViewModel() }
                 factory { CollectionJobsViewModel(get()) }
                 factory { CollectionCompaniesViewModel(get()) }

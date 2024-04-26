@@ -3,7 +3,9 @@ package co.nexlabs.betterhr.joblanding.network.api.home
 import android.util.Log
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIState
+import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.JobDetailViewModelMapper
+import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
@@ -25,6 +27,15 @@ class JobDetailViewModel(private val jobDetailRepository: JobDetailRepository): 
         viewModelScope.launch(Dispatchers.IO) {
             jobDetailRepository.getJobDetail(jobId).toFlow()
                 .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                        )
+                    }
+
                     when (e) {
                         is ApolloHttpException -> {
                             println("HTTP error: ${e.message}")
@@ -44,9 +55,17 @@ class JobDetailViewModel(private val jobDetailRepository: JobDetailRepository): 
                         }
                     }
                 }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing
+                        )
+                    }
                     if (!data.hasErrors()) {
                         _uiState.update {
                             it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                                 jobDetail = JobDetailViewModelMapper.mapDataToViewModel(data.data!!.jobLandingJob)
                             )
                         }

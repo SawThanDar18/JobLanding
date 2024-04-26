@@ -16,13 +16,14 @@ import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scre
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.JobDetailsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.choose_country.ChooseCountryScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
+import co.nexlabs.betterhr.joblanding.android.screen.splash.ScreenPortal
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIModel
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import org.koin.compose.getKoin
@@ -37,7 +38,11 @@ fun MyApp() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        NavHost(navController, startDestination = "choose-country-screen") {
+        NavHost(navController, startDestination = "screen-portal") {
+            composable("screen-portal") {
+                val viewModel: ScreenPortalViewModel = getKoin().get()
+                ScreenPortal(navController, viewModel)
+            }
             composable("profile-unregister-screen") {
                 UnregisterProfileScreen(navController)
             }
@@ -49,10 +54,10 @@ fun MyApp() {
                 val viewModel: ChooseCountryViewModel = getKoin().get()
                 ChooseCountryScreen(viewModel, navController)
             }
-            composable("bottom-navigation-screen/{pageId}") {
+            composable("bottom-navigation-screen/{pageId}/{destination}") {
                 val sharedViewModel: SharedViewModel = getKoin().get()
-                if (it.arguments?.getString("pageId") != "") {
-                    BottomNavigation(sharedViewModel, navController, it.arguments?.getString("pageId") ?: "")
+                if (it.arguments?.getString("pageId") != "" && it.arguments?.getString("destination") != "") {
+                    BottomNavigation(sharedViewModel, navController, it.arguments?.getString("pageId") ?: "", it.arguments?.getString("destination") ?: "")
                 }
             }
             composable("jobs-lists-screen/{collectionId}/{collectionName}") {

@@ -1,5 +1,9 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,10 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -41,7 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
+import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,133 +58,158 @@ fun CollectionCompaniesListsScreen(viewModel: CollectionCompaniesViewModel, navC
         viewModel.getCollectionCompanies(collectionId, false)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            //.verticalScroll(rememberScrollState())
-            .padding(top = 16.dp, bottom = 32.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        AnimatedVisibility(
+            uiState.isLoading,
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.arrow_left),
-                contentDescription = "Arrow Left",
-                modifier = Modifier.size(24.dp)
-                    .clickable { navController.popBackStack() },
-            )
-
-            Text(
-                text = collectionName,
-                modifier = Modifier.padding(start = 8.dp),
-                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = FontWeight.W600,
-                color = Color(0xFF4A4A4A),
-                fontSize = 14.sp,
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.search_black),
-                contentDescription = "Search",
-                modifier = Modifier.size(24.dp),
+            CircularProgressIndicator(
+                color = Color(0xFF1ED292)
             )
         }
 
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxWidth(),
-            //state = rememberLazyGridState(),
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        AnimatedVisibility(
+            uiState.error != UIErrorType.Nothing,
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
-            items(uiState.collectionCompaniesList.size) { index ->
-                val item = uiState.collectionCompaniesList[index]
+            ErrorLayout(errorType = uiState.error)
+        }
 
-                Box(
+        AnimatedVisibility(
+            uiState.collectionCompaniesList.isNotEmpty(),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    //.verticalScroll(rememberScrollState())
+                    .padding(top = 16.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .width(100.dp)
-                        .height(169.dp)
-                        .background(
-                            color = Color.Transparent,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
-                        .clickable {
-                            navController.navigate("company-details/${item.company.id}")
-                        },
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Column(
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow_left),
+                        contentDescription = "Arrow Left",
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Transparent),
-                        verticalArrangement = Arrangement.SpaceEvenly,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.aia_logo),
-                            contentDescription = "Company Logo",
-                            modifier = Modifier
-                                .size(80.dp),
-                            contentScale = ContentScale.Fit
-                        )
+                            .size(24.dp)
+                            .clickable { navController.popBackStack() },
+                    )
 
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = item.company.name,
-                            maxLines = 1,
-                            softWrap = true,
-                            overflow = TextOverflow.Ellipsis,
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W500,
-                            color = Color(0xFF4A4A4A),
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(horizontal = 14.dp)
-                        )
+                    Text(
+                        text = collectionName,
+                        modifier = Modifier.padding(start = 8.dp),
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W600,
+                        color = Color(0xFF4A4A4A),
+                        fontSize = 14.sp,
+                    )
 
-                        Column(
+                    Image(
+                        painter = painterResource(id = R.drawable.search_black),
+                        contentDescription = "Search",
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxWidth(),
+                    //state = rememberLazyGridState(),
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    items(uiState.collectionCompaniesList.size) { index ->
+                        val item = uiState.collectionCompaniesList[index]
+
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.Transparent),
-                            verticalArrangement = Arrangement.spacedBy(2.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .width(100.dp)
+                                .height(169.dp)
+                                .background(
+                                    color = Color.Transparent,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
+                                .clickable {
+                                    navController.navigate("company-details/${item.company.id}")
+                                },
                         ) {
-                            Text(
-                                textAlign = TextAlign.Center,
-                                text = "${item.jobOpeningCount} job",
-                                maxLines = 1,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFF6A6A6A),
-                                fontSize = 12.sp,
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Transparent),
+                                verticalArrangement = Arrangement.SpaceEvenly,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.aia_logo),
+                                    contentDescription = "Company Logo",
+                                    modifier = Modifier
+                                        .size(80.dp),
+                                    contentScale = ContentScale.Fit
+                                )
 
-                            Text(
-                                textAlign = TextAlign.Center,
-                                text = "openings",
-                                maxLines = 1,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFF6A6A6A),
-                                fontSize = 12.sp,
-                            )
+                                Text(
+                                    textAlign = TextAlign.Center,
+                                    text = item.company.name,
+                                    maxLines = 1,
+                                    softWrap = true,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W500,
+                                    color = Color(0xFF4A4A4A),
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(horizontal = 14.dp)
+                                )
+
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.Transparent),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        textAlign = TextAlign.Center,
+                                        text = "${item.jobOpeningCount} job",
+                                        maxLines = 1,
+                                        softWrap = true,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFF6A6A6A),
+                                        fontSize = 12.sp,
+                                    )
+
+                                    Text(
+                                        textAlign = TextAlign.Center,
+                                        text = "openings",
+                                        maxLines = 1,
+                                        softWrap = true,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFF6A6A6A),
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
 
-        /*Row(
+                /*Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
@@ -285,6 +315,13 @@ fun CollectionCompaniesListsScreen(viewModel: CollectionCompaniesViewModel, navC
             }
 
         }*/
+            }
+        }
     }
+}
+
+@Composable
+fun MyToast(message: String) {
+    Toast.makeText(LocalContext.current.applicationContext, message, Toast.LENGTH_SHORT).show()
 }
 

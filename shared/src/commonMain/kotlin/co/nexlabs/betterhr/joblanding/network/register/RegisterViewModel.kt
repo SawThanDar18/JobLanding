@@ -1,5 +1,8 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
+import android.app.Application
+import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +19,15 @@ sealed class UiState {
 }
 
 class RegisterViewModel(
-    private val registerRepository: RegisterRepository
+    val application: Application,
+    private val registerRepository: RegisterRepository,
 ) : ViewModel() {
+
+    private val localStorage: LocalStorage
+
+    init {
+        localStorage = AndroidLocalStorageImpl(application)
+    }
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
@@ -29,7 +39,7 @@ class RegisterViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 var response = registerRepository.requestOTP(phoneNumber)
-                _uiState.value = UiState.Success(response.data.response.message)
+                _uiState.value = UiState.Success(response.data.response.message ?: "")
             } catch (e: Exception) {
                 _uiState.value = UiState.Error("Error: ${e.message}")
             }
@@ -43,14 +53,20 @@ class RegisterViewModel(
                 if (response.data.verifyPhoneNumber.token == null) {
                     _uiStateForVerify.value = UiState.Error("Error: ${response.data.verifyPhoneNumber.message}")
                 } else {
-                    _uiStateForVerify.value = UiState.Success(
-                        "token>>${response.data.verifyPhoneNumber.token}"
-                    )
+                    _uiStateForVerify.value = UiState.Success(response.data.verifyPhoneNumber.token)
                 }
             } catch (e: Exception) {
                 _uiStateForVerify.value = UiState.Error("Error: ${e.message}")
             }
         }
+    }
+
+    fun updateToken(token: String) {
+        localStorage.token = token
+    }
+
+    fun getPageId(): String {
+        return localStorage.pageId
     }
 
 }

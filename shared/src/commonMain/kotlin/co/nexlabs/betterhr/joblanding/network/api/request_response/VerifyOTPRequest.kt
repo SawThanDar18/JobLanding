@@ -24,6 +24,6 @@ data class VerifyPhoneNumResponse(val data: VerifyResponse) {
     data class Response(
         val status: Int,
         val message: String,
-        val token: String?
+        val token: String
     )
 }

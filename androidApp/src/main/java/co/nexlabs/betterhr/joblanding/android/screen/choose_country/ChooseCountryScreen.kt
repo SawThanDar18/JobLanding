@@ -219,7 +219,9 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                             val pageId = uiState.dynamicPageId
                             if (pageId != null && pageId != "") {
                                 scope.launch {
-                                    navController.navigate("bottom-navigation-screen/${pageId}")
+                                    viewModel.updateCountryId(selectedItem.id)
+                                    viewModel.updatePageId(pageId)
+                                    navController.navigate("bottom-navigation-screen/${pageId}/${"home"}")
                                 }
                             }
                         }

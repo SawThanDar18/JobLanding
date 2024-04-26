@@ -1,6 +1,5 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
-import android.text.Layout
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -13,12 +12,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,15 +24,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,26 +47,20 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
-import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
-import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionCompaniesUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.JobsListUIModel
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: String) {
@@ -87,6 +71,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+
+    var token by remember { mutableStateOf("") }
 
     LaunchedEffect(refreshing) {
         if (refreshing) {
@@ -103,6 +89,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
         if (pageId != null && pageId != "") {
             viewModel.getJobLandingSections(pageId)
         }
+        token = viewModel.getToken()
     }
 
     var style by remember { mutableStateOf("style-7") }
@@ -138,7 +125,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp, 16.dp, 16.dp, 72.dp),
+                        .padding(16.dp, 16.dp, 16.dp, 80.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
 
@@ -173,6 +160,57 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
             }
         }
     }
+
+    if (token == "") {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 73.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .background(color = Color(0xFF111111).copy(alpha = 0.8f))
+                    .padding(horizontal = 16.dp)
+                    .clickable {
+                        navController.navigate("bottom-navigation-screen/${pageId}/${"profile"}")
+                    },
+            ) {
+                Text(
+                    maxLines = 1,
+                    softWrap = true,
+                    overflow = TextOverflow.Ellipsis,
+                    text = "Sign up with email or phone number!",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFFFFFFFF),
+                    fontSize = 12.sp,
+                )
+
+                Box(
+                    modifier = Modifier
+                        .width(101.dp)
+                        .height(25.dp)
+                        .border(1.dp, Color(0xFFE9FCF5), RoundedCornerShape(8.dp))
+                        .background(color = Color(0xFFE9FCF5), shape = MaterialTheme.shapes.medium),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "SIGN UP NOW",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W500,
+                        color = Color(0xFF1ED292),
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -511,7 +549,7 @@ fun NestedLazyColumn(style: String, items: List<HomeUIModel>, navController: Nav
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
                     .height(50.dp)
                     .fillMaxWidth()
-                    .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
+                    .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
             ) {
 
                 Row(

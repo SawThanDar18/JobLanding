@@ -1,6 +1,9 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
+import android.app.Application
 import android.util.Log
+import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIState
@@ -23,7 +26,13 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class HomeViewModel(private val homeRepository: HomeRepository): ViewModel() {
+class HomeViewModel(application: Application, private val homeRepository: HomeRepository): ViewModel() {
+
+    private val localStorage: LocalStorage
+
+    init {
+        localStorage = AndroidLocalStorageImpl(application.applicationContext)
+    }
 
     private val _uiState = MutableStateFlow(HomeUIState())
     val uiState = _uiState.asStateFlow()
@@ -36,8 +45,8 @@ class HomeViewModel(private val homeRepository: HomeRepository): ViewModel() {
                         it.copy(
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
-                                    .any { it is ApolloNetworkException })
-                                UIErrorType.Network else UIErrorType.Other()
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
                         )
                     }
                     when (e) {
@@ -78,5 +87,13 @@ class HomeViewModel(private val homeRepository: HomeRepository): ViewModel() {
                     }
                 }
         }
+    }
+
+    fun getCountryId(): String {
+        return localStorage.countryId
+    }
+
+    fun getToken(): String {
+        return localStorage.token
     }
 }

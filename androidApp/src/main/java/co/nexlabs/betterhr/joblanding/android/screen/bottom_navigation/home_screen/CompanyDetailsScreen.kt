@@ -1,6 +1,8 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
-import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,8 +24,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.TabRowDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -31,7 +33,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -54,9 +55,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.style.TextOverflow
+import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailJobs
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIModel
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,113 +83,141 @@ fun CompanyDetailsScreen(viewModel: CompanyDetailViewModel, navController: NavCo
 
     val item = uiState.companyDetail
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
-    ) {
-        Column {
-            OverlapBoxes(
-                modifier = Modifier.fillMaxWidth()
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        AnimatedVisibility(
+            uiState.isLoading,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            CircularProgressIndicator(
+                color = Color(0xFF1ED292)
+            )
+        }
+
+        AnimatedVisibility(
+            uiState.error != UIErrorType.Nothing,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            ErrorLayout(errorType = uiState.error)
+        }
+
+        AnimatedVisibility(
+            uiState.companyDetail.jobs.isNotEmpty(),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 16.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.yoma_cover),
-                    contentDescription = "Background Image",
+                Column {
+                    OverlapBoxes(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.yoma_cover),
+                            contentDescription = "Background Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp),
+                            contentScale = ContentScale.FillWidth
+                        )
+
+                        Image(
+                            painter = painterResource(id = R.drawable.bank_logo),
+                            contentDescription = "Company Logo",
+                            modifier = Modifier
+                                .width(61.dp)
+                                .height(61.dp)
+                                .clip(CircleShape),
+                        )
+                    }
+                }
+
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(160.dp),
-                    contentScale = ContentScale.FillWidth
-                )
+                        .padding(end = 10.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Get Job Alerts",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFF6A6A6A),
+                        fontSize = 12.sp,
+                    )
 
-                Image(
-                    painter = painterResource(id = R.drawable.bank_logo),
-                    contentDescription = "Company Logo",
+                    ToggleButton(
+                        checked = isChecked,
+                        onCheckedChange = { isChecked = it }
+                    )
+                }
+
+                Text(
                     modifier = Modifier
-                        .width(61.dp)
-                        .height(61.dp)
-                        .clip(CircleShape),
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, top = 10.dp),
+                    text = item.name,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFF4A4A4A),
+                    fontSize = 16.sp,
                 )
-            }
-        }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 10.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Get Job Alerts",
-                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = FontWeight.W400,
-                color = Color(0xFF6A6A6A),
-                fontSize = 12.sp,
-            )
-
-            ToggleButton(
-                checked = isChecked,
-                onCheckedChange = { isChecked = it }
-            )
-        }
-
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 10.dp),
-            text = item.name,
-            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-            fontWeight = FontWeight.W600,
-            color = Color(0xFF4A4A4A),
-            fontSize = 16.sp,
-        )
-
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 6.dp),
-            text = "Company",
-            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-            fontWeight = FontWeight.W400,
-            color = Color(0xFF4A4A4A),
-            fontSize = 12.sp,
-        )
-
-        TabRow(
-            indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
-                    color = Color(0xFF1ED292),
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[tabIndex])
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, top = 6.dp),
+                    text = "Company",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFF4A4A4A),
+                    fontSize = 12.sp,
                 )
-            },
-            contentColor = Color(0xFF1ED292),
-            modifier = Modifier.fillMaxWidth(),
-            selectedTabIndex = tabIndex
-        ) {
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    text = {
-                        Text(
-                            text = title,
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W500,
-                            fontSize = 14.sp,
-                            color = if (tabIndex == index) Color(0xFF1ED292) else Color(0xFF757575)
+
+                TabRow(
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            color = Color(0xFF1ED292),
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[tabIndex])
                         )
                     },
-                    selected = tabIndex == index,
-                    onClick = { tabIndex = index }
-                )
+                    contentColor = Color(0xFF1ED292),
+                    modifier = Modifier.fillMaxWidth(),
+                    selectedTabIndex = tabIndex
+                ) {
+                    tabs.forEachIndexed { index, title ->
+                        Tab(
+                            text = {
+                                Text(
+                                    text = title,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W500,
+                                    fontSize = 14.sp,
+                                    color = if (tabIndex == index) Color(0xFF1ED292) else Color(
+                                        0xFF757575
+                                    )
+                                )
+                            },
+                            selected = tabIndex == index,
+                            onClick = { tabIndex = index }
+                        )
+                    }
+                }
+                when (tabIndex) {
+                    0 -> JobsScreen(uiState.companyDetail.jobs, navController)
+                    1 -> AboutScreen(uiState.companyDetail, uriHandler)
+                }
+
+
             }
         }
-        when (tabIndex) {
-            0 -> JobsScreen(uiState.companyDetail.jobs, navController)
-            1 -> AboutScreen(uiState.companyDetail, uriHandler)
-        }
-
-
     }
 
     Box {

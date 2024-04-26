@@ -9,6 +9,7 @@ plugins {
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
+
 kotlin {
     //targetHierarchy.default()
 
@@ -39,7 +40,6 @@ kotlin {
 //            baseName = "shared"
 //        }
 //    }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -80,6 +80,9 @@ kotlin {
                 implementation(ReactiveX.rxKotlin)
 
                 implementation(AndroidArchLifeCycle.livedata)
+
+                implementation("com.russhwolf:multiplatform-settings:0.7.4")
+
             }
         }
         val androidMain by getting {

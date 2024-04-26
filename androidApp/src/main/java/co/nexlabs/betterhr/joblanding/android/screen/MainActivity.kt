@@ -17,13 +17,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.screen.splash.ScreenPortal
 import co.nexlabs.betterhr.joblanding.di.initKoin
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        initKoin()
+        initKoin(this.application)
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
         val controller = WindowCompat.getInsetsController(window, window.decorView)

@@ -4,6 +4,7 @@ package co.nexlabs.betterhr.joblanding.util
 //https://better.hr/integration_uat/graphql
 val baseUrl = "https://better.hr/integration_uat"
 val baseUrlForJob = "https://jobdev.better.hr/api/graphql"
+val baseUrlForAuth = "https://joblandingdev.better.hr/api/graphql"
 val smsUrl = "/graphql"
 val getCountriesUrl = "/api/get/countries"
 

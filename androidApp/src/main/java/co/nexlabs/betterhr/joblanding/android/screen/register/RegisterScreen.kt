@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.register
 
+import android.opengl.Visibility
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -57,15 +59,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.MyToast
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import co.nexlabs.betterhr.joblanding.network.register.UiState
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 
-    var timer by remember { mutableStateOf(0) }
+    var timer by remember { mutableStateOf(60) }
     var isTimerRunning by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
@@ -77,6 +81,20 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 
     var timerText by remember { mutableStateOf("") }
 
+    if (isTimerRunning) {
+
+        LaunchedEffect(Unit) {
+            /*while (timer > 0) {
+                delay(60000)
+                timer--
+            }*/
+            for (i in 59 downTo 0) {
+                timer = i
+                delay(1000)
+            }
+        }
+    }
+
     when (val currentState = uiState.value) {
         is UiState.Loading -> {
 
@@ -84,16 +102,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 
         is UiState.Success -> {
             isTimerRunning = true
-            if (isTimerRunning) {
-                LaunchedEffect(Unit) {
-                    for (i in 59 downTo 0) {
-                        timer = i
-                        delay(1000)
-                    }
-                    isTimerRunning = false
-                }
-            }
-            MyToast(message = currentState.data)
+            //MyToast(message = "Code was sent to $text")
 
         }
 
@@ -102,10 +111,10 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         }
     }
 
-    timerText = if (timer == 0) {
-        "Send OTP"
+    if (timer == 0) {
+        isTimerRunning = false
     } else {
-        timer.toString()
+        timerText = timer.toString()
     }
 
     when (val currentState = uiStateForVerify.value) {
@@ -113,6 +122,9 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         }
 
         is UiState.Success -> {
+            scope.launch {
+                viewModel.updateToken(currentState.data)
+            }
             MyToast(message = currentState.data)
         }
 
@@ -139,13 +151,19 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         horizontalAlignment = Alignment.Start
     ) {
 
-        Box(contentAlignment = Alignment.CenterStart) {
+        Box(contentAlignment = Alignment.CenterStart,
+            modifier = Modifier.clickable {
+                scope.launch {
+                    if (viewModel.getPageId().isNotBlank()) {
+                        navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"profile"}")
+                    }
+                }
+            }) {
             Image(
                 painter = painterResource(id = R.drawable.arrow_left),
                 contentDescription = "Arrow Left Icon",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { navController.popBackStack() },
             )
         }
 
@@ -237,7 +255,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 )
                 {
                     Text(
-                        text = "$timer sec",
+                        text = "Send OTP",
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFFFFFFFF),
@@ -246,11 +264,11 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 }
             } else {
                 Button(
-                    enabled = true,
                     onClick = {
                         if (text.isNotEmpty()) {
                             if (android.util.Patterns.PHONE.matcher(text).matches()) {
                                 scope.launch {
+                                    isTimerRunning = true
                                     viewModel.requestOTP(text)
                                 }
                             } else {
@@ -389,27 +407,57 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.alert_circle_outline),
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-                alignment = Alignment.Center
-            )
-            Spacer(modifier = Modifier.width(1.dp))
+            Row(
+                modifier = Modifier.wrapContentSize(),
+                horizontalArrangement = Arrangement.spacedBy(1.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.alert_circle_outline),
+                    contentDescription = "Alert Icon",
+                    modifier = Modifier.size(16.dp)
+                )
 
-            Text(
-                text = "Get instead OTP code",
-                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = FontWeight.W400,
-                color = Color(0xFFAAAAAA),
-                fontSize = 12.sp,
-                style = TextStyle(textAlign = TextAlign.Justify),
-                modifier = Modifier.fillMaxWidth()
-            )
+                Text(
+                    text = "Get instead OTP code",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFFAAAAAA),
+                    fontSize = 12.sp,
+                    modifier = Modifier.wrapContentSize()
+                )
+            }
+
+            if (isTimerRunning) {
+                Row(
+                    modifier = Modifier.wrapContentSize(),
+                    horizontalArrangement = Arrangement.spacedBy(1.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "00:",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFFA7BAC5),
+                        fontSize = 12.sp,
+                        modifier = Modifier.wrapContentSize()
+                    )
+
+                    Text(
+                        text = timerText,
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFFA7BAC5),
+                        fontSize = 12.sp,
+                        modifier = Modifier.wrapContentSize()
+                    )
+                }
+            }
+
         }
 
         Column(

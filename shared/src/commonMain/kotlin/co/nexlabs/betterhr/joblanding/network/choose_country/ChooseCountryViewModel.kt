@@ -1,8 +1,12 @@
 package co.nexlabs.betterhr.joblanding.network.choose_country
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorageFunctions
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
@@ -24,13 +28,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-class ChooseCountryViewModel(private val chooseCountryRepository: ChooseCountryRepository) :
+
+class ChooseCountryViewModel(application: Application,
+    private val chooseCountryRepository: ChooseCountryRepository
+) :
     ViewModel() {
+
+    private val localStorage: LocalStorage
+    init {
+        localStorage = AndroidLocalStorageImpl(application.applicationContext)
+    }
 
     private val _uiState = MutableStateFlow(ChooseCountryUIState())
     val uiState = _uiState.asStateFlow()
-
-    //var dynamicPagesID: MutableLiveData<String> = MutableLiveData()
 
     fun getCountriesList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -79,20 +89,23 @@ class ChooseCountryViewModel(private val chooseCountryRepository: ChooseCountryR
                         it.copy(
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
-                                    .any { it is ApolloNetworkException })
-                                UIErrorType.Network else UIErrorType.Other()
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
                         )
                     }
                     when (e) {
                         is ApolloHttpException -> {
                             println("HTTP error: ${e.message}")
                         }
+
                         is ApolloNetworkException -> {
                             println("Network error: ${e.message}")
                         }
+
                         is ApolloParseException -> {
                             println("Parse error: ${e.message}")
                         }
+
                         else -> {
                             println("An error occurred: ${e.message}")
                             e.printStackTrace()
@@ -118,5 +131,17 @@ class ChooseCountryViewModel(private val chooseCountryRepository: ChooseCountryR
                     }
                 }
         }
+    }
+
+    fun updateCountryId(countryId: String) {
+        localStorage.countryId = countryId
+    }
+
+    fun getCountryId(): String {
+        return localStorage.countryId
+    }
+
+    fun updatePageId(pageId: String) {
+        localStorage.pageId = pageId
     }
 }
