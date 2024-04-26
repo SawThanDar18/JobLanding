@@ -26,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.HomeScreen
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
@@ -35,8 +36,12 @@ import org.koin.compose.getKoin
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageId: String, destination: String) {
-    Log.d("tag>>", destination)
+fun BottomNavigation(
+    sharedViewModel: SharedViewModel,
+    nav: NavController,
+    pageId: String,
+    destination: String
+) {
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
 
@@ -67,7 +72,9 @@ fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageI
         backgroundColor = Color.White,
         bottomBar = {
             BottomNavigation(
-                modifier = Modifier.height(73.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .height(73.dp)
+                    .fillMaxWidth(),
                 backgroundColor = Color.White
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -75,7 +82,9 @@ fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageI
 
                 items.forEach { item ->
                     BottomNavigationItem(
-                        modifier = Modifier.padding(bottom = 0.dp).weight(1f)
+                        modifier = Modifier
+                            .padding(bottom = 0.dp)
+                            .weight(1f)
                             .align(Alignment.CenterVertically),
                         icon = {
                             val image = if (currentRoute == item.route) {
@@ -117,41 +126,29 @@ fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageI
         }
     ) {
         NavHost(navController, startDestination = destination) {
-            composable("home") {
-                val viewModel: HomeViewModel = getKoin().get()
-                HomeScreen(viewModel, nav, pageId)
+
+            if (destination == "home") {
+                composable("home") {
+                    val viewModel: HomeViewModel = getKoin().get()
+                    HomeScreen(viewModel, nav, pageId)
+                }
             }
-            composable("application") { ApplicationScreen() }
-            composable("inbox") { InboxScreen() }
-            composable("interviews") { InterviewsScreen() }
-            composable("profile") { UnregisterProfileScreen(nav) }
 
-                when(destination) {
-                    "home" -> {
-                        composable("home") {
-                            val viewModel: HomeViewModel = getKoin().get()
-                            HomeScreen(viewModel, nav, pageId)
-                        }
-                    }
-
-                    "application" -> {
-                        composable("application") { ApplicationScreen() }
-                    }
-
-                    "inbox" -> {
-                        composable("inbox") { InboxScreen() }
-                    }
-
-                    "interviews" -> {
-                        composable("interviews") { InterviewsScreen() }
-                    }
-
-                    "profile" -> {
-                        composable("profile") { UnregisterProfileScreen(nav) }
-                    }
+            if (destination == "profile") {
+                composable("profile") { UnregisterProfileScreen(nav) }
             }
 
 
+            if (destination == "") {
+                composable("home") {
+                    val viewModel: HomeViewModel = getKoin().get()
+                    HomeScreen(viewModel, nav, pageId)
+                }
+                composable("application") { ApplicationScreen() }
+                composable("inbox") { NotificationScreen() }
+                composable("interviews") { InterviewsScreen() }
+                composable("profile") { UnregisterProfileScreen(nav) }
+            }
         }
     }
 }
@@ -159,11 +156,6 @@ fun BottomNavigation(sharedViewModel: SharedViewModel, nav: NavController, pageI
 @Composable
 fun ApplicationScreen() {
     //Text(text = "Application", modifier = Modifier.padding(16.dp))
-}
-
-@Composable
-fun InboxScreen() {
-    //Text(text = "Inbox", modifier = Modifier.padding(16.dp))
 }
 
 @Composable
