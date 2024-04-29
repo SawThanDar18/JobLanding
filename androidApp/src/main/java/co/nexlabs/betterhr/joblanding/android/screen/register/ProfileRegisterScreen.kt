@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.register
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,23 +37,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -62,7 +76,9 @@ fun ProfileRegisterScreen() {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
-        modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp),
+        modifier = Modifier
+            .padding(16.dp, 16.dp, 16.dp, 0.dp)
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
@@ -91,6 +107,7 @@ fun ProfileRegisterScreen() {
         Spacer(modifier = Modifier.height(40.dp))
 
         LazyColumn(
+            modifier = Modifier.padding(bottom = 92.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -108,26 +125,13 @@ fun ProfileRegisterScreen() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Upload profile picture",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFF4A4A4A),
-                    fontSize = 14.sp
-                )
+                MultiStyleText(text1 = "Upload profile picture", color1 = Color(0xFF4A4A4A), text2 = "*", color2 = Color(0xFFffa558))
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(35.dp))
 
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Start,
-                        text = "Full name",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF4A4A4A),
-                        fontSize = 14.sp
-                    )
-
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    MultiStyleText(text1 = "Full name", color1 = Color(0xFF4A4A4A), text2 = "*", color2 = Color(0xFFffa558))
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -234,14 +238,9 @@ fun ProfileRegisterScreen() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Resume or CV",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W400,
-                    color = Color(0xFF4A4A4A),
-                    fontSize = 14.sp
-                )
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    MultiStyleText(text1 = "Resume or CV ", color1 = Color(0xFF4A4A4A), text2 = "*", color2 = Color(0xFFffa558))
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -249,26 +248,18 @@ fun ProfileRegisterScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
-                        .border(1.dp, Color(0xFF757575), RoundedCornerShape(4.dp))
+                        //.border(1.dp, Color(0xFF757575), RoundedCornerShape(4.dp))
                         .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+                        .DashBorder(1.dp, Color(0xFF757575), 4.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Canvas(modifier = Modifier.fillMaxSize()) {
-                        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(4f, 2f), 0f)
-                        drawLine(
-                            color = Color(0xFF757575),
-                            start = Offset(0f, size.height / 2f),
-                            end = Offset(size.width, size.height / 2f),
-                            strokeWidth = 2f,
-                            //cap = Stroke.Cap.Round,
-                            pathEffect = pathEffect
-                        )
-                    }
 
                     Image(
                         painter = painterResource(id = R.drawable.attach_file),
                         contentDescription = "Attach File Icon",
                         modifier = Modifier
-                            .size(width = 114.dp, height = 180.dp)
+                            .size(width = 114.dp, height = 180.dp),
+                        alignment = Alignment.Center
                     )
 
                 }
@@ -295,40 +286,33 @@ fun ProfileRegisterScreen() {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(60.dp)
-                                .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp))
+                                .height(50.dp)
                                 .background(
-                                    color = Color.Transparent,
+                                    color = Color(0xFFF2F6FC),
                                     shape = MaterialTheme.shapes.medium
                                 )
+                                .DashBorder(1.dp, Color(0xFFA7BAC5), 4.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Canvas(modifier = Modifier.fillMaxSize()) {
-                                val pathEffect = PathEffect.dashPathEffect(floatArrayOf(4f, 2f), 0f)
-                                drawLine(
-                                    color = Color(0xFF757575),
-                                    start = Offset(0f, size.height / 2f),
-                                    end = Offset(size.width, size.height / 2f),
-                                    strokeWidth = 2f,
-                                    pathEffect = pathEffect
-                                )
-                            }
 
                             Row(
-                                modifier = Modifier.padding(10.dp),
+                                modifier = Modifier.padding(10.dp).fillMaxSize(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.weight(1f),
+                                    horizontalArrangement = Arrangement.Start,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Image(
-                                        painter = painterResource(id = R.drawable.attach_file),
-                                        contentDescription = "Attach File Icon",
+                                        painter = painterResource(id = R.drawable.bank_logo),
+                                        contentDescription = "PDF Logo Icon",
                                         modifier = Modifier
-                                            .size(width = 114.dp, height = 180.dp)
+                                            .size(24.dp)
                                     )
+
+                                    Spacer(modifier = Modifier.width(16.dp))
 
                                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                         Text(
@@ -343,15 +327,15 @@ fun ProfileRegisterScreen() {
                                             text = "5.6 MB",
                                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             fontWeight = FontWeight.W400,
-                                            color = Color(0xFF4A4A4A),
-                                            fontSize = 14.sp
+                                            color = Color(0xFF757575),
+                                            fontSize = 8.sp
                                         )
                                     }
                                 }
 
                                 Image(
-                                    painter = painterResource(id = R.drawable.attach_file),
-                                    contentDescription = "Attach File Icon",
+                                    painter = painterResource(id = R.drawable.x),
+                                    contentDescription = "X Icon",
                                     modifier = Modifier
                                         .size(16.dp)
                                 )
@@ -368,7 +352,8 @@ fun ProfileRegisterScreen() {
                         .fillMaxWidth()
                         .height(40.dp)
                         .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                        .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
+                        .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium),
+                    contentAlignment = Alignment.Center
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -376,7 +361,7 @@ fun ProfileRegisterScreen() {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.upload),
+                            painter = painterResource(id = R.drawable.attach_file),
                             contentDescription = "Upload Icon",
                             modifier = Modifier
                                 .size(20.dp)
@@ -400,13 +385,13 @@ fun ProfileRegisterScreen() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.Bottom,
         modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
+            .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 32.dp),
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(40.dp)
                 .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
                 .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium),
             contentAlignment = Alignment.Center,
@@ -420,4 +405,29 @@ fun ProfileRegisterScreen() {
             )
         }
     }
+}
+
+
+@Composable
+fun MultiStyleText(text1: String, color1: Color, text2: String, color2: Color) {
+    Text(
+        buildAnnotatedString {
+                withStyle(style = SpanStyle(
+                    color = color1,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp
+                )) {
+                    append(text1)
+                }
+                withStyle(style = SpanStyle(
+                    color = color2,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp
+                )) {
+                    append(text2)
+                }
+            }
+    )
 }

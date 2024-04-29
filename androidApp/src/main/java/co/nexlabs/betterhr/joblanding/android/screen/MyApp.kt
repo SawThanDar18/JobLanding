@@ -16,7 +16,8 @@ import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scre
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.JobDetailsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationScreen
 import co.nexlabs.betterhr.joblanding.android.screen.choose_country.ChooseCountryScreen
-import co.nexlabs.betterhr.joblanding.android.screen.register.EditProfileScreen
+import co.nexlabs.betterhr.joblanding.android.screen.register.CompleteProfileScreen
+import co.nexlabs.betterhr.joblanding.android.screen.register.ProfileDetailEditScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.ProfileRegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.splash.ScreenPortal
@@ -41,7 +42,7 @@ fun MyApp() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        NavHost(navController, startDestination = "profile-register-screen") {
+        NavHost(navController, startDestination = "complete-profile-screen") {
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
@@ -93,8 +94,11 @@ fun MyApp() {
             composable("inbox-screen") {
                 NotificationScreen()
             }
-            composable("edit-profile-screen") {
-                EditProfileScreen()
+            composable("profile-edit-detail-screen") {
+                ProfileDetailEditScreen()
+            }
+            composable("complete-profile-screen") {
+                CompleteProfileScreen()
             }
         }
     }
