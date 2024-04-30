@@ -14,7 +14,11 @@ import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scre
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionJobsListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CompanyDetailsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.JobDetailsScreen
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationScreen
 import co.nexlabs.betterhr.joblanding.android.screen.choose_country.ChooseCountryScreen
+import co.nexlabs.betterhr.joblanding.android.screen.register.CompleteProfileScreen
+import co.nexlabs.betterhr.joblanding.android.screen.register.ProfileDetailEditScreen
+import co.nexlabs.betterhr.joblanding.android.screen.register.ProfileRegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.splash.ScreenPortal
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
@@ -38,17 +42,20 @@ fun MyApp() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        NavHost(navController, startDestination = "screen-portal") {
+        NavHost(navController, startDestination = "complete-profile-screen") {
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
             }
-            composable("profile-unregister-screen") {
+            composable("inbox-screen") {
                 UnregisterProfileScreen(navController)
             }
             composable("register-screen") {
                 val viewModel: RegisterViewModel = getKoin().get()
                 RegisterScreen(navController, viewModel)
+            }
+            composable("profile-register-screen") {
+                ProfileRegisterScreen()
             }
             composable("choose-country-screen") {
                 val viewModel: ChooseCountryViewModel = getKoin().get()
@@ -56,7 +63,7 @@ fun MyApp() {
             }
             composable("bottom-navigation-screen/{pageId}/{destination}") {
                 val sharedViewModel: SharedViewModel = getKoin().get()
-                if (it.arguments?.getString("pageId") != "" && it.arguments?.getString("destination") != "") {
+                if (it.arguments?.getString("pageId") != "" || it.arguments?.getString("destination") != "") {
                     BottomNavigation(sharedViewModel, navController, it.arguments?.getString("pageId") ?: "", it.arguments?.getString("destination") ?: "")
                 }
             }
@@ -83,6 +90,15 @@ fun MyApp() {
                 if (it.arguments?.getString("companyId") != "") {
                     CompanyDetailsScreen(viewModel, navController, it.arguments?.getString("companyId") ?: "")
                 }
+            }
+            composable("inbox-screen") {
+                NotificationScreen()
+            }
+            composable("profile-edit-detail-screen") {
+                ProfileDetailEditScreen()
+            }
+            composable("complete-profile-screen") {
+                CompleteProfileScreen()
             }
         }
     }
