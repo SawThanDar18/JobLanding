@@ -54,9 +54,9 @@ object CompanyDetailViewModelMapper {
             data.subdomain,
             data.country,
             data.name,
-            data.description,
-            data.company_mail,
-            data.company_link,
+            data.description ?: "",
+            data.company_mail ?: "",
+            data.company_link ?: "",
             data.jobs_count ?: 0,
             collectionJobsList
         )

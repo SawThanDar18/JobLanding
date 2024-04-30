@@ -65,9 +65,9 @@ object HomeViewModelMapper {
                         it.collection_id,
                         it.state_name,
                         it.job_opening_count,
-                        it.last3_view_count,
-                        it.last3_conversation_rate,
-                        it.last3_cv_count,
+                        it.last3_view_count ?: 0,
+                        it.last3_conversation_rate ?: 0,
+                        it.last3_cv_count ?: 0,
                         CompanyUIModel(
                             it.company!!.id,
                             it.company.name

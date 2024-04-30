@@ -18,9 +18,9 @@ object CollectionCompaniesViewModelMapper {
             data.collection_id,
             data.state_name,
             data.job_opening_count,
-            data.last3_view_count,
-            data.last3_conversation_rate,
-            data.last3_cv_count,
+            data.last3_view_count ?: 0,
+            data.last3_conversation_rate ?: 0,
+            data.last3_cv_count ?: 0,
             CompaniesCompanyUIModel(
                 data.company!!.id,
                 data.company.name
