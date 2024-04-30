@@ -1,0 +1,17 @@
+{
+  "name": "With Auth API",
+  "schemaPath": "schema.json",
+  "extensions": {
+    "endpoints": {
+      "Better HR Debug": {
+        "url": "https://joblandingdev.better.hr/api/graphql"
+      },
+      "Local": {
+        "url": "http://192.168.1.55:8000/graphql",
+        "headers": {
+          "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vYmV0dGVyLmxvY2FsL2dyYXBocWwvYXV0aCIsImlhdCI6MTU0NzU2MzQyOSwiZXhwIjoxNTUyNzQ3NDI5LCJuYmYiOjE1NDc1NjM0MjksImp0aSI6IlViMWg1Y3pGQUwyTTh6QWMiLCJzdWIiOiI1YmRiMGNkMC00NmY4LTExZTgtYmRkMy02M2M3ZmJjNTZiYzMiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.2YhM4ggVzI56rxgC34fb-9kMwXM737ozAoetvfGnAtM"
+        }
+      }
+    }
+  }
+}

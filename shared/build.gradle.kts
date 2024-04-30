@@ -145,8 +145,13 @@ dependencies {
 }
 
 apollo {
-    service("service") {
-        packageName.set("co.nexlabs.betterhr.joblanding")
+    service("with_auth") {
+        sourceFolder.set("co/nexlabs/betterhr/job/with_auth")
+        packageName.set("co.nexlabs.betterhr.job.with_auth")
+    }
+    service("without_auth") {
+        sourceFolder.set("co/nexlabs/betterhr/job/without_auth")
+        packageName.set("co.nexlabs.betterhr.job.without_auth")
     }
 }
 

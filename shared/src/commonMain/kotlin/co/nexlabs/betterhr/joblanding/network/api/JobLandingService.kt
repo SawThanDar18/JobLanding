@@ -1,11 +1,11 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
-import co.nexlabs.betterhr.joblanding.DynamicPagesQuery
-import co.nexlabs.betterhr.joblanding.JobLandingCollectionCompaniesQuery
-import co.nexlabs.betterhr.joblanding.JobLandingCollectionJobsQuery
-import co.nexlabs.betterhr.joblanding.JobLandingCompanyDetailQuery
-import co.nexlabs.betterhr.joblanding.JobLandingJobDetailQuery
-import co.nexlabs.betterhr.joblanding.JobLandingSectionsQuery
+import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse

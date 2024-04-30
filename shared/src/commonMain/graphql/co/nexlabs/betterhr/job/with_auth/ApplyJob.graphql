@@ -1,0 +1,28 @@
+mutation ApplyJob(
+    $id: String,
+    $candidate_id: String,
+    $job_id: String,
+    $status: String
+) {
+    ApplyJobMutation (
+        id: $id
+        candidate_id: $candidate_id
+        job_id: $job_id
+        status: $status
+    ) {
+        id
+        candidate_id
+        job_id
+        status
+        rating
+        interviews {
+            title
+        }
+        assignments {
+            title
+        }
+        offers {
+            title
+        }
+    }
+}

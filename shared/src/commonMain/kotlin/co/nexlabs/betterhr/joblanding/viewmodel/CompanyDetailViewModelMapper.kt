@@ -1,6 +1,6 @@
 package co.nexlabs.betterhr.joblanding.viewmodel
 
-import co.nexlabs.betterhr.joblanding.JobLandingCompanyDetailQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailCompanyUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailJobs
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIModel
