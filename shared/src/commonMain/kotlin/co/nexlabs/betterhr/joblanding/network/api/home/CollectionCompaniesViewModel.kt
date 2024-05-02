@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.network.api.home
 
 import android.util.Log
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesRepository
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionCompaniesViewModelMapper
@@ -23,6 +24,8 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 class CollectionCompaniesViewModel(private val collectionJobsRepository: CollectionCompaniesRepository): ViewModel() {
     private val _uiState = MutableStateFlow(CollectionCompaniesUIState())
     val uiState = _uiState.asStateFlow()
+
+    val collectionCompaniesList: MutableList<CollectionCompaniesUIModel> = ArrayList()
 
     fun getCollectionCompanies(collectionId: String, isPaginate: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -62,6 +65,7 @@ class CollectionCompaniesViewModel(private val collectionJobsRepository: Collect
                         )
                     }
                     if (!data.hasErrors()) {
+                        collectionCompaniesList.addAll(CollectionCompaniesViewModelMapper.mapResponseToViewModel(data.data!!))
                         _uiState.update {
                             it.copy(
                                 isLoading = false,

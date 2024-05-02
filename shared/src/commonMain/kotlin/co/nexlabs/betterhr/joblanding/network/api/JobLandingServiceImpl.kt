@@ -2,10 +2,13 @@ package co.nexlabs.betterhr.joblanding.network.api
 
 import android.app.Application
 import android.util.Log
+import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
+import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
+import co.nexlabs.betterhr.job.with_auth.VerifySmsTokenAndAuthMutation
 import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
@@ -29,6 +32,9 @@ import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
 import com.apollographql.apollo3.ApolloCall
 import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo3.api.Optional
+import com.apollographql.apollo3.cache.normalized.api.MemoryCacheFactory
+import com.apollographql.apollo3.cache.normalized.normalizedCache
 import com.apollographql.apollo3.exception.ApolloException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -61,7 +67,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
 
     val headerInterceptorWithAuth = Interceptor { chain ->
         val request = chain.request().newBuilder()
-            .addHeader("Authorization", "Bearer ${localStorage.token}")
+            .addHeader("Authorization", "bearer ${localStorage.bearerToken}")
             .build()
         chain.proceed(request)
     }
@@ -85,11 +91,18 @@ class JobLandingServiceImpl(private val application: Application, private val cl
     val apolloClient = ApolloClient.Builder()
         .okHttpClient(okHttpClient)
         .serverUrl(baseUrlForJob)
+        .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
         .build()
 
     val apolloClientWithAuth = ApolloClient.Builder()
         .okHttpClient(okHttpClientWithAuth)
         .serverUrl(baseUrlForAuth)
+        .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
+        .build()
+
+    val apolloClientWithAuthWithoutToken = ApolloClient.Builder()
+        .serverUrl(baseUrlForAuth)
+        .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
         .build()
 
     override suspend fun sendVerification(body: SendVerificationCodeRequest): SendVerificationResponse {
@@ -158,15 +171,40 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         return response.body()
     }
 
+    override suspend fun createCandidate(
+        name: String,
+        email: String,
+        phone: String,
+        desiredPosition: String,
+        summary: String,
+        countryId: String
+    ): ApolloCall<CreateCandidateMutation.Data> {
+        return apolloClientWithAuthWithoutToken.mutation(CreateCandidateMutation(
+            name, email, phone, desiredPosition, summary, countryId
+        ))
+    }
+
+    override suspend fun getBearerToken(token: String): ApolloCall<VerifySmsTokenAndAuthMutation.Data> {
+        /*try {
+            val response = apolloClientWithAuthWithoutToken.mutation(VerifySmsTokenAndAuthMutation(token))
+            println("mm>>${response.execute().data!!.verifySmsTokenAndAuth.token}")
+        } catch (e: ApolloException) {
+            println("ApolloClient error: ${e.message}")
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }*/
+        return apolloClientWithAuthWithoutToken.mutation(VerifySmsTokenAndAuthMutation(token))
+    }
+
     override suspend fun getCandidateDatas(): ApolloCall<CandidateQuery.Data> {
-        try {
+        /*try {
             val response = apolloClientWithAuth.query(CandidateQuery())
             println("mm>>${response.execute().data!!.me.id}")
         } catch (e: ApolloException) {
             println("ApolloClient error: ${e.message}")
         } catch (e: Exception) {
             println("Error: ${e.message}")
-        }
+        }*/
         return apolloClientWithAuth.query(CandidateQuery())
     }
 
@@ -184,14 +222,14 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         platform: String
     ): ApolloCall<DynamicPagesQuery.Data> {
 
-        try {
+        /*try {
             val response = apolloClient.query(DynamicPagesQuery(countryId, platform))
             println("mm>>${response.execute().data!!.dynamicPages.size}")
         } catch (e: ApolloException) {
             println("ApolloClient error: ${e.message}")
         } catch (e: Exception) {
             println("Error: ${e.message}")
-        }
+        }*/
         return apolloClient.query(DynamicPagesQuery(countryId, platform))
     }
 
@@ -223,14 +261,14 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         jobId: String
     ): ApolloCall<SaveJobMutation.Data> {
         Log.d("candi>>>", candidateId)
-        try {
+        /*try {
             val response = apolloClientWithAuth.mutation(SaveJobMutation(candidateId, jobId))
             println("mm>>${response.execute().data!!.saveJob!!.job_id}")
         } catch (e: ApolloException) {
             println("ApolloClient error: ${e.message}")
         } catch (e: Exception) {
             println("Error: ${e.message}")
-        }
+        }*/
         return apolloClientWithAuth.mutation(SaveJobMutation(candidateId, jobId))
     }
 
@@ -240,5 +278,15 @@ class JobLandingServiceImpl(private val application: Application, private val cl
 
     override suspend fun unSaveJob(id: String): ApolloCall<UnSaveJobMutation.Data> {
         return apolloClientWithAuth.mutation(UnSaveJobMutation(id))
+    }
+
+    override suspend fun applyJob(
+        referenceId: String,
+        candidateId: String,
+        jobId: String,
+        status: String,
+        subDomain: String
+    ): ApolloCall<ApplyJobMutation.Data> {
+        return apolloClientWithAuth.mutation(ApplyJobMutation(Optional.present(referenceId), candidateId, jobId, Optional.present(status), subDomain))
     }
 }

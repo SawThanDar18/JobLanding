@@ -23,6 +23,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,12 +43,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
+import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CompleteProfileScreen() {
+fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: NavController) {
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -105,7 +113,7 @@ fun CompleteProfileScreen() {
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Saw Thandar",
+                            text = uiState.candidateData.name,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                             fontWeight = FontWeight.W600,
                             color = Color(0xFF6A6A6A),
@@ -113,7 +121,7 @@ fun CompleteProfileScreen() {
                         )
 
                         Text(
-                            text = "Android Developer",
+                            text = uiState.candidateData.desiredPosition,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                             fontWeight = FontWeight.W400,
                             color = Color(0xFF6A6A6A),
@@ -124,7 +132,10 @@ fun CompleteProfileScreen() {
 
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .clickable {
+                                           navController.navigate("profile-edit-detail-screen")
+                                },
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -164,7 +175,7 @@ fun CompleteProfileScreen() {
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "09984849984",
+                        text = uiState.candidateData.phone,
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF6A6A6A),
@@ -192,7 +203,7 @@ fun CompleteProfileScreen() {
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "sawthandar@better.hr",
+                        text = uiState.candidateData.email,
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF6A6A6A),

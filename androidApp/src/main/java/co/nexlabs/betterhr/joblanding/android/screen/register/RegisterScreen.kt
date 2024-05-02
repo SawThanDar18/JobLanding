@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.android.screen.register
 
 import android.opengl.Visibility
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,6 +47,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -57,6 +60,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.MyToast
@@ -79,15 +84,15 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
     val applicationContext = LocalContext.current.applicationContext
     var text by remember { mutableStateOf("") }
 
+    var focusRequesters = remember {
+        List(6) { FocusRequester() }
+    }
+
     var timerText by remember { mutableStateOf("") }
 
     if (isTimerRunning) {
 
         LaunchedEffect(Unit) {
-            /*while (timer > 0) {
-                delay(60000)
-                timer--
-            }*/
             for (i in 59 downTo 0) {
                 timer = i
                 delay(1000)
@@ -102,8 +107,6 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 
         is UiState.Success -> {
             isTimerRunning = true
-            //MyToast(message = "Code was sent to $text")
-
         }
 
         is UiState.Error -> {
@@ -122,12 +125,12 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         }
 
         is UiState.Success -> {
-            scope.launch {
-                //viewModel.updateToken(currentState.data)
-                //viewModel.getCandidateDataAndUpdate()
-                //navController.navigate("profile-register-screen")
+            LaunchedEffect(Unit) {
+                scope.launch {
+                    viewModel.updateToken(currentState.data)
+                }
+                navController.navigate("profile-register-screen")
             }
-            MyToast(message = currentState.data)
         }
 
         is UiState.Error -> {
@@ -138,14 +141,6 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
     var boxColor by remember { mutableStateOf(Color(0xFFD9D9D9)) }
 
     var code: List<Char> by remember { mutableStateOf(listOf()) }
-
-    val focusRequesters = remember {
-        val temp = mutableListOf<FocusRequester>()
-        repeat(6) {
-            temp.add(FocusRequester())
-        }
-        temp
-    }
 
     Column(
         modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp),
@@ -204,6 +199,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
         ) {
             Box(
                 modifier = Modifier
+                    .weight(2f)
                     .height(50.dp)
                     .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
             ) {
@@ -251,6 +247,8 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                     onClick = {},
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFA7BAC5)),
                     modifier = Modifier
+                        .weight(1f)
+                        .width(83.dp)
                         .height(50.dp)
                         .background(color = Color(0xFFA7BAC5), shape = MaterialTheme.shapes.medium)
                         .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(0.dp, 4.dp, 4.dp, 0.dp))
@@ -272,6 +270,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                                 scope.launch {
                                     isTimerRunning = true
                                     viewModel.requestOTP(text)
+                                    viewModel.updatePhone(text)
                                 }
                             } else {
                                 Toast.makeText(
@@ -290,6 +289,8 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1ED292)),
                     modifier = Modifier
+                        .weight(1f)
+                        .width(83.dp)
                         .height(50.dp)
                         .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
                         .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(0.dp, 4.dp, 4.dp, 0.dp))
@@ -494,9 +495,11 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
+
             Box(
                 modifier = Modifier
                     .clickable {
+                        focusRequesters.forEach { it.freeFocus() }
                         scope.launch {
                             viewModel.verifyOTP(code.joinToString(separator = ""))
                         }
@@ -517,14 +520,6 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 
         }
 
-    }
-
-
-
-    DisposableEffect(Unit) {
-        onDispose {
-            focusRequesters.forEach { it.freeFocus() }
-        }
     }
 }
 
@@ -581,6 +576,10 @@ fun MyToast(message: String) {
             }
         }
     }*/
+}
+
+fun clearFocus(rootView: View) {
+    rootView.clearFocus()
 }
 
 

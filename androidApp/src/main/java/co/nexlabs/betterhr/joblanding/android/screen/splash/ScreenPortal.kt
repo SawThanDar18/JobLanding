@@ -25,7 +25,7 @@ fun ScreenPortal(navController: NavController, viewModel: ScreenPortalViewModel)
     val scope = rememberCoroutineScope()
 
     scope.launch {
-        delay(3000)
+        delay(1000)
         if (viewModel.getCountryId().isNotBlank() && viewModel.getPageId().isNotBlank()) {
             navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"home"}")
         } else {

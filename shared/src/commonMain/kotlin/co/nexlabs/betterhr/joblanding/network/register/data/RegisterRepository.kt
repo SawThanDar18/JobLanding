@@ -1,4 +1,4 @@
-package co.nexlabs.betterhr.joblanding.network.register
+package co.nexlabs.betterhr.joblanding.network.register.data
 
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
@@ -13,6 +13,4 @@ class RegisterRepository(private val jobLandingService: JobLandingService) {
     suspend fun verifyOTP(code: String) = jobLandingService.validateCode(
         VerifyOTPRequest(code)
     )
-
-    suspend fun getCandidateData() = jobLandingService.getCandidateDatas()
 }

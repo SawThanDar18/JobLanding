@@ -25,9 +25,21 @@ class AndroidLocalStorageImpl(context: Context): LocalStorage {
             preferences.putString("token", value)
         }
 
+    override var bearerToken: String
+        get() = preferences.getString("bearerToken", "")
+        set(value) {
+            preferences.putString("bearerToken", value)
+        }
+
     override var candidateId: String
         get() = preferences.getString("candidateId", "")
         set(value) {
             preferences.putString("candidateId", value)
+        }
+
+    override var phone: String
+        get() = preferences.getString("phone", "")
+        set(value) {
+            preferences.putString("phone", value)
         }
 }

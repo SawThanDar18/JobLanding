@@ -1,4 +1,4 @@
-package co.nexlabs.betterhr.joblanding.network.register
+package co.nexlabs.betterhr.joblanding.network.register.data
 
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 

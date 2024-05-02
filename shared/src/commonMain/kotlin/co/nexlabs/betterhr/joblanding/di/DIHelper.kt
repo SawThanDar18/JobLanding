@@ -1,11 +1,13 @@
 package co.nexlabs.betterhr.joblanding.di
 
 import android.app.Application
-import co.nexlabs.betterhr.joblanding.network.register.RegisterRepository
+import co.nexlabs.betterhr.joblanding.network.register.data.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingServiceImpl
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.apply_job.data.ApplyJobRepository
+import co.nexlabs.betterhr.joblanding.network.api.apply_job.ApplyJobViewModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeRepository
@@ -20,6 +22,10 @@ import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRep
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
+import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
+import co.nexlabs.betterhr.joblanding.network.register.ProfileRegisterViewModel
+import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileRepository
+import co.nexlabs.betterhr.joblanding.network.register.data.ProfileRegisterRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -70,6 +76,9 @@ fun initKoin(application: Application) {
                 single { CollectionCompaniesRepository(get()) }
                 single { JobDetailRepository(get()) }
                 single { CompanyDetailRepository(get()) }
+                single { ProfileRegisterRepository(get()) }
+                single { ApplyJobRepository(get()) }
+                single { CompleteProfileRepository(get()) }
                 factory { ScreenPortalViewModel(application) }
                 factory { RegisterViewModel(application, get()) }
                 factory { ChooseCountryViewModel(application, get()) }
@@ -80,6 +89,9 @@ fun initKoin(application: Application) {
                 factory { JobDetailViewModel(application, get()) }
                 factory { CompanyDetailViewModel(get()) }
                 factory { BottomNavigationViewModel(application) }
+                factory { ProfileRegisterViewModel(application, get()) }
+                factory { ApplyJobViewModel(application, get()) }
+                factory { CompleteProfileViewModel(application, get()) }
             }
         )
     }

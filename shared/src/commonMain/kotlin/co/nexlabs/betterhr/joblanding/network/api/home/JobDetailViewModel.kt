@@ -2,9 +2,13 @@ package co.nexlabs.betterhr.joblanding.network.api.home
 
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobDatUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRepository
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.JobDetailViewModelMapper
@@ -22,11 +26,18 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class JobDetailViewModel(application: Application, private val jobDetailRepository: JobDetailRepository): ViewModel() {
+class JobDetailViewModel(
+    application: Application,
+    private val jobDetailRepository: JobDetailRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(JobDetailUIState())
     val uiState = _uiState.asStateFlow()
 
+    private val _jobDetail = MutableLiveData<JobDetailUIModel>()
+    var jobDetail: LiveData<JobDetailUIModel> = _jobDetail
+
     private val localStorage: LocalStorage
+
     init {
         localStorage = AndroidLocalStorageImpl(application)
     }
@@ -48,7 +59,9 @@ class JobDetailViewModel(application: Application, private val jobDetailReposito
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
                                     .any { it is ApolloNetworkException || it is ApolloParseException })
-                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                                UIErrorType.Network else UIErrorType.Other(
+                                e.message ?: "Something went wrong!"
+                            )
                         )
                     }
 
@@ -86,7 +99,12 @@ class JobDetailViewModel(application: Application, private val jobDetailReposito
                             )
                         }
                     } else {
-                        Log.d("result>>", "it.hasErrors")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
                     }
                 }
         }
@@ -101,9 +119,7 @@ class JobDetailViewModel(application: Application, private val jobDetailReposito
                         it.copy(
                             isSaveJobSuccess = false,
                             isLoading = true,
-                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
-                                    .any { it is ApolloNetworkException || it is ApolloParseException })
-                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                            error = UIErrorType.Other(e.message.toString())
                         )
                     }
 
@@ -142,13 +158,20 @@ class JobDetailViewModel(application: Application, private val jobDetailReposito
                             )
                         }
                     } else {
-                        Log.d("result>>", "it.hasErrors")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
                     }
                 }
         }
     }
 
-    fun fetchSaveJobsByid(jobId: String) {
+    fun fetchSaveJobsById(jobId: String) {
+        Log.d("bearer>>", localStorage.bearerToken)
+        Log.d("jobid>>", jobId)
         viewModelScope.launch(Dispatchers.IO) {
             jobDetailRepository.fetchSaveJobsById(jobId).toFlow()
                 .catch { e ->
@@ -157,7 +180,9 @@ class JobDetailViewModel(application: Application, private val jobDetailReposito
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
                                     .any { it is ApolloNetworkException || it is ApolloParseException })
-                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                                UIErrorType.Network else UIErrorType.Other(
+                                e.message ?: "Something went wrong!"
+                            )
                         )
                     }
 
@@ -191,11 +216,17 @@ class JobDetailViewModel(application: Application, private val jobDetailReposito
                             it.copy(
                                 isLoading = false,
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
-                                fetchSaveJobs = JobDetailViewModelMapper.mapFetchSaveJobDataToViewModel(data.data!!.fetchSaveJobByJobId!!)
+                                fetchSaveJobs =
+                                JobDetailViewModelMapper.mapFetchSaveJobDataToViewModel(data.data!!.fetchSaveJobByJobId!!)
                             )
                         }
                     } else {
-                        Log.d("result>>", "it.hasErrors")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
                     }
                 }
         }
@@ -209,9 +240,7 @@ class JobDetailViewModel(application: Application, private val jobDetailReposito
                         it.copy(
                             isUnSaveJobSuccess = false,
                             isLoading = true,
-                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
-                                    .any { it is ApolloNetworkException || it is ApolloParseException })
-                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                            error = UIErrorType.Other(e.message.toString())
                         )
                     }
 
@@ -250,7 +279,12 @@ class JobDetailViewModel(application: Application, private val jobDetailReposito
                             )
                         }
                     } else {
-                        Log.d("result>>", "it.hasErrors")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
                     }
                 }
         }

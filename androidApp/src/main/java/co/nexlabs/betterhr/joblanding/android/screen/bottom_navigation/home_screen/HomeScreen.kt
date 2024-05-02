@@ -72,7 +72,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
-    var token by remember { mutableStateOf("") }
+    var bearerToken by remember { mutableStateOf("") }
 
     LaunchedEffect(refreshing) {
         if (refreshing) {
@@ -89,7 +89,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
         if (pageId != null && pageId != "") {
             viewModel.getJobLandingSections(pageId)
         }
-        token = viewModel.getToken()
+        bearerToken = viewModel.getBearerToken()
     }
 
     var style by remember { mutableStateOf("style-7") }
@@ -161,7 +161,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
         }
     }
 
-    if (token == "") {
+    if (bearerToken == "") {
         Box(
             modifier = Modifier
                 .fillMaxSize()

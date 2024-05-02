@@ -11,7 +11,7 @@ class BottomNavigationViewModel(application: Application): ViewModel() {
         localStorage = AndroidLocalStorageImpl(application.applicationContext)
     }
 
-    fun getToken(): String {
-        return localStorage.token
+    fun getBearerToken(): String {
+        return localStorage.bearerToken
     }
 }

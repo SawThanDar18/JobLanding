@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -26,6 +27,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,7 +52,12 @@ import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import kotlinx.coroutines.launch
 
 @Composable
-fun CollectionCompaniesListsScreen(viewModel: CollectionCompaniesViewModel, navController: NavController, collectionId: String, collectionName: String) {
+fun CollectionCompaniesListsScreen(
+    viewModel: CollectionCompaniesViewModel,
+    navController: NavController,
+    collectionId: String,
+    collectionName: String
+) {
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -78,10 +85,11 @@ fun CollectionCompaniesListsScreen(viewModel: CollectionCompaniesViewModel, navC
         }
 
         AnimatedVisibility(
-            uiState.collectionCompaniesList.isNotEmpty(),
+            viewModel.collectionCompaniesList.isNotEmpty(),
             enter = fadeIn(),
             exit = fadeOut()
         ) {
+            Log.d("dat>>", viewModel.collectionCompaniesList.toString())
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -129,8 +137,8 @@ fun CollectionCompaniesListsScreen(viewModel: CollectionCompaniesViewModel, navC
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(uiState.collectionCompaniesList.size) { index ->
-                        val item = uiState.collectionCompaniesList[index]
+                    items(viewModel.collectionCompaniesList.size) { index ->
+                        val item = viewModel.collectionCompaniesList[index]
 
                         Box(
                             modifier = Modifier

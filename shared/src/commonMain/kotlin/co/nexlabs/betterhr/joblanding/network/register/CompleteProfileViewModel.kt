@@ -1,47 +1,49 @@
-package co.nexlabs.betterhr.joblanding.network.api.home
+package co.nexlabs.betterhr.joblanding.network.register
 
 import android.app.Application
-import android.util.Log
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
-import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeRepository
-import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
-import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIState
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
+import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileRepository
+import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
-import co.nexlabs.betterhr.joblanding.viewmodel.HomeViewModelMapper
+import co.nexlabs.betterhr.joblanding.viewmodel.CandidateViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class HomeViewModel(application: Application, private val homeRepository: HomeRepository): ViewModel() {
-
+class CompleteProfileViewModel(
+    application: Application,
+    private val completeProfileRepository: CompleteProfileRepository
+): ViewModel() {
     private val localStorage: LocalStorage
 
     init {
         localStorage = AndroidLocalStorageImpl(application.applicationContext)
     }
 
-    private val _uiState = MutableStateFlow(HomeUIState())
+    private val _uiState = MutableStateFlow(CompleteProfileUIState())
     val uiState = _uiState.asStateFlow()
 
-    fun getJobLandingSections(pageId: String) {
+    fun getCandidateData() {
         viewModelScope.launch(Dispatchers.IO) {
-            homeRepository.getJobLandingSections(pageId).toFlow()
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing
+                )
+            }
+
+            completeProfileRepository.getCandidateData().toFlow()
                 .catch { e ->
                     _uiState.update {
                         it.copy(
@@ -69,8 +71,7 @@ class HomeViewModel(application: Application, private val homeRepository: HomeRe
                             e.printStackTrace()
                         }
                     }
-                }
-                .collectLatest { data ->
+                }.collectLatest { data ->
                     _uiState.update {
                         it.copy(
                             isLoading = true,
@@ -82,17 +83,18 @@ class HomeViewModel(application: Application, private val homeRepository: HomeRe
                             it.copy(
                                 isLoading = false,
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
-                                jobLandingSectionsList = HomeViewModelMapper.mapResponseToViewModel(data.data!!)
+                                candidateData = CandidateViewModelMapper.mapDataToViewModel(data.data!!.me)
                             )
                         }
                     } else {
-                        Log.d("result>>", "it.hasErrors")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
                     }
                 }
         }
-    }
-
-    fun getBearerToken(): String {
-        return localStorage.bearerToken
     }
 }

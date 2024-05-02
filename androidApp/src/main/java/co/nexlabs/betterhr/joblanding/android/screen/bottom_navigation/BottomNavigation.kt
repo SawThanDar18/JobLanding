@@ -35,6 +35,7 @@ import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
+import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.getKoin
 
@@ -139,8 +140,9 @@ fun BottomNavigation(
             composable("inbox") { NotificationScreen() }
             composable("interviews") { InterviewsScreen() }
             composable("profile") {
-                if (viewModel.getToken() != "") {
-                    CompleteProfileScreen()
+                if (viewModel.getBearerToken() != "") {
+                    val viewModel: CompleteProfileViewModel = getKoin().get()
+                    CompleteProfileScreen(viewModel, nav)
                 } else {
                     UnregisterProfileScreen(nav)
                 }
@@ -155,7 +157,14 @@ fun BottomNavigation(
                 "application" -> composable("application") { ApplicationsScreen() }
                 "inbox" -> composable("inbox") { NotificationScreen() }
                 "interviews" -> composable("interviews") { InterviewsScreen() }
-                "profile" -> composable("profile") { UnregisterProfileScreen(nav) }
+                "profile" -> composable("profile") {
+                    if (viewModel.getBearerToken() != "") {
+                        val viewModel: CompleteProfileViewModel = getKoin().get()
+                        CompleteProfileScreen(viewModel, nav)
+                    } else {
+                        UnregisterProfileScreen(nav)
+                    }
+                }
             }
         }
     }

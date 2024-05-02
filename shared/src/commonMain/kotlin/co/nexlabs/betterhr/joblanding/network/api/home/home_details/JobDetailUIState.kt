@@ -4,7 +4,7 @@ import co.nexlabs.betterhr.joblanding.util.UIErrorType
 
 data class JobDetailUIState(
     val saveJobSuccessMsg: String = "",
-    val isSaveJobSuccess: Boolean = false,
+    var isSaveJobSuccess: Boolean = false,
     val isUnSaveJobSuccess: Boolean = false,
     val isLoading: Boolean = true,
     val error: UIErrorType = UIErrorType.Nothing,

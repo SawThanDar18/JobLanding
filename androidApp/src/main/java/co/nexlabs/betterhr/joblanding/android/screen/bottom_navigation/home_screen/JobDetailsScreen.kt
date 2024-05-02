@@ -3,6 +3,8 @@ package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scr
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,11 +29,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -60,7 +64,12 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailCompanyUIModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIModel
+import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -71,457 +80,458 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     val uiState by viewModel.uiState.collectAsState()
     val applicationContext = LocalContext.current.applicationContext
 
+    var isSuccessSaveJob by remember { mutableStateOf(false) }
+    isSuccessSaveJob = uiState.isSaveJobSuccess
+
     scope.launch {
-        if (jobId != null && jobId != "") {
+        if (jobId.isNotBlank()) {
             viewModel.getJobDetail(jobId)
+            //viewModel.fetchSaveJobsById(jobId)
         }
     }
 
-    var item = uiState.jobDetail
+    LaunchedEffect(isSuccessSaveJob) {
+        delay(3000)
+        uiState.isSaveJobSuccess = false
+    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 70.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Column {
-            Boxes(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.yoma_cover),
-                    contentDescription = "Background Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp),
-                    contentScale = ContentScale.FillWidth
-                )
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-                Image(
-                    painter = painterResource(id = R.drawable.bank_logo),
-                    contentDescription = "Company Logo",
-                    modifier = Modifier
-                        .width(61.dp)
-                        .height(61.dp)
-                        .clip(CircleShape),
-                )
-            }
-        }
-
-        Text(
-            text = item.position,
-            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-            fontWeight = FontWeight.W600,
-            color = Color(0xFF4A4A4A),
-            fontSize = 16.sp,
-            modifier = Modifier
-                .padding(top = 6.dp),
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 6.dp),
+        AnimatedVisibility(
+            uiState.error != UIErrorType.Nothing,
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
+            ErrorLayout(uiState.error)
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 70.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Column {
+                Boxes(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.yoma_cover),
+                        contentDescription = "Background Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(160.dp),
+                        contentScale = ContentScale.FillWidth
+                    )
+
+                    Image(
+                        painter = painterResource(id = R.drawable.bank_logo),
+                        contentDescription = "Company Logo",
+                        modifier = Modifier
+                            .width(61.dp)
+                            .height(61.dp)
+                            .clip(CircleShape),
+                    )
+                }
+            }
+
             Text(
-                text = item.company.name,
+                text = uiState.jobDetail.position,
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = FontWeight.W400,
-                color = Color(0xFF1082DE),
-                fontSize = 12.sp,
-                modifier = Modifier.clickable {
-                    navController.navigate("company-details/${item.company.id}")
-                }
+                fontWeight = FontWeight.W600,
+                color = Color(0xFF4A4A4A),
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .padding(top = 6.dp),
             )
-            Image(
-                painter = painterResource(id = R.drawable.arrow_right_up),
-                contentDescription = "Arrow Right Up",
-                modifier = Modifier.size(16.dp)
-            )
-        }
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            item {
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.job_icon),
-                        contentDescription = "Job Icon",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Full time",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 12.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.salary_range),
-                        contentDescription = "Salary Icon",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "${item.miniSalary}-${item.maxiSalary}${item.currencyCode}",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 12.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.experience_icon),
-                        contentDescription = "Experience Icon",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "2+ years of experience",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 12.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.location_icon),
-                        contentDescription = "Location Icon",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "${item.cityName}, ${item.stateName}",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 12.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.date_icon),
-                        contentDescription = "Date Icon",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Posted 14 days ago",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 12.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.application_icon),
-                        contentDescription = "Applicants Icon",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "${item.lastCVCount} Applicants",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 12.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                            .background(color = Color(0xFFE4E7ED)),
-
-                        )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                ) {
-                    Text(
-                        text = "Job descriptions",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 14.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                ) {
-                    Text(
-                        text = item.description,
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF757575),
-                        fontSize = 14.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                            .background(color = Color(0xFFE4E7ED)),
-
-                        )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                ) {
-                    Text(
-                        text = "Job requirements",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 14.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                ) {
-                    Text(
-                        text = item.requirement,
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF757575),
-                        fontSize = 14.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                            .background(color = Color(0xFFE4E7ED)),
-
-                        )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                ) {
-                    Text(
-                        text = "Benefits & perks",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 14.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                ) {
-                    Text(
-                        text = item.benefitsAndPerks,
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF757575),
-                        fontSize = 14.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillMaxWidth()
-                            .background(color = Color(0xFFE4E7ED)),
-
-                        )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.gradient_line),
-                        contentDescription = "Gradient Line",
-                        modifier = Modifier
-                            .size(4.dp, 18.dp),
-                        contentScale = ContentScale.Fit
-                    )
-
-                    Text(
-                        text = "Similar Jobs",
-                        modifier = Modifier.padding(start = 4.dp),
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 14.sp,
-                    )
-                }
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp),
+            ) {
+                Text(
+                    text = uiState.jobDetail.company.name,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFF1082DE),
+                    fontSize = 12.sp,
+                    modifier = Modifier.clickable {
+                        navController.navigate("company-details/${uiState.jobDetail.company.id}")
+                    }
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.arrow_right_up),
+                    contentDescription = "Arrow Right Up",
+                    modifier = Modifier.size(16.dp)
+                )
             }
 
-            items(items.size) { index ->
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color.Transparent,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
-                ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                item {
                     Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 10.dp),
                         horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(),
                     ) {
-                        Column {
-                            Image(
-                                painter = painterResource(id = R.drawable.company_logo),
-                                contentDescription = "Company Logo",
-                                modifier = Modifier
-                                    .size(48.dp),
-                                contentScale = ContentScale.Fit
-                            )
-                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.job_icon),
+                            contentDescription = "Job Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Full time",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 12.sp,
+                        )
+                    }
 
-                        Column(modifier = Modifier.padding(start = 8.dp)) {
-                            Text(
-                                text = "Designer",
-                                maxLines = 2,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W600,
-                                color = Color(0xFF6A6A6A),
-                                fontSize = 13.sp,
-                            )
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.salary_range),
+                            contentDescription = "Salary Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${uiState.jobDetail.miniSalary}-${uiState.jobDetail.maxiSalary}${uiState.jobDetail.currencyCode}",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 12.sp,
+                        )
+                    }
 
-                            Text(
-                                modifier = Modifier.padding(top = 3.dp),
-                                text = "Yoma Bank",
-                                maxLines = 2,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFF757575),
-                                fontSize = 12.sp,
-                            )
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.experience_icon),
+                            contentDescription = "Experience Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "2+ years of experience",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 12.sp,
+                        )
+                    }
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.location_icon),
+                            contentDescription = "Location Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${uiState.jobDetail.cityName}, ${uiState.jobDetail.stateName}",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 12.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.date_icon),
+                            contentDescription = "Date Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Posted 14 days ago",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 12.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.application_icon),
+                            contentDescription = "Applicants Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "${uiState.jobDetail.lastCVCount} Applicants",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 12.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth()
+                                .background(color = Color(0xFFE4E7ED)),
+
+                            )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    ) {
+                        Text(
+                            text = "Job descriptions",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 14.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp),
+                    ) {
+                        Text(
+                            text = uiState.jobDetail.description,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 14.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth()
+                                .background(color = Color(0xFFE4E7ED)),
+
+                            )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    ) {
+                        Text(
+                            text = "Job requirements",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 14.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp),
+                    ) {
+                        Text(
+                            text = uiState.jobDetail.requirement,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 14.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth()
+                                .background(color = Color(0xFFE4E7ED)),
+
+                            )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    ) {
+                        Text(
+                            text = "Benefits & perks",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 14.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp),
+                    ) {
+                        Text(
+                            text = uiState.jobDetail.benefitsAndPerks,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 14.sp,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth()
+                                .background(color = Color(0xFFE4E7ED)),
+
+                            )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.gradient_line),
+                            contentDescription = "Gradient Line",
+                            modifier = Modifier
+                                .size(4.dp, 18.dp),
+                            contentScale = ContentScale.Fit
+                        )
+
+                        Text(
+                            text = "Similar Jobs",
+                            modifier = Modifier.padding(start = 4.dp),
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 14.sp,
+                        )
+                    }
+                }
+
+                items(items.size) { index ->
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            .fillMaxWidth()
+                            .height(80.dp)
+                            .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp)),
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 10.dp),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Image(
+                                    painter = painterResource(id = R.drawable.company_logo),
+                                    contentDescription = "Company Logo",
+                                    modifier = Modifier
+                                        .size(48.dp),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+
+                            Column(modifier = Modifier.padding(start = 8.dp)) {
+                                Text(
+                                    text = "Designer",
+                                    maxLines = 2,
+                                    softWrap = true,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 13.sp,
+                                )
 
                                 Text(
-                                    text = "MMK 400k-600k",
-                                    maxLines = 1,
+                                    modifier = Modifier.padding(top = 3.dp),
+                                    text = "Yoma Bank",
+                                    maxLines = 2,
                                     softWrap = true,
                                     overflow = TextOverflow.Ellipsis,
                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
@@ -530,72 +540,88 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     fontSize = 12.sp,
                                 )
 
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
 
+                                    Text(
+                                        text = "MMK 400k-600k",
+                                        maxLines = 1,
+                                        softWrap = true,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFF757575),
+                                        fontSize = 12.sp,
+                                    )
+
+                                    Spacer(modifier = Modifier.width(4.dp))
+
+                                    Image(
+                                        painter = painterResource(id = R.drawable.grey_line),
+                                        contentDescription = "Grey Space Line",
+                                        modifier = Modifier
+                                            .size(1.dp, 8.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+
+                                    Spacer(modifier = Modifier.width(4.dp))
+
+                                    Text(
+                                        text = "Yangon",
+                                        maxLines = 1,
+                                        softWrap = true,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFF757575),
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            Column(
+                                horizontalAlignment = Alignment.End,
+                                verticalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.wrapContentHeight()
+                            ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.grey_line),
-                                    contentDescription = "Grey Space Line",
+                                    painter = painterResource(id = R.drawable.save_unselected_icon),
+                                    contentDescription = "Save Unselected Icon",
                                     modifier = Modifier
-                                        .size(1.dp, 8.dp),
+                                        .size(11.dp, 15.dp),
                                     contentScale = ContentScale.Fit
                                 )
 
-                                Spacer(modifier = Modifier.width(4.dp))
-
                                 Text(
-                                    text = "Yangon",
+                                    text = "",
                                     maxLines = 1,
                                     softWrap = true,
                                     overflow = TextOverflow.Ellipsis,
                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                     fontWeight = FontWeight.W400,
-                                    color = Color(0xFF757575),
-                                    fontSize = 12.sp,
+                                    color = Color(0xFFF8CB2E),
+                                    fontSize = 10.sp,
+                                )
+
+                                Text(
+                                    text = "2 days left",
+                                    maxLines = 1,
+                                    softWrap = true,
+                                    overflow = TextOverflow.Ellipsis,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFFF8CB2E),
+                                    fontSize = 10.sp,
                                 )
                             }
                         }
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Column(
-                            horizontalAlignment = Alignment.End,
-                            verticalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.wrapContentHeight()
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.save_unselected_icon),
-                                contentDescription = "Save Unselected Icon",
-                                modifier = Modifier
-                                    .size(11.dp, 15.dp),
-                                contentScale = ContentScale.Fit
-                            )
-
-                            Text(
-                                text = "",
-                                maxLines = 1,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFFF8CB2E),
-                                fontSize = 10.sp,
-                            )
-
-                            Text(
-                                text = "2 days left",
-                                maxLines = 1,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFFF8CB2E),
-                                fontSize = 10.sp,
-                            )
-                        }
                     }
                 }
-            }
 
+            }
         }
     }
 
@@ -612,7 +638,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         )
     }
 
-    if (uiState.isSaveJobSuccess) {
+    if (isSuccessSaveJob) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Bottom,
@@ -664,7 +690,10 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                 .height(44.dp)
                 .weight(2f)
                 .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium),
+                .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
+                .clickable {
+                           navController.navigate("apply-job-before-sign-up")
+                },
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -678,7 +707,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        if (uiState.fetchSaveJobs.data.id == "" || uiState.isUnSaveJobSuccess) {
+        Log.d("fetchsavejob>>", uiState.fetchSaveJobs.data.id)
+
+        if (uiState.fetchSaveJobs.data.id == "") {
             Box(
                 modifier = Modifier
                     .width(70.dp)
@@ -691,7 +722,13 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                 viewModel.saveJob(uiState.jobDetail.id)
                             } else {
                                 if (viewModel.getPageId() != "") {
-                                    Toast.makeText(applicationContext, "Please LogIn/Register First!", Toast.LENGTH_LONG).show()
+                                    Toast
+                                        .makeText(
+                                            applicationContext,
+                                            "Please LogIn/Register First!",
+                                            Toast.LENGTH_LONG
+                                        )
+                                        .show()
                                     navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"profile"}")
                                 }
                             }

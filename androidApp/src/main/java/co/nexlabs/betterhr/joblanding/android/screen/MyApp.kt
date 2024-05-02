@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.BottomNavigation
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionCompaniesListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionJobsListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CompanyDetailsScreen
@@ -23,13 +24,17 @@ import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.splash.ScreenPortal
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.apply_job.ApplyJobViewModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.ApplyJobBeforeSignUp
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
+import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
+import co.nexlabs.betterhr.joblanding.network.register.ProfileRegisterViewModel
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import org.koin.compose.getKoin
 
@@ -43,7 +48,7 @@ fun MyApp() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        NavHost(navController, startDestination = "screen-portal") {
+        NavHost(navController, startDestination = "apply-job") {
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
@@ -56,7 +61,8 @@ fun MyApp() {
                 RegisterScreen(navController, viewModel)
             }
             composable("profile-register-screen") {
-                ProfileRegisterScreen()
+                val viewModel: ProfileRegisterViewModel = getKoin().get()
+                ProfileRegisterScreen(viewModel, navController)
             }
             composable("choose-country-screen") {
                 val viewModel: ChooseCountryViewModel = getKoin().get()
@@ -99,7 +105,15 @@ fun MyApp() {
                 ProfileDetailEditScreen()
             }
             composable("complete-profile-screen") {
-                CompleteProfileScreen()
+                val viewModel: CompleteProfileViewModel = getKoin().get()
+                CompleteProfileScreen(viewModel, navController)
+            }
+            composable("apply-job-before-sign-up") {
+                ApplyJobBeforeSignUp()
+            }
+            composable("apply-job") {
+                val viewModel: ApplyJobViewModel = getKoin().get()
+                ApplyJobScreen(viewModel, navController)
             }
         }
     }
