@@ -23,6 +23,7 @@ import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.splash.ScreenPortal
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
@@ -42,7 +43,7 @@ fun MyApp() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        NavHost(navController, startDestination = "complete-profile-screen") {
+        NavHost(navController, startDestination = "screen-portal") {
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
@@ -62,9 +63,9 @@ fun MyApp() {
                 ChooseCountryScreen(viewModel, navController)
             }
             composable("bottom-navigation-screen/{pageId}/{destination}") {
-                val sharedViewModel: SharedViewModel = getKoin().get()
+                val viewModel: BottomNavigationViewModel = getKoin().get()
                 if (it.arguments?.getString("pageId") != "" || it.arguments?.getString("destination") != "") {
-                    BottomNavigation(sharedViewModel, navController, it.arguments?.getString("pageId") ?: "", it.arguments?.getString("destination") ?: "")
+                    BottomNavigation(viewModel, navController, it.arguments?.getString("pageId") ?: "", it.arguments?.getString("destination") ?: "")
                 }
             }
             composable("jobs-lists-screen/{collectionId}/{collectionName}") {

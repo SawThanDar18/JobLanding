@@ -1,10 +1,23 @@
 package co.nexlabs.betterhr.joblanding.viewmodel
 
+import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobDatUIModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobsUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailCompanyUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIModel
 
 object JobDetailViewModelMapper {
+
+    fun mapFetchSaveJobDataToViewModel(data: FetchSaveJobByJobIdQuery.FetchSaveJobByJobId): FetchSaveJobsUIModel {
+        return FetchSaveJobsUIModel(
+            FetchSaveJobDatUIModel(
+                data.id ?: "",
+                data.job_id ?: "",
+                data.candidate_id ?: ""
+            )
+        )
+    }
 
     fun mapDataToViewModel(data: JobLandingJobDetailQuery.JobLandingJob): JobDetailUIModel {
 

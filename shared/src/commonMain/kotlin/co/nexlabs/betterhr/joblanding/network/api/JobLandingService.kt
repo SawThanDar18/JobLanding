@@ -1,5 +1,9 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
+import co.nexlabs.betterhr.job.with_auth.CandidateQuery
+import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
+import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
+import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
 import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
@@ -19,6 +23,8 @@ interface JobLandingService {
 
     suspend fun validateCode(body: VerifyOTPRequest): VerifyPhoneNumResponse
 
+    suspend fun getCandidateDatas(): ApolloCall<CandidateQuery.Data>
+
     suspend fun getCountriesList(): GetCountriesListResponse
 
     suspend fun getDynamicPagesQuery(countryId: String, platform: String): ApolloCall<DynamicPagesQuery.Data>
@@ -32,5 +38,11 @@ interface JobLandingService {
     suspend fun getJobDetail(jobId: String): ApolloCall<JobLandingJobDetailQuery.Data>
 
     suspend fun getCompanyDetail(companyId: String): ApolloCall<JobLandingCompanyDetailQuery.Data>
+
+    suspend fun saveJob(candidateId: String, jobId: String): ApolloCall<SaveJobMutation.Data>
+
+    suspend fun fetchSaveJobsById(jobId: String): ApolloCall<FetchSaveJobByJobIdQuery.Data>
+
+    suspend fun unSaveJob(id: String): ApolloCall<UnSaveJobMutation.Data>
 
 }

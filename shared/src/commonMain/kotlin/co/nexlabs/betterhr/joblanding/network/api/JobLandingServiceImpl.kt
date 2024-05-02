@@ -1,11 +1,19 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
+import android.app.Application
+import android.util.Log
+import co.nexlabs.betterhr.job.with_auth.CandidateQuery
+import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
+import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
+import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
 import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
+import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
@@ -15,6 +23,7 @@ import co.nexlabs.betterhr.joblanding.util.API_KEY
 import co.nexlabs.betterhr.joblanding.util.API_VALUE
 import co.nexlabs.betterhr.joblanding.util.API_VALUE_JOB
 import co.nexlabs.betterhr.joblanding.util.baseUrl
+import co.nexlabs.betterhr.joblanding.util.baseUrlForAuth
 import co.nexlabs.betterhr.joblanding.util.baseUrlForJob
 import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
@@ -36,10 +45,23 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
-class JobLandingServiceImpl(private val client: HttpClient) : JobLandingService {
+class JobLandingServiceImpl(private val application: Application, private val client: HttpClient) : JobLandingService {
+
+    private val localStorage: LocalStorage
+    init {
+        localStorage = AndroidLocalStorageImpl(application)
+    }
+
     val headerInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
             .addHeader(API_KEY, API_VALUE_JOB)
+            .build()
+        chain.proceed(request)
+    }
+
+    val headerInterceptorWithAuth = Interceptor { chain ->
+        val request = chain.request().newBuilder()
+            .addHeader("Authorization", "Bearer ${localStorage.token}")
             .build()
         chain.proceed(request)
     }
@@ -55,9 +77,19 @@ class JobLandingServiceImpl(private val client: HttpClient) : JobLandingService 
         .addInterceptor(headerInterceptor)
         .build()
 
+    val okHttpClientWithAuth = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .addInterceptor(headerInterceptorWithAuth)
+        .build()
+
     val apolloClient = ApolloClient.Builder()
         .okHttpClient(okHttpClient)
         .serverUrl(baseUrlForJob)
+        .build()
+
+    val apolloClientWithAuth = ApolloClient.Builder()
+        .okHttpClient(okHttpClientWithAuth)
+        .serverUrl(baseUrlForAuth)
         .build()
 
     override suspend fun sendVerification(body: SendVerificationCodeRequest): SendVerificationResponse {
@@ -126,6 +158,18 @@ class JobLandingServiceImpl(private val client: HttpClient) : JobLandingService 
         return response.body()
     }
 
+    override suspend fun getCandidateDatas(): ApolloCall<CandidateQuery.Data> {
+        try {
+            val response = apolloClientWithAuth.query(CandidateQuery())
+            println("mm>>${response.execute().data!!.me.id}")
+        } catch (e: ApolloException) {
+            println("ApolloClient error: ${e.message}")
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }
+        return apolloClientWithAuth.query(CandidateQuery())
+    }
+
     override suspend fun getCountriesList(): GetCountriesListResponse {
         val response = client.post("${baseUrl}${getCountriesUrl}") {
             headers {
@@ -172,5 +216,29 @@ class JobLandingServiceImpl(private val client: HttpClient) : JobLandingService 
 
     override suspend fun getCompanyDetail(companyId: String): ApolloCall<JobLandingCompanyDetailQuery.Data> {
         return apolloClient.query(JobLandingCompanyDetailQuery(companyId))
+    }
+
+    override suspend fun saveJob(
+        candidateId: String,
+        jobId: String
+    ): ApolloCall<SaveJobMutation.Data> {
+        Log.d("candi>>>", candidateId)
+        try {
+            val response = apolloClientWithAuth.mutation(SaveJobMutation(candidateId, jobId))
+            println("mm>>${response.execute().data!!.saveJob!!.job_id}")
+        } catch (e: ApolloException) {
+            println("ApolloClient error: ${e.message}")
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }
+        return apolloClientWithAuth.mutation(SaveJobMutation(candidateId, jobId))
+    }
+
+    override suspend fun fetchSaveJobsById(jobId: String): ApolloCall<FetchSaveJobByJobIdQuery.Data> {
+        return apolloClientWithAuth.query(FetchSaveJobByJobIdQuery(jobId))
+    }
+
+    override suspend fun unSaveJob(id: String): ApolloCall<UnSaveJobMutation.Data> {
+        return apolloClientWithAuth.mutation(UnSaveJobMutation(id))
     }
 }

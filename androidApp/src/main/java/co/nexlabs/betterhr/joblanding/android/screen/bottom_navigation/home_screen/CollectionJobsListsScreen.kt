@@ -48,7 +48,12 @@ import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import kotlinx.coroutines.launch
 
 @Composable
-fun CollectionJobsListsScreen(viewModel: CollectionJobsViewModel, navController: NavController, collectionId: String, collectionName: String) {
+fun CollectionJobsListsScreen(
+    viewModel: CollectionJobsViewModel,
+    navController: NavController,
+    collectionId: String,
+    collectionName: String
+) {
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
@@ -81,51 +86,53 @@ fun CollectionJobsListsScreen(viewModel: CollectionJobsViewModel, navController:
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(top = 16.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                item {
-                    Column(
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow_left),
+                        contentDescription = "Arrow Left",
                         modifier = Modifier
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                            .size(24.dp)
+                            .clickable { navController.popBackStack() },
+                    )
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.arrow_left),
-                                contentDescription = "Arrow Left",
-                                modifier = Modifier.size(24.dp)
-                                    .clickable { navController.popBackStack() },
-                            )
+                    Text(
+                        text = collectionName,
+                        modifier = Modifier.padding(start = 8.dp),
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W600,
+                        color = Color(0xFF4A4A4A),
+                        fontSize = 14.sp,
+                    )
 
-                            Text(
-                                text = collectionName,
-                                modifier = Modifier.padding(start = 8.dp),
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W600,
-                                color = Color(0xFF4A4A4A),
-                                fontSize = 14.sp,
-                            )
+                    Image(
+                        painter = painterResource(id = R.drawable.search_black),
+                        contentDescription = "Search",
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
 
-                            Image(
-                                painter = painterResource(id = R.drawable.search_black),
-                                contentDescription = "Search",
-                                modifier = Modifier.size(24.dp),
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 32.dp),
+                ) {
+                    item {
 
                         Image(
                             painter = painterResource(id = R.drawable.cover),
@@ -138,89 +145,73 @@ fun CollectionJobsListsScreen(viewModel: CollectionJobsViewModel, navController:
 
                         Spacer(modifier = Modifier.height(10.dp))
                     }
-                }
 
-                items(uiState.collectionJobsList.size) { index ->
+                    items(uiState.collectionJobsList.size) { index ->
 
-                    val item = uiState.collectionJobsList[index]
-                    var currencyCode = ""
-                    if (item.currencyCode == "MMK") {
-                        currencyCode = "k"
-                    }
+                        val item = uiState.collectionJobsList[index]
+                        var currencyCode = ""
+                        if (item.currencyCode == "MMK") {
+                            currencyCode = "k"
+                        }
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent),
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Box(
-                            Modifier
-                                .padding(start = 16.dp, end = 16.dp)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Transparent),
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            val textPadding = 16.dp
-                            val overlayBoxHeight = 14.dp
                             Box(
-                                modifier = Modifier
-                                    .background(
-                                        color = Color.Transparent,
-                                        shape = MaterialTheme.shapes.medium
-                                    )
-                                    .fillMaxWidth()
-                                    .height(80.dp)
-                                    .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
-                                    .clickable {
-                                        navController.navigate("job-details/${item.id}")
-                                    },
+                                Modifier
+                                    .padding(start = 16.dp, end = 16.dp)
                             ) {
-                                Row(
+                                val textPadding = 16.dp
+                                val overlayBoxHeight = 14.dp
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(horizontal = 10.dp),
-                                    horizontalArrangement = Arrangement.Start,
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
+                                        )
+                                        .fillMaxWidth()
+                                        .height(80.dp)
+                                        .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
+                                        .clickable {
+                                            navController.navigate("job-details/${item.id}")
+                                        },
                                 ) {
-                                    Column {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.company_logo),
-                                            contentDescription = "Company Logo",
-                                            modifier = Modifier
-                                                .size(48.dp),
-                                            contentScale = ContentScale.Fit
-                                        )
-                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 10.dp),
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.company_logo),
+                                                contentDescription = "Company Logo",
+                                                modifier = Modifier
+                                                    .size(48.dp),
+                                                contentScale = ContentScale.Fit
+                                            )
+                                        }
 
-                                    Column(modifier = Modifier.padding(start = 8.dp)) {
-                                        Text(
-                                            text = item.position,
-                                            maxLines = 2,
-                                            softWrap = true,
-                                            overflow = TextOverflow.Ellipsis,
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            fontWeight = FontWeight.W600,
-                                            color = Color(0xFF6A6A6A),
-                                            fontSize = 13.sp,
-                                        )
-
-                                        Text(
-                                            modifier = Modifier.padding(top = 3.dp),
-                                            text = item.company.name,
-                                            maxLines = 2,
-                                            softWrap = true,
-                                            overflow = TextOverflow.Ellipsis,
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            fontWeight = FontWeight.W400,
-                                            color = Color(0xFF757575),
-                                            fontSize = 12.sp,
-                                        )
-
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
+                                        Column(modifier = Modifier.padding(start = 8.dp)) {
+                                            Text(
+                                                text = item.position,
+                                                maxLines = 2,
+                                                softWrap = true,
+                                                overflow = TextOverflow.Ellipsis,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                fontWeight = FontWeight.W600,
+                                                color = Color(0xFF6A6A6A),
+                                                fontSize = 13.sp,
+                                            )
 
                                             Text(
-                                                text = "${item.currencyCode} ${item.miniSalary}${currencyCode}-${item.maxiSalary}${currencyCode}",
-                                                maxLines = 1,
+                                                modifier = Modifier.padding(top = 3.dp),
+                                                text = item.company.name,
+                                                maxLines = 2,
                                                 softWrap = true,
                                                 overflow = TextOverflow.Ellipsis,
                                                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
@@ -229,89 +220,105 @@ fun CollectionJobsListsScreen(viewModel: CollectionJobsViewModel, navController:
                                                 fontSize = 12.sp,
                                             )
 
-                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
 
+                                                Text(
+                                                    text = "${item.currencyCode} ${item.miniSalary}${currencyCode}-${item.maxiSalary}${currencyCode}",
+                                                    maxLines = 1,
+                                                    softWrap = true,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W400,
+                                                    color = Color(0xFF757575),
+                                                    fontSize = 12.sp,
+                                                )
+
+                                                Spacer(modifier = Modifier.width(4.dp))
+
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.grey_line),
+                                                    contentDescription = "Grey Space Line",
+                                                    modifier = Modifier
+                                                        .size(1.dp, 8.dp),
+                                                    contentScale = ContentScale.Fit
+                                                )
+
+                                                Spacer(modifier = Modifier.width(4.dp))
+
+                                                Text(
+                                                    text = item.cityName,
+                                                    maxLines = 1,
+                                                    softWrap = true,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W400,
+                                                    color = Color(0xFF757575),
+                                                    fontSize = 12.sp,
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.weight(1f))
+
+                                        Column(
+                                            horizontalAlignment = Alignment.End,
+                                            verticalArrangement = Arrangement.SpaceBetween,
+                                            modifier = Modifier.wrapContentHeight()
+                                        ) {
                                             Image(
-                                                painter = painterResource(id = R.drawable.grey_line),
-                                                contentDescription = "Grey Space Line",
+                                                painter = painterResource(id = R.drawable.save_unselected_icon),
+                                                contentDescription = "Save Unselected Icon",
                                                 modifier = Modifier
-                                                    .size(1.dp, 8.dp),
+                                                    .size(11.dp, 15.dp),
                                                 contentScale = ContentScale.Fit
                                             )
 
-                                            Spacer(modifier = Modifier.width(4.dp))
-
                                             Text(
-                                                text = item.cityName,
+                                                text = "",
                                                 maxLines = 1,
                                                 softWrap = true,
                                                 overflow = TextOverflow.Ellipsis,
                                                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                 fontWeight = FontWeight.W400,
-                                                color = Color(0xFF757575),
-                                                fontSize = 12.sp,
+                                                color = Color(0xFFF8CB2E),
+                                                fontSize = 10.sp,
+                                            )
+
+                                            Text(
+                                                text = "2 days left",
+                                                maxLines = 1,
+                                                softWrap = true,
+                                                overflow = TextOverflow.Ellipsis,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                fontWeight = FontWeight.W400,
+                                                color = Color(0xFFF8CB2E),
+                                                fontSize = 10.sp,
                                             )
                                         }
                                     }
-
-                                    Spacer(modifier = Modifier.weight(1f))
-
-                                    Column(
-                                        horizontalAlignment = Alignment.End,
-                                        verticalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier.wrapContentHeight()
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.save_unselected_icon),
-                                            contentDescription = "Save Unselected Icon",
-                                            modifier = Modifier
-                                                .size(11.dp, 15.dp),
-                                            contentScale = ContentScale.Fit
-                                        )
-
-                                        Text(
-                                            text = "",
-                                            maxLines = 1,
-                                            softWrap = true,
-                                            overflow = TextOverflow.Ellipsis,
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            fontWeight = FontWeight.W400,
-                                            color = Color(0xFFF8CB2E),
-                                            fontSize = 10.sp,
-                                        )
-
-                                        Text(
-                                            text = "2 days left",
-                                            maxLines = 1,
-                                            softWrap = true,
-                                            overflow = TextOverflow.Ellipsis,
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            fontWeight = FontWeight.W400,
-                                            color = Color(0xFFF8CB2E),
-                                            fontSize = 10.sp,
-                                        )
-                                    }
                                 }
-                            }
-                            Box(
-                                Modifier
-                                    .height(overlayBoxHeight)
-                                    .width(37.dp)
-                                    .offset(x = textPadding, y = -overlayBoxHeight / 2)
-                                    .background(
-                                        color = Color(0xFF1ED292),
-                                        shape = MaterialTheme.shapes.medium
+                                Box(
+                                    Modifier
+                                        .height(overlayBoxHeight)
+                                        .width(37.dp)
+                                        .offset(x = textPadding, y = -overlayBoxHeight / 2)
+                                        .background(
+                                            color = Color(0xFF1ED292),
+                                            shape = MaterialTheme.shapes.medium
+                                        )
+                                        .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(4.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "New!",
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFFFFFFFF),
+                                        fontSize = 10.sp,
                                     )
-                                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(4.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "New!",
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W400,
-                                    color = Color(0xFFFFFFFF),
-                                    fontSize = 10.sp,
-                                )
+                                }
                             }
                         }
                     }

@@ -1,5 +1,8 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
@@ -64,6 +69,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+    val applicationContext = LocalContext.current.applicationContext
 
     scope.launch {
         if (jobId != null && jobId != "") {
@@ -606,6 +612,46 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         )
     }
 
+    if (uiState.isSaveJobSuccess) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 16.dp, end = 16.dp, bottom = 70.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(38.dp)
+                    .border(1.dp, Color(0xFFE9FCF5), RoundedCornerShape(8.dp))
+                    .background(color = Color(0xFFE9FCF5), shape = MaterialTheme.shapes.medium),
+            ) {
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Image(
+                    painter = painterResource(id = R.drawable.save_job_icon),
+                    contentDescription = "Save Job Image",
+                    modifier = Modifier
+                        .size(13.33.dp)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Job is saved.",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    color = Color(0xFF757575),
+                    fontSize = 12.sp,
+                )
+            }
+        }
+    }
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Bottom,
@@ -632,23 +678,55 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Box(
-            modifier = Modifier
-                .width(70.dp)
-                .height(44.dp)
-                .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-                .clickable {
-                    navController.navigate("bottom-navigation-screen")
-                },
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.save_unselected_icon),
-                contentDescription = "Save Unselected Image",
+        if (uiState.fetchSaveJobs.data.id == "" || uiState.isUnSaveJobSuccess) {
+            Box(
                 modifier = Modifier
-                    .size(16.dp)
-            )
+                    .width(70.dp)
+                    .height(44.dp)
+                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                    .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
+                    .clickable {
+                        scope.launch {
+                            if (viewModel.getToken() != "") {
+                                viewModel.saveJob(uiState.jobDetail.id)
+                            } else {
+                                if (viewModel.getPageId() != "") {
+                                    Toast.makeText(applicationContext, "Please LogIn/Register First!", Toast.LENGTH_LONG).show()
+                                    navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"profile"}")
+                                }
+                            }
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.save_unselected_icon),
+                    contentDescription = "Save Unselected Image",
+                    modifier = Modifier
+                        .size(16.dp)
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .width(70.dp)
+                    .height(44.dp)
+                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                    .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
+                    .clickable {
+                        scope.launch {
+                            viewModel.unSaveJob(uiState.fetchSaveJobs.data.id)
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.save_selected_icon),
+                    contentDescription = "Save Selected Image",
+                    modifier = Modifier
+                        .size(16.dp)
+                )
+            }
         }
     }
 }

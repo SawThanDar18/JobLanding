@@ -123,7 +123,9 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
 
         is UiState.Success -> {
             scope.launch {
-                viewModel.updateToken(currentState.data)
+                //viewModel.updateToken(currentState.data)
+                //viewModel.getCandidateDataAndUpdate()
+                //navController.navigate("profile-register-screen")
             }
             MyToast(message = currentState.data)
         }

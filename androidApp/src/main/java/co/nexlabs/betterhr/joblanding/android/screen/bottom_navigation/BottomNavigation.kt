@@ -25,10 +25,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.applications.ApplicationsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.HomeScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationScreen
+import co.nexlabs.betterhr.joblanding.android.screen.register.CompleteProfileScreen
+import co.nexlabs.betterhr.joblanding.android.screen.register.ProfileRegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import kotlinx.coroutines.launch
@@ -37,7 +41,7 @@ import org.koin.compose.getKoin
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun BottomNavigation(
-    sharedViewModel: SharedViewModel,
+    viewModel: BottomNavigationViewModel,
     nav: NavController,
     pageId: String,
     destination: String
@@ -127,35 +131,34 @@ fun BottomNavigation(
     ) {
         NavHost(navController, startDestination = destination) {
 
-            if (destination == "home") {
-                composable("home") {
-                    val viewModel: HomeViewModel = getKoin().get()
-                    HomeScreen(viewModel, nav, pageId)
+            composable("home") {
+                val viewModel: HomeViewModel = getKoin().get()
+                HomeScreen(viewModel, nav, pageId)
+            }
+            composable("application") { ApplicationsScreen() }
+            composable("inbox") { NotificationScreen() }
+            composable("interviews") { InterviewsScreen() }
+            composable("profile") {
+                if (viewModel.getToken() != "") {
+                    CompleteProfileScreen()
+                } else {
+                    UnregisterProfileScreen(nav)
                 }
             }
 
-            if (destination == "profile") {
-                composable("profile") { UnregisterProfileScreen(nav) }
-            }
-
-
-            if (destination == "") {
-                composable("home") {
+            when(destination) {
+                "home" -> composable("home") {
                     val viewModel: HomeViewModel = getKoin().get()
                     HomeScreen(viewModel, nav, pageId)
                 }
-                composable("application") { ApplicationScreen() }
-                composable("inbox") { NotificationScreen() }
-                composable("interviews") { InterviewsScreen() }
-                composable("profile") { UnregisterProfileScreen(nav) }
+
+                "application" -> composable("application") { ApplicationsScreen() }
+                "inbox" -> composable("inbox") { NotificationScreen() }
+                "interviews" -> composable("interviews") { InterviewsScreen() }
+                "profile" -> composable("profile") { UnregisterProfileScreen(nav) }
             }
         }
     }
-}
-
-@Composable
-fun ApplicationScreen() {
-    //Text(text = "Application", modifier = Modifier.padding(16.dp))
 }
 
 @Composable

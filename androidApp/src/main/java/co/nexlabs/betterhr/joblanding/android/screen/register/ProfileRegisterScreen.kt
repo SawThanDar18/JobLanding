@@ -77,7 +77,7 @@ fun ProfileRegisterScreen() {
 
     Column(
         modifier = Modifier
-            .padding(16.dp, 16.dp, 16.dp, 0.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 72.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
@@ -386,7 +386,7 @@ fun ProfileRegisterScreen() {
         verticalAlignment = Alignment.Bottom,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 32.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 72.dp),
     ) {
         Box(
             modifier = Modifier
