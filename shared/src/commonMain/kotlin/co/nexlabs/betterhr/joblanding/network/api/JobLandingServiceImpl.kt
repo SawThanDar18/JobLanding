@@ -17,6 +17,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
@@ -27,6 +28,7 @@ import co.nexlabs.betterhr.joblanding.util.API_VALUE
 import co.nexlabs.betterhr.joblanding.util.API_VALUE_JOB
 import co.nexlabs.betterhr.joblanding.util.baseUrl
 import co.nexlabs.betterhr.joblanding.util.baseUrlForAuth
+import co.nexlabs.betterhr.joblanding.util.baseUrlForCreateApplication
 import co.nexlabs.betterhr.joblanding.util.baseUrlForJob
 import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
@@ -35,7 +37,6 @@ import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
 import com.apollographql.apollo3.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo3.cache.normalized.normalizedCache
-import com.apollographql.apollo3.exception.ApolloException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -47,9 +48,12 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import com.apollographql.apollo3.network.okHttpClient
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.request.forms.formData
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import java.io.File
 
 class JobLandingServiceImpl(private val application: Application, private val client: HttpClient) : JobLandingService {
 
@@ -288,5 +292,50 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         subDomain: String
     ): ApolloCall<ApplyJobMutation.Data> {
         return apolloClientWithAuth.mutation(ApplyJobMutation(Optional.present(referenceId), candidateId, jobId, Optional.present(status), subDomain))
+    }
+
+    override suspend fun createApplication(
+        referenceJobId: String,
+        subdomain: String,
+        jobTitle: String,
+        status: String,
+        appliedDate: String,
+        candidateId: String,
+        currentJobTitle: String,
+        currentCompany: String,
+        workingSince: String,
+        files: List<FileRequest>
+    ): String {
+        try {
+            val response = client.post(baseUrlForCreateApplication) {
+                headers {
+                    append(HttpHeaders.ContentType, "multipart/form-data")
+                }
+                setBody(
+                    formData {
+                        append("reference_job_id", referenceJobId)
+                        append("subdomain", subdomain)
+                        append("job_title", jobTitle)
+                        append("status", status)
+                        append("applied_date", appliedDate)
+                        append("candidate_id", candidateId)
+                        append("current_job_title", currentJobTitle)
+                        append("current_company", currentCompany)
+                        append("working_since", workingSince)
+                        files.forEach { file ->
+                            file.fileType.forEach {
+                                append(it.type, it.name)
+                            }
+                        }
+                    }
+                )
+            }
+            return response.body()
+        } catch (e: ClientRequestException) {
+            // Handle request exception
+        } finally {
+            client.close()
+        }
+        return ""
     }
 }

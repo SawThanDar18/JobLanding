@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.home.home_details
 
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CandidateUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 
 data class JobDetailUIState(
@@ -16,5 +17,9 @@ data class JobDetailUIState(
     ),
     val fetchSaveJobs: FetchSaveJobsUIModel = FetchSaveJobsUIModel(
         FetchSaveJobDatUIModel("", "", "")
+    ),
+    val candidateData: CandidateUIModel = CandidateUIModel(
+        "", "", "", "", "", "", "",
+        emptyList(), emptyList()
     )
 )

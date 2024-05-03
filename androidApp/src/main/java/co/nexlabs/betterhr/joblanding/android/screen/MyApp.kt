@@ -10,7 +10,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.BottomNavigation
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionCompaniesListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionJobsListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CompanyDetailsScreen
@@ -23,14 +22,14 @@ import co.nexlabs.betterhr.joblanding.android.screen.register.ProfileRegisterScr
 import co.nexlabs.betterhr.joblanding.android.screen.register.RegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.splash.ScreenPortal
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
-import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.ApplyJobViewModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.ApplyJobBeforeSignUp
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobBeforeSignUp
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobScreens
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -48,7 +47,7 @@ fun MyApp() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        NavHost(navController, startDestination = "apply-job") {
+        NavHost(navController, startDestination = "screen-portal") {
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
@@ -113,7 +112,7 @@ fun MyApp() {
             }
             composable("apply-job") {
                 val viewModel: ApplyJobViewModel = getKoin().get()
-                ApplyJobScreen(viewModel, navController)
+                ApplyJobScreens(viewModel, navController)
             }
         }
     }

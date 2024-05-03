@@ -13,14 +13,14 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
+import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
-import co.nexlabs.betterhr.joblanding.network.api.request_response.UploadUserFileRequest
-import co.nexlabs.betterhr.joblanding.network.api.request_response.UploadUserFileVariables
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyOTPRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyPhoneNumResponse
 import com.apollographql.apollo3.ApolloCall
+import java.io.File
 
 interface JobLandingService {
 
@@ -62,5 +62,18 @@ interface JobLandingService {
     suspend fun unSaveJob(id: String): ApolloCall<UnSaveJobMutation.Data>
 
     suspend fun applyJob(referenceId: String, candidateId: String, jobId: String, status: String, subDomain: String): ApolloCall<ApplyJobMutation.Data>
+
+    suspend fun createApplication(
+        referenceJobId: String,
+        subdomain: String,
+        jobTitle: String,
+        status: String,
+        appliedDate: String,
+        candidateId: String,
+        currentJobTitle: String,
+        currentCompany: String,
+        workingSince: String,
+        files: List<FileRequest>
+    ): String
 
 }

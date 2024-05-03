@@ -17,11 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -66,7 +63,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ApplyJobScreen(viewModel: ApplyJobViewModel, navController: NavController) {
+fun ApplyJobScreens(viewModel: ApplyJobViewModel, navController: NavController) {
 
     var bottomBarVisible by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
@@ -924,7 +921,7 @@ fun ApplyJobScreen(viewModel: ApplyJobViewModel, navController: NavController) {
                                 Box(contentAlignment = Alignment.Center) {
                                     androidx.compose.material3.Text(
                                         textAlign = TextAlign.Center,
-                                        text = "Successfully applied the job",
+                                        text = "Successfully applied the job!",
                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                         fontWeight = FontWeight.W400,
                                         color = Color(0xFF757575),
@@ -972,7 +969,7 @@ fun ApplyJobScreen(viewModel: ApplyJobViewModel, navController: NavController) {
                 sheetState = rememberModalBottomSheetState(
                     initialValue = ModalBottomSheetValue.Expanded
                 ),
-                sheetShape = RoundedCornerShape(24.dp),
+                sheetShape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp, topStart = 24.dp, topEnd = 24.dp),
                 sheetElevation = 16.dp,
                 sheetBackgroundColor = Color.White,
                 sheetContentColor = contentColorFor(Color.White),

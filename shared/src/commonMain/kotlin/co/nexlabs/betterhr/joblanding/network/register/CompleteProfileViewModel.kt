@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
 import android.app.Application
+import android.util.Log
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileRepository

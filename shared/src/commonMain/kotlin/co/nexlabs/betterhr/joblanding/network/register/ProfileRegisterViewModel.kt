@@ -71,7 +71,7 @@ class ProfileRegisterViewModel(
             }
 
             profileRegisterRepository.createCandidate(
-                name, email, "+959400031516", desiredPosition, summary, localStorage.countryId
+                name, email, localStorage.phone, desiredPosition, summary, localStorage.countryId
             ).toFlow()
                 .catch { e ->
                     _uiState.update {

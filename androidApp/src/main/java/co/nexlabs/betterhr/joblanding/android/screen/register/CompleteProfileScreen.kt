@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.register
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,12 +49,17 @@ import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: NavController) {
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+
+    scope.launch {
+        viewModel.getCandidateData()
+    }
 
     Column(
         modifier = Modifier
@@ -134,7 +141,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                           navController.navigate("profile-edit-detail-screen")
+                                    navController.navigate("profile-edit-detail-screen")
                                 },
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically
@@ -519,7 +526,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth().padding(bottom = 72.dp)
+                        .fillMaxWidth()
+                        .padding(bottom = 72.dp)
                         .height(2.dp)
                         .background(color = Color(0xFFE4E7ED))
                 )
