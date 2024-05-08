@@ -3,7 +3,7 @@ query JobLandingCompanyDetail($company_id: String!){
     {
         id
         subdomain
-        country
+#        country
         name
         description
         company_mail

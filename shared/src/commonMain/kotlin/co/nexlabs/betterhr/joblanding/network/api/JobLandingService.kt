@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
+import android.net.Uri
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
@@ -17,10 +18,10 @@ import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
+import co.nexlabs.betterhr.joblanding.network.api.request_response.UploadResponseId
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyOTPRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyPhoneNumResponse
 import com.apollographql.apollo3.ApolloCall
-import java.io.File
 
 interface JobLandingService {
 
@@ -73,7 +74,15 @@ interface JobLandingService {
         currentJobTitle: String,
         currentCompany: String,
         workingSince: String,
-        files: List<FileRequest>
+        files: List<FileRequest>,
+        types: List<String>
     ): String
+
+    suspend fun uploadUserFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        candidateId: String
+    ): UploadResponseId
 
 }

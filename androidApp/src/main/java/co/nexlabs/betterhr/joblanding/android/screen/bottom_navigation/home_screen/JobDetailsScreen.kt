@@ -2,7 +2,11 @@ package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scr
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
@@ -71,6 +75,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
@@ -82,11 +88,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.net.toFile
+import co.nexlabs.betterhr.joblanding.android.data.CurrentDateTimeFormatted
 import co.nexlabs.betterhr.joblanding.android.screen.register.MultiStyleText
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -94,18 +105,24 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
+import java.io.FileOutputStream
 import java.io.InputStreamReader
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class, ExperimentalLayoutApi::class,
+@OptIn(
+    ExperimentalMaterialApi::class, ExperimentalLayoutApi::class, ExperimentalLayoutApi::class,
     ExperimentalLayoutApi::class
 )
 @Composable
 fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController, jobId: String) {
 
+    var isJobSaved by remember { mutableStateOf(false) }
+
     val items = (0..4).toList()
     var bottomBarVisibleAfterSignUp by remember { mutableStateOf(false) }
     var bottomBarVisible by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
+
+    var isJobSaveSuccessVisible by remember { mutableStateOf(false) }
 
     var applicationContext = LocalContext.current.applicationContext
     var fullName by remember { mutableStateOf("") }
@@ -169,12 +186,18 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     var timer by remember { mutableStateOf(60) }
     var isTimerRunning by remember { mutableStateOf(false) }
 
-    /*val scope = rememberCoroutineScope()
-    val uiState = viewModel.uiState.collectAsState(initial = UiState.Loading)
-    val uiStateForVerify = viewModel.uiStateForVerify.collectAsState(initial = UiState.Loading)*/
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
+
+    val uiStateRegister = viewModel.uiStateRegister.collectAsState(initial = UiState.Loading)
+    val uiStateForVerify = viewModel.uiStateForVerify.collectAsState(initial = UiState.Loading)
+
     var text by remember { mutableStateOf("") }
     var boxColor by remember { mutableStateOf(Color(0xFFD9D9D9)) }
     var code: List<Char> by remember { mutableStateOf(listOf()) }
+
+    var isClearCV by remember { mutableStateOf(false) }
+    var isClearCoverLetter by remember { mutableStateOf(false) }
 
     var focusRequesters = remember {
         List(6) { FocusRequester() }
@@ -192,8 +215,57 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         }
     }
 
-    val scope = rememberCoroutineScope()
-    val uiState by viewModel.uiState.collectAsState()
+    when (val currentState = uiStateRegister.value) {
+        is UiState.Loading -> {
+
+        }
+
+        is UiState.Success -> {
+            isTimerRunning = true
+        }
+
+        is UiState.Error -> {
+            MyToast(currentState.errorMessage)
+        }
+    }
+
+    if (timer == 0) {
+        isTimerRunning = false
+    } else {
+        timerText = timer.toString()
+    }
+
+    when (val currentState = uiStateForVerify.value) {
+        is UiState.Loading -> {
+        }
+
+        is UiState.Success -> {
+            LaunchedEffect(Unit) {
+                scope.launch {
+                    viewModel.updateToken(currentState.data)
+                }
+                step = "stepTwo"
+            }
+        }
+
+        is UiState.Error -> {
+            MyToast(currentState.errorMessage)
+        }
+    }
+
+    if (uiState.isSuccessForCandidateId) {
+        scope.launch {
+            viewModel.updateCandidateId(uiState.candidateId)
+            viewModel.getBearerTokenFromAPI(viewModel.getToken())
+        }
+    }
+
+    if (uiState.isSuccessForBearerToken) {
+        scope.launch {
+            viewModel.updateBearerToken(uiState.bearerToken)
+        }
+        step = "stepThree"
+    }
 
     var isSuccessSaveJob by remember { mutableStateOf(false) }
     isSuccessSaveJob = uiState.isSaveJobSuccess
@@ -201,7 +273,16 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     scope.launch {
         if (jobId.isNotBlank()) {
             viewModel.getJobDetail(jobId)
-            //viewModel.fetchSaveJobsById(jobId)
+            if (viewModel.getBearerToken() != "") {
+                viewModel.fetchSaveJobsById(jobId)
+            }
+        }
+    }
+
+    LaunchedEffect(isJobSaveSuccessVisible) {
+        scope.launch {
+            delay(2000)
+            isJobSaveSuccessVisible = false
         }
     }
 
@@ -210,9 +291,22 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         uiState.isSaveJobSuccess = false
     }
 
-    if (uiState.candidateData != null) {
+    /*if (uiState.candidateData != null) {
         fullName = uiState.candidateData.name
         email = uiState.candidateData.email
+    }*/
+
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var imageFileName by remember { mutableStateOf("") }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            imageFileName = getFileName(applicationContext, it)
+            selectedImageUri = uri
+            Log.d("imageFile>>", selectedImageUri.toString())
+            Log.d("imageFile>>Name", imageFileName)
+        }
     }
 
 
@@ -869,9 +963,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Log.d("fetchsavejob>>", uiState.fetchSaveJobs.data.id)
-
-        if (uiState.fetchSaveJobs.data.id == "") {
+        if (uiState.fetchSaveJobs.data.id == "" || uiState.isUnSaveJobSuccess) {
             Box(
                 modifier = Modifier
                     .width(70.dp)
@@ -927,6 +1019,29 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                 )
             }
         }
+
+        /*if(uiState.isSaveJobSuccess) {
+            Box(
+                modifier = Modifier
+                    .width(70.dp)
+                    .height(44.dp)
+                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                    .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
+                    .clickable {
+                        scope.launch {
+                            viewModel.unSaveJob(uiState.fetchSaveJobs.id)
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.save_selected_icon),
+                    contentDescription = "Save Selected Image",
+                    modifier = Modifier
+                        .size(16.dp)
+                )
+            }
+        }*/
     }
 
     Column(
@@ -970,7 +1085,6 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             .size(24.dp)
                                             .clickable {
                                                 bottomBarVisibleAfterSignUp = false
-                                                step = "stepOne"
                                             },
                                         alignment = Alignment.Center
                                     )
@@ -1000,15 +1114,64 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     item {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.bank_logo),
-                                                contentDescription = "Profile Icon",
-                                                modifier = Modifier
-                                                    .size(84.dp)
-                                                    .clip(CircleShape),
-                                                contentScale = ContentScale.Fit
-                                            )
+                                        Box(contentAlignment = Alignment.Center,
+                                            modifier = Modifier.clickable {
+                                                launcher.launch("image/*")
+                                            }) {
+                                            if (selectedImageUri != null) {
+
+                                                val imageRequest = remember(selectedImageUri) {
+                                                    ImageRequest.Builder(applicationContext)
+                                                        .data(selectedImageUri).build()
+                                                }
+
+                                                Image(
+                                                    painter = rememberImagePainter(
+                                                        request = imageRequest,
+                                                    ),
+                                                    contentDescription = "Profile Icon",
+                                                    modifier = Modifier
+                                                        .size(84.dp)
+                                                        .clip(CircleShape)
+                                                        .graphicsLayer {
+                                                            shape = CircleShape
+                                                        },
+                                                    contentScale = ContentScale.Fit
+                                                )
+                                            } else {
+                                                if (uiState.candidateData != null) {
+                                                    if (uiState.candidateData.profilePath != null) {
+                                                        Image(
+                                                            painter = rememberGlidePainter(
+                                                                request = uiState.candidateData.profilePath
+                                                            ),
+                                                            contentDescription = "Profile Icon",
+                                                            modifier = Modifier
+                                                                .size(84.dp)
+                                                                .clip(CircleShape),
+                                                            contentScale = ContentScale.Fit
+                                                        )
+                                                    } else {
+                                                        Image(
+                                                            painter = painterResource(id = R.drawable.camera),
+                                                            contentDescription = "Profile Icon",
+                                                            modifier = Modifier
+                                                                .size(84.dp)
+                                                                .clip(CircleShape),
+                                                            contentScale = ContentScale.Fit
+                                                        )
+                                                    }
+                                                } else {
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.camera),
+                                                        contentDescription = "Profile Icon",
+                                                        modifier = Modifier
+                                                            .size(84.dp)
+                                                            .clip(CircleShape),
+                                                        contentScale = ContentScale.Fit
+                                                    )
+                                                }
+                                            }
                                         }
 
                                         Spacer(modifier = Modifier.height(16.dp))
@@ -1046,7 +1209,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     color = Color.Transparent,
                                                     shape = MaterialTheme.shapes.medium
                                                 ),
-                                            value = fullName,
+                                            value = if (uiState.candidateData != null) uiState.candidateData.name else fullName,
                                             onValueChange = {
                                                 fullName = it
                                             },
@@ -1115,7 +1278,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     color = Color.Transparent,
                                                     shape = MaterialTheme.shapes.medium
                                                 ),
-                                            value = email,
+                                            value = if (uiState.candidateData != null) uiState.candidateData.email else email,
                                             onValueChange = {
                                                 email = it
                                             },
@@ -1254,8 +1417,91 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                 }
 
                                             }
-                                        } else {
+                                        } else if (uiState.candidateData != null && cvFile == null && !isClearCV) {
+                                            if (uiState.candidateData.cvFileName != "" && uiState.candidateData.cvFilePath != "") {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(200.dp)
+                                                        .background(
+                                                            color = Color.Transparent,
+                                                            shape = MaterialTheme.shapes.medium
+                                                        )
+                                                        .DashBorder(1.dp, Color(0xFF757575), 4.dp),
+                                                ) {
 
+                                                    Column(
+                                                        modifier = Modifier
+                                                            .fillMaxSize()
+                                                            .padding(
+                                                                horizontal = 16.dp,
+                                                                vertical = 16.dp
+                                                            ),
+                                                        verticalArrangement = Arrangement.SpaceBetween,
+                                                        horizontalAlignment = Alignment.CenterHorizontally
+                                                    ) {
+
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .weight(0.5f),
+                                                            contentAlignment = Alignment.TopEnd,
+                                                        ) {
+                                                            Image(
+                                                                painter = painterResource(id = R.drawable.x),
+                                                                contentDescription = "X Icon",
+                                                                modifier = Modifier
+                                                                    .size(14.dp)
+                                                                    .clickable {
+                                                                        isClearCV = true
+                                                                    },
+                                                                alignment = Alignment.CenterEnd
+                                                            )
+                                                        }
+
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .weight(2f),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Image(
+                                                                painter = painterResource(id = R.drawable.pdf_file_icon),
+                                                                contentDescription = "Attach File Icon",
+                                                                modifier = Modifier
+                                                                    .size(
+                                                                        width = 39.08.dp,
+                                                                        height = 48.dp
+                                                                    ),
+                                                                alignment = Alignment.Center
+                                                            )
+                                                        }
+
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .weight(1f),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Text(
+                                                                maxLines = 2,
+                                                                softWrap = true,
+                                                                overflow = TextOverflow.Ellipsis,
+                                                                text = uiState.candidateData.cvFileName,
+                                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                                fontWeight = FontWeight.W400,
+                                                                color = Color(0xFF757575),
+                                                                fontSize = 14.sp,
+                                                                modifier = Modifier
+                                                                    .width(114.dp),
+                                                                textAlign = TextAlign.Center
+                                                            )
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                        } else {
                                             Box(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -1295,9 +1541,121 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
                                         Spacer(modifier = Modifier.height(10.dp))
 
-                                        AnimatedVisibility(visible = coverLetterFile.isNotEmpty(),
+                                        AnimatedVisibility(
+                                            visible = (uiState.candidateData != null && coverLetterFile.isEmpty() && !isClearCoverLetter),
                                             enter = fadeIn(),
-                                            exit = fadeOut()) {
+                                            exit = fadeOut()
+                                        ) {
+                                            AnimatedVisibility(
+                                                visible = (uiState.candidateData.coverFileName != "" && uiState.candidateData.coverFilePath != ""),
+                                                enter = fadeIn(),
+                                                exit = fadeOut()
+                                            ) {
+                                                FlowRow(
+                                                    maxItemsInEachRow = 1,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(bottom = 12.dp),
+                                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                                ) {
+                                                    repeat(1) { fileInfo ->
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .height(50.dp)
+                                                                .background(
+                                                                    color = Color(0xFFF2F6FC),
+                                                                    shape = MaterialTheme.shapes.medium
+                                                                )
+                                                                .DashBorder(
+                                                                    1.dp,
+                                                                    Color(0xFFA7BAC5),
+                                                                    4.dp
+                                                                ),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+
+                                                            Row(
+                                                                modifier = Modifier
+                                                                    .padding(10.dp)
+                                                                    .fillMaxSize(),
+                                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                                verticalAlignment = Alignment.CenterVertically
+                                                            ) {
+                                                                Row(
+                                                                    modifier = Modifier.weight(1f),
+                                                                    horizontalArrangement = Arrangement.Start,
+                                                                    verticalAlignment = Alignment.CenterVertically
+                                                                ) {
+                                                                    Image(
+                                                                        painter = painterResource(id = R.drawable.pdf_file_icon),
+                                                                        contentDescription = "PDF Logo Icon",
+                                                                        modifier = Modifier
+                                                                            .size(24.dp)
+                                                                    )
+
+                                                                    Spacer(
+                                                                        modifier = Modifier.width(
+                                                                            16.dp
+                                                                        )
+                                                                    )
+
+                                                                    Column(
+                                                                        verticalArrangement = Arrangement.spacedBy(
+                                                                            4.dp
+                                                                        )
+                                                                    ) {
+                                                                        Text(
+                                                                            text = uiState.candidateData.coverFileName,
+                                                                            fontFamily = FontFamily(
+                                                                                Font(
+                                                                                    R.font.poppins_regular
+                                                                                )
+                                                                            ),
+                                                                            fontWeight = FontWeight.W400,
+                                                                            color = Color(0xFF4A4A4A),
+                                                                            fontSize = 14.sp,
+                                                                            maxLines = 1,
+                                                                            softWrap = true,
+                                                                            overflow = TextOverflow.Ellipsis
+                                                                        )
+
+                                                                        Text(
+                                                                            text = "123 KB",
+                                                                            fontFamily = FontFamily(
+                                                                                Font(
+                                                                                    R.font.poppins_regular
+                                                                                )
+                                                                            ),
+                                                                            fontWeight = FontWeight.W400,
+                                                                            color = Color(0xFF757575),
+                                                                            fontSize = 8.sp
+                                                                        )
+                                                                    }
+                                                                }
+
+                                                                Image(
+                                                                    painter = painterResource(id = R.drawable.x),
+                                                                    contentDescription = "X Icon",
+                                                                    modifier = Modifier
+                                                                        .size(16.dp)
+                                                                        .clickable {
+                                                                            isClearCoverLetter = true
+                                                                        }
+                                                                )
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        AnimatedVisibility(
+                                            visible = coverLetterFile.isNotEmpty(),
+                                            enter = fadeIn(),
+                                            exit = fadeOut()
+                                        ) {
                                             FlowRow(
                                                 maxItemsInEachRow = 1,
                                                 modifier = Modifier
@@ -1343,7 +1701,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 verticalAlignment = Alignment.CenterVertically
                                                             ) {
                                                                 Image(
-                                                                    painter = painterResource(id = R.drawable.bank_logo),
+                                                                    painter = painterResource(id = R.drawable.pdf_file_icon),
                                                                     contentDescription = "PDF Logo Icon",
                                                                     modifier = Modifier
                                                                         .size(24.dp)
@@ -1393,6 +1751,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 modifier = Modifier
                                                                     .size(16.dp)
                                                                     .clickable {
+                                                                        coverLetterFile = emptyList()
                                                                     }
                                                             )
                                                         }
@@ -1452,18 +1811,16 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             Box(
                                                 modifier = Modifier
                                                     .clickable {
-                                                        if (fullName.isNotBlank() && email.isNotBlank()) {
-                                                            //go to work experience
-                                                            step = "stepTwo"
-                                                        } else {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Please fill name & email!",
-                                                                    Toast.LENGTH_LONG
+                                                        scope.launch {
+                                                            selectedImageUri?.let { uri ->
+                                                                viewModel.uploadFile(
+                                                                    uri,
+                                                                    imageFileName,
+                                                                    "profile"
                                                                 )
-                                                                .show()
+                                                            }
                                                         }
+                                                        step = "stepTwo"
                                                     }
                                                     .fillMaxWidth()
                                                     .height(40.dp)
@@ -1528,7 +1885,6 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             .size(24.dp)
                                             .clickable {
                                                 bottomBarVisibleAfterSignUp = false
-                                                step = "stepOne"
                                             },
                                         alignment = Alignment.Center
                                     )
@@ -1792,6 +2148,18 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             .clickable {
                                                 if (jobTitle.isNotBlank() && companyName.isNotBlank() && startMonth.isNotBlank() && startYear.isNotBlank()) {
                                                     //go to complete state
+                                                    scope.launch {
+                                                        /*viewModel.createApplication(
+                                                            uiState.jobDetail.id,
+                                                            uiState.jobDetail.company.subDomain,
+                                                            uiState.jobDetail.position,
+                                                            CurrentDateTimeFormatted(),
+                                                            jobTitle,
+                                                            companyName,
+                                                            "",
+                                                            emptyList()
+                                                        )*/
+                                                    }
                                                     step = "stepThree"
                                                 } else {
                                                     Toast
@@ -1995,7 +2363,6 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             .size(24.dp)
                                             .clickable {
                                                 bottomBarVisible = false
-                                                step = "stepOne"
                                             },
                                         alignment = Alignment.Center
                                     )
@@ -2127,11 +2494,11 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     if (android.util.Patterns.PHONE.matcher(text)
                                                             .matches()
                                                     ) {
-                                                        /*scope.launch {
+                                                        scope.launch {
                                                             isTimerRunning = true
                                                             viewModel.requestOTP(text)
                                                             viewModel.updatePhone(text)
-                                                        }*/
+                                                        }
                                                     } else {
                                                         Toast.makeText(
                                                             applicationContext,
@@ -2350,10 +2717,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                         modifier = Modifier
                                             .clickable {
                                                 focusRequesters.forEach { it.freeFocus() }
-                                                step = "stepTwo"
-                                                /*scope.launch {
-                                                viewModel.verifyOTP(code.joinToString(separator = ""))
-                                            }*/
+                                                scope.launch {
+                                                    viewModel.verifyOTP(code.joinToString(separator = ""))
+                                                }
                                             }
                                             .height(50.dp)
                                             .fillMaxWidth()
@@ -2405,7 +2771,6 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             .size(24.dp)
                                             .clickable {
                                                 bottomBarVisible = false
-                                                step = "stepOne"
                                             },
                                         alignment = Alignment.Center
                                     )
@@ -2435,15 +2800,40 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     item {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.camera),
-                                                contentDescription = "Profile Icon",
-                                                modifier = Modifier
-                                                    .size(84.dp)
-                                                    .clip(CircleShape),
-                                                contentScale = ContentScale.Fit
-                                            )
+                                        Box(contentAlignment = Alignment.Center,
+                                            modifier = Modifier.clickable {
+                                                launcher.launch("image/*")
+                                            }) {
+                                            if (selectedImageUri != null) {
+
+                                                val imageRequest = remember(selectedImageUri) {
+                                                    ImageRequest.Builder(applicationContext)
+                                                        .data(selectedImageUri).build()
+                                                }
+
+                                                Image(
+                                                    painter = rememberImagePainter(
+                                                        request = imageRequest,
+                                                    ),
+                                                    contentDescription = "Profile Icon",
+                                                    modifier = Modifier
+                                                        .size(84.dp)
+                                                        .clip(CircleShape)
+                                                        .graphicsLayer {
+                                                            shape = CircleShape
+                                                        },
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                            } else {
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.camera),
+                                                    contentDescription = "Profile Icon",
+                                                    modifier = Modifier
+                                                        .size(84.dp)
+                                                        .clip(CircleShape),
+                                                    contentScale = ContentScale.Fit
+                                                )
+                                            }
                                         }
 
                                         Spacer(modifier = Modifier.height(16.dp))
@@ -2606,26 +2996,115 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
                                         Spacer(modifier = Modifier.height(10.dp))
 
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(200.dp)
-                                                .background(
-                                                    color = Color.Transparent,
-                                                    shape = MaterialTheme.shapes.medium
-                                                )
-                                                .DashBorder(1.dp, Color(0xFF757575), 4.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
+                                        if (cvFile != null) {
 
-                                            Image(
-                                                painter = painterResource(id = R.drawable.attach_file),
-                                                contentDescription = "Attach File Icon",
+                                            Box(
                                                 modifier = Modifier
-                                                    .size(width = 114.dp, height = 180.dp),
-                                                alignment = Alignment.Center
-                                            )
+                                                    .fillMaxWidth()
+                                                    .height(200.dp)
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    )
+                                                    .DashBorder(1.dp, Color(0xFF757575), 4.dp),
+                                            ) {
 
+                                                Column(
+                                                    modifier = Modifier
+                                                        .fillMaxSize()
+                                                        .padding(
+                                                            horizontal = 16.dp,
+                                                            vertical = 16.dp
+                                                        ),
+                                                    verticalArrangement = Arrangement.SpaceBetween,
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .weight(0.5f),
+                                                        contentAlignment = Alignment.TopEnd,
+                                                    ) {
+                                                        Image(
+                                                            painter = painterResource(id = R.drawable.x),
+                                                            contentDescription = "X Icon",
+                                                            modifier = Modifier
+                                                                .size(14.dp)
+                                                                .clickable {
+                                                                    cvFile = null
+                                                                },
+                                                            alignment = Alignment.CenterEnd
+                                                        )
+                                                    }
+
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .weight(2f),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Image(
+                                                            painter = painterResource(id = R.drawable.pdf_file_icon),
+                                                            contentDescription = "Attach File Icon",
+                                                            modifier = Modifier
+                                                                .size(
+                                                                    width = 39.08.dp,
+                                                                    height = 48.dp
+                                                                ),
+                                                            alignment = Alignment.Center
+                                                        )
+                                                    }
+
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .weight(1f),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Text(
+                                                            maxLines = 2,
+                                                            softWrap = true,
+                                                            overflow = TextOverflow.Ellipsis,
+                                                            text = cvFileName,
+                                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                            fontWeight = FontWeight.W400,
+                                                            color = Color(0xFF757575),
+                                                            fontSize = 14.sp,
+                                                            modifier = Modifier
+                                                                .width(114.dp),
+                                                            textAlign = TextAlign.Center
+                                                        )
+                                                    }
+                                                }
+
+                                            }
+                                        } else {
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(200.dp)
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    )
+                                                    .DashBorder(1.dp, Color(0xFF757575), 4.dp)
+                                                    .clickable {
+                                                        fileChooserLauncher.launch("application/pdf")
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.attach_file),
+                                                    contentDescription = "Attach File Icon",
+                                                    modifier = Modifier
+                                                        .size(width = 114.dp, height = 180.dp),
+                                                    alignment = Alignment.Center
+                                                )
+
+                                            }
                                         }
 
                                         Spacer(modifier = Modifier.height(16.dp))
@@ -2641,25 +3120,19 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
                                         Spacer(modifier = Modifier.height(10.dp))
 
-                                        AnimatedVisibility(visible = coverLetterFile.isNotEmpty(),
+                                        AnimatedVisibility(
+                                            visible = coverLetterFile.isNotEmpty(),
                                             enter = fadeIn(),
-                                            exit = fadeOut()) {
+                                            exit = fadeOut()
+                                        ) {
                                             FlowRow(
                                                 maxItemsInEachRow = 1,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .padding(horizontal = 16.dp),
+                                                    .padding(bottom = 12.dp),
                                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
                                                 repeat(coverLetterFile.size) { fileInfo ->
-                                                    Log.d(
-                                                        "fileName>>",
-                                                        coverLetterFile[fileInfo].fileName ?: ""
-                                                    )
-                                                    Log.d(
-                                                        "fileSize>>",
-                                                        coverLetterFile[fileInfo].fileSize ?: ""
-                                                    )
                                                     Box(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
@@ -2689,7 +3162,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 verticalAlignment = Alignment.CenterVertically
                                                             ) {
                                                                 Image(
-                                                                    painter = painterResource(id = R.drawable.bank_logo),
+                                                                    painter = painterResource(id = R.drawable.pdf_file_icon),
                                                                     contentDescription = "PDF Logo Icon",
                                                                     modifier = Modifier
                                                                         .size(24.dp)
@@ -2739,6 +3212,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 modifier = Modifier
                                                                     .size(16.dp)
                                                                     .clickable {
+                                                                        coverLetterFile = emptyList()
                                                                     }
                                                             )
                                                         }
@@ -2798,17 +3272,59 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             Box(
                                                 modifier = Modifier
                                                     .clickable {
-                                                        if (fullName.isNotBlank() && email.isNotBlank()) {
-                                                            //go to work experience
-                                                            step = "stepThree"
+
+                                                        val validate =
+                                                            (selectedImageUri != null && fullName.isNotBlank() && email.isNotBlank() && cvFile != null)
+                                                        if (!validate) {
+                                                            if (fullName == "") {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please fill name!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            } else if (email == "") {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please fill email!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            } else if (cvFile == null) {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please upload CV!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            } else if (selectedImageUri == null) {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please upload Profile Picture!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            }
                                                         } else {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Please fill name & email!",
-                                                                    Toast.LENGTH_LONG
+                                                            scope.launch {
+                                                                viewModel.createCandidate(
+                                                                    fullName,
+                                                                    email,
+                                                                    uiState.jobDetail.position,
+                                                                    "summary"
                                                                 )
-                                                                .show()
+                                                                selectedImageUri?.let { uri ->
+                                                                    viewModel.uploadFile(
+                                                                        uri,
+                                                                        imageFileName,
+                                                                        "profile"
+                                                                    )
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                     .fillMaxWidth()
@@ -2874,7 +3390,6 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             .size(24.dp)
                                             .clickable {
                                                 bottomBarVisible = false
-                                                step = "stepOne"
                                             },
                                         alignment = Alignment.Center
                                     )

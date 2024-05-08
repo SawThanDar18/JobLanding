@@ -86,7 +86,12 @@ class HomeViewModel(application: Application, private val homeRepository: HomeRe
                             )
                         }
                     } else {
-                        Log.d("result>>", "it.hasErrors")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
                     }
                 }
         }

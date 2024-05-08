@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
 import android.app.Application
-import android.util.Log
+import android.net.Uri
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
@@ -21,6 +21,7 @@ import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
+import co.nexlabs.betterhr.joblanding.network.api.request_response.UploadResponseId
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyOTPRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyPhoneNumResponse
 import co.nexlabs.betterhr.joblanding.util.API_KEY
@@ -30,6 +31,7 @@ import co.nexlabs.betterhr.joblanding.util.baseUrl
 import co.nexlabs.betterhr.joblanding.util.baseUrlForAuth
 import co.nexlabs.betterhr.joblanding.util.baseUrlForCreateApplication
 import co.nexlabs.betterhr.joblanding.util.baseUrlForJob
+import co.nexlabs.betterhr.joblanding.util.baseUrlForUploadFile
 import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
 import com.apollographql.apollo3.ApolloCall
@@ -48,16 +50,19 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import com.apollographql.apollo3.network.okHttpClient
-import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import java.io.File
+import java.io.FileInputStream
 
-class JobLandingServiceImpl(private val application: Application, private val client: HttpClient) : JobLandingService {
+class JobLandingServiceImpl(private val application: Application, private val client: HttpClient) :
+    JobLandingService {
 
     private val localStorage: LocalStorage
+
     init {
         localStorage = AndroidLocalStorageImpl(application)
     }
@@ -183,9 +188,11 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         summary: String,
         countryId: String
     ): ApolloCall<CreateCandidateMutation.Data> {
-        return apolloClientWithAuthWithoutToken.mutation(CreateCandidateMutation(
-            name, email, phone, desiredPosition, summary, countryId
-        ))
+        return apolloClientWithAuthWithoutToken.mutation(
+            CreateCandidateMutation(
+                name, email, phone, desiredPosition, summary, countryId
+            )
+        )
     }
 
     override suspend fun getBearerToken(token: String): ApolloCall<VerifySmsTokenAndAuthMutation.Data> {
@@ -213,7 +220,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
     }
 
     override suspend fun getCountriesList(): GetCountriesListResponse {
-        val response = client.post("${baseUrl}${getCountriesUrl}") {
+        val response = client.post("${getCountriesUrl}") {
             headers {
                 append(API_KEY, API_VALUE)
             }
@@ -228,7 +235,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
 
         /*try {
             val response = apolloClient.query(DynamicPagesQuery(countryId, platform))
-            println("mm>>${response.execute().data!!.dynamicPages.size}")
+            println("mm>>${response.execute().data!!.dynamicPages}")
         } catch (e: ApolloException) {
             println("ApolloClient error: ${e.message}")
         } catch (e: Exception) {
@@ -248,7 +255,10 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         return apolloClient.query(JobLandingCollectionCompaniesQuery(collectionId, isPaginate))
     }
 
-    override suspend fun getJobLandingCollectionJobs(collectionId: String, isPaginate: Boolean): ApolloCall<JobLandingCollectionJobsQuery.Data> {
+    override suspend fun getJobLandingCollectionJobs(
+        collectionId: String,
+        isPaginate: Boolean
+    ): ApolloCall<JobLandingCollectionJobsQuery.Data> {
         return apolloClient.query(JobLandingCollectionJobsQuery(collectionId, isPaginate))
     }
 
@@ -264,15 +274,6 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         candidateId: String,
         jobId: String
     ): ApolloCall<SaveJobMutation.Data> {
-        Log.d("candi>>>", candidateId)
-        /*try {
-            val response = apolloClientWithAuth.mutation(SaveJobMutation(candidateId, jobId))
-            println("mm>>${response.execute().data!!.saveJob!!.job_id}")
-        } catch (e: ApolloException) {
-            println("ApolloClient error: ${e.message}")
-        } catch (e: Exception) {
-            println("Error: ${e.message}")
-        }*/
         return apolloClientWithAuth.mutation(SaveJobMutation(candidateId, jobId))
     }
 
@@ -291,7 +292,15 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         status: String,
         subDomain: String
     ): ApolloCall<ApplyJobMutation.Data> {
-        return apolloClientWithAuth.mutation(ApplyJobMutation(Optional.present(referenceId), candidateId, jobId, Optional.present(status), subDomain))
+        return apolloClientWithAuth.mutation(
+            ApplyJobMutation(
+                Optional.present(referenceId),
+                candidateId,
+                jobId,
+                Optional.present(status),
+                subDomain
+            )
+        )
     }
 
     override suspend fun createApplication(
@@ -304,12 +313,13 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         currentJobTitle: String,
         currentCompany: String,
         workingSince: String,
-        files: List<FileRequest>
+        files: List<FileRequest>,
+        types: List<String>
     ): String {
-        try {
             val response = client.post(baseUrlForCreateApplication) {
                 headers {
                     append(HttpHeaders.ContentType, "multipart/form-data")
+                    append("Authorization", "bearer ${localStorage.bearerToken}")
                 }
                 setBody(
                     formData {
@@ -327,15 +337,43 @@ class JobLandingServiceImpl(private val application: Application, private val cl
                                 append(it.type, it.name)
                             }
                         }
+                        append("file_types", "")
                     }
                 )
             }
             return response.body()
-        } catch (e: ClientRequestException) {
-            // Handle request exception
-        } finally {
-            client.close()
+    }
+
+    override suspend fun uploadUserFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        candidateId: String
+    ): UploadResponseId {
+        val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
+        val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
+        val byteArray = inputStream.readBytes()
+
+        val formData = formData {
+            append("file", byteArray, Headers.build {
+                append(HttpHeaders.ContentDisposition, "filename=\"${fileName.replace(" ", "_")}\"")
+            })
+            append("type", type)
+            append("candidate_id", candidateId)
         }
-        return ""
+
+        val response = client.submitFormWithBinaryData(
+            url = baseUrlForUploadFile,
+            formData = formData,
+        ) {
+            onUpload { bytesSentTotal, contentLength ->
+                println("Uploaded $bytesSentTotal bytes from $contentLength")
+            }
+            headers {
+                append("Authorization", "bearer ${localStorage.bearerToken}")
+            }
+        }
+
+        return response.body()
     }
 }

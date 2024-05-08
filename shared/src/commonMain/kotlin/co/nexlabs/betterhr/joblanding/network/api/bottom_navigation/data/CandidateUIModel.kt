@@ -8,6 +8,11 @@ data class CandidateUIModel(
     val summary: String,
     val desiredPosition: String,
     val countryId: String,
+    val profilePath: String,
+    val cvFileName: String,
+    val cvFilePath: String,
+    val coverFileName: String,
+    val coverFilePath: String,
     val applications: List<ApplicationsUIModel>,
     val companies: List<CompaniesUIModel>
 )

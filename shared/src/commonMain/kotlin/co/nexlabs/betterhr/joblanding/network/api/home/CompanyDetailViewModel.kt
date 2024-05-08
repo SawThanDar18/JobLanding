@@ -70,7 +70,12 @@ class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailR
                             )
                         }
                     } else {
-                        Log.d("result>>", "it.hasErrors")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
                     }
                 }
         }

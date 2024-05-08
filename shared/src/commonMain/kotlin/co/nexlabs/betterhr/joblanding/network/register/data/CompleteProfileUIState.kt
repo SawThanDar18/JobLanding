@@ -7,7 +7,7 @@ data class CompleteProfileUIState(
     val isLoading: Boolean = true,
     val error: UIErrorType = UIErrorType.Nothing,
     val candidateData: CandidateUIModel = CandidateUIModel(
-        "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "", "", "",
         emptyList(), emptyList()
     )
 )

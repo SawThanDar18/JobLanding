@@ -119,14 +119,28 @@ class ChooseCountryViewModel(application: Application,
                         )
                     }
                     if (!data.hasErrors()) {
-                        if (data.data?.dynamicPages!![0].id != null && data.data?.dynamicPages!![0].id != "") {
+                        if (data.data!!.dynamicPages.isNotEmpty()) {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                    error = if (data.data == null || data.data!!.dynamicPages.isNullOrEmpty()) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                                     dynamicPageId = data.data?.dynamicPages!![0].id,
                                 )
                             }
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = UIErrorType.Other("No Data!")
+                                )
+                            }
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
                         }
                     }
                 }

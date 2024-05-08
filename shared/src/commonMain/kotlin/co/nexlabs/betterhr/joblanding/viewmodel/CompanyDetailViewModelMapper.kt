@@ -52,7 +52,7 @@ object CompanyDetailViewModelMapper {
         return CompanyDetailUIModel(
             data.id,
             data.subdomain,
-            data.country,
+           // data.country,
             data.name,
             data.description ?: "",
             data.company_mail ?: "",

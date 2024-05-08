@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetCountriesListResponse(
-    @SerialName("status") val status: String,
-    @SerialName("message") val message: String,
     @SerialName("data") val data: List<DataResponse>
 )
 

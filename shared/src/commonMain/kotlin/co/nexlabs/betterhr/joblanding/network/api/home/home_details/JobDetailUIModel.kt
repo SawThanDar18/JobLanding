@@ -33,5 +33,6 @@ data class JobDetailUIModel(
 
 data class JobDetailCompanyUIModel(
     val id: String,
-    val name: String
+    val name: String,
+    val subDomain: String
 )

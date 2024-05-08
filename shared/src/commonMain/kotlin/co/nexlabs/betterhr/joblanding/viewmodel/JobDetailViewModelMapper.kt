@@ -9,14 +9,24 @@ import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIM
 
 object JobDetailViewModelMapper {
 
-    fun mapFetchSaveJobDataToViewModel(data: FetchSaveJobByJobIdQuery.FetchSaveJobByJobId): FetchSaveJobsUIModel {
-        return FetchSaveJobsUIModel(
-            FetchSaveJobDatUIModel(
-                data.id ?: "",
-                data.job_id ?: "",
-                data.candidate_id ?: ""
+    fun mapFetchSaveJobDataToViewModel(data: FetchSaveJobByJobIdQuery.Data?): FetchSaveJobsUIModel {
+        return if (data != null) {
+            FetchSaveJobsUIModel(
+                data = FetchSaveJobDatUIModel(
+                    data.fetchSaveJobByJobId!!.id ?: "",
+                    data.fetchSaveJobByJobId.job_id ?: "",
+                    data.fetchSaveJobByJobId.candidate_id ?: ""
+                )
             )
-        )
+        } else {
+            FetchSaveJobsUIModel(data = FetchSaveJobDatUIModel(
+                "", "", ""
+            ))
+        }
+
+        return FetchSaveJobsUIModel(data = FetchSaveJobDatUIModel(
+            "", "", ""
+        ))
     }
 
     fun mapDataToViewModel(data: JobLandingJobDetailQuery.JobLandingJob): JobDetailUIModel {
@@ -51,7 +61,8 @@ object JobDetailViewModelMapper {
             data.last3_cv_count ?: 0,
             JobDetailCompanyUIModel(
                 data.company!!.id,
-                data.company.name
+                data.company.name,
+                data.company.subdomain
             )
         )
     }

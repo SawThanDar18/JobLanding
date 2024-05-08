@@ -7,6 +7,13 @@ query Candidate {
         summary
         desired_position
         country_id
+        files {
+            id
+            name
+            type
+            folder
+            full_path
+        }
         applications {
             files {
                 name

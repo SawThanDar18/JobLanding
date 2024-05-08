@@ -156,6 +156,19 @@ object AndroidArchLifeCycle {
     const val lifecycle_compiler = "androidx.lifecycle:lifecycle-compiler:$version"
 }
 
+object CoilJetPack {
+    private const val version = "0.20.0"
+    const val coil = "com.google.accompanist:accompanist-coil:$version"
+}
+
+object GlideJetPack {
+    private const val glideVersion = "4.12.0"
+    private const val accompanistGlideVesion = "0.10.0"
+    const val accompanistGlide = "com.google.accompanist:accompanist-glide:$accompanistGlideVesion"
+    const val glide = "com.github.bumptech.glide:glide:$glideVersion"
+    const val glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
+}
+
 object AndroidArchCore {
     private const val version = "2.1.0"
     const val runtime = "androidx.arch.core:core-runtime:$version"

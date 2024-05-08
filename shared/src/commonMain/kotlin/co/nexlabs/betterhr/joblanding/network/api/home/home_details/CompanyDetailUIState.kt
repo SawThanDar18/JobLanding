@@ -6,7 +6,7 @@ data class CompanyDetailUIState(
     val isLoading: Boolean = true,
     val error: UIErrorType = UIErrorType.Nothing,
     val companyDetail: CompanyDetailUIModel = CompanyDetailUIModel(
-        "", "", "", "", "", "", "",
+        "", "", "", "", "", "",
         0, emptyList()
     )
 )

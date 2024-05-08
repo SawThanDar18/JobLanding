@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
@@ -96,6 +97,21 @@ class CompleteProfileViewModel(
                         }
                     }
                 }
+        }
+    }
+
+    fun uploadFile(
+        file: Uri,
+        fileName: String,
+        type: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                var response = completeProfileRepository.uploadFile(file, fileName, type, localStorage.candidateId)
+                Log.d("response>>", response.id)
+            } catch (e: Exception) {
+                Log.d("error>>", e.message.toString())
+            }
         }
     }
 }

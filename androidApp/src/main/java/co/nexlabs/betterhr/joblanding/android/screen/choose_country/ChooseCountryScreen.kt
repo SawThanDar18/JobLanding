@@ -66,8 +66,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavController) {
 
+    var applicationContext = LocalContext.current.applicationContext
     var items by remember { mutableStateOf(mutableListOf<Item>()) }
-    var selectedItem by remember { mutableStateOf(Item("ab18de52-e946-4925-83ab-46f804846034", "Select your country")) }
+    var selectedItem by remember {
+        mutableStateOf(
+            Item(
+                "ab18de52-e946-4925-83ab-46f804846034",
+                "Select your country"
+            )
+        )
+    }
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
@@ -76,7 +84,6 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
 
     scope.launch {
         viewModel.getCountriesList()
-        viewModel.getDynamicPagesId(selectedItem.id)
     }
 
     Column(
@@ -129,7 +136,6 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable {
-                        //items = uiState.items
                         expanded = true
                     },
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -179,6 +185,9 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                             onClick = {
                                 selectedItem = item
                                 expanded = false
+                                scope.launch {
+                                    viewModel.getDynamicPagesId(selectedItem.id)
+                                }
                             }
                         ) {
                             Row(
@@ -214,31 +223,33 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                 .fillMaxSize()
         ) {
             Box(
-                    modifier = Modifier
-                        .clickable {
+                modifier = Modifier
+                    .clickable {
+                        scope.launch {
                             val pageId = uiState.dynamicPageId
-                            if (pageId != null && pageId != "") {
-                                scope.launch {
-                                    viewModel.updateCountryId(selectedItem.id)
-                                    viewModel.updatePageId(pageId)
-                                    navController.navigate("bottom-navigation-screen/${pageId}/${"home"}")
-                                }
+                            if (pageId != "") {
+                                viewModel.updateCountryId(selectedItem.id)
+                                viewModel.updatePageId(pageId)
+                                navController.navigate("bottom-navigation-screen/${pageId}/${"home"}")
+                            } else {
+                                Toast.makeText(applicationContext, "No Data!", Toast.LENGTH_LONG).show()
                             }
                         }
-                        .height(40.dp)
-                        .fillMaxWidth()
-                        .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                        .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = "Get Started",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFFFFFFFF),
-                        fontSize = 14.sp,
-                    )
-                }
+                    }
+                    .height(40.dp)
+                    .fillMaxWidth()
+                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                    .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "Get Started",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFFFFFFFF),
+                    fontSize = 14.sp,
+                )
+            }
         }
     }
 }

@@ -21,4 +21,8 @@ class ScreenPortalViewModel(application: Application): ViewModel() {
         return localStorage.pageId
     }
 
+    fun updatePage(pageId: String) {
+        localStorage.pageId = pageId
+    }
+
 }
