@@ -1,10 +1,14 @@
 package co.nexlabs.betterhr.joblanding.network.api.home.home_details
 
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CandidateUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.FilesUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 
 data class JobDetailUIState(
+    val isSuccessGetJobDetail: Boolean = false,
+    val isBearerTokenExist: Boolean = false,
     val isSuccessUpdateApplication: Boolean = false,
+    val isSuccessCreateApplication: Boolean = false,
     val isSuccessForCandidateId: Boolean = false,
     val isSuccessForBearerToken: Boolean = false,
     val candidateId: String = "",
@@ -27,6 +31,7 @@ data class JobDetailUIState(
     ),
     val candidateData: CandidateUIModel = CandidateUIModel(
         "", "", "", "", "", "", "", "", "", "", "", "",
+        FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),
         emptyList(), emptyList()
     ),
     val idFromProfileUpload: String = "",

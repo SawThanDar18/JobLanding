@@ -1,5 +1,5 @@
-query FetchNotifications($status: [String], $search: String, $page: Int!, $limit: Int!) {
-    notifications(status: $status, search: $search, page: $page, limit: $limit) {
+query FetchNotifications($status: [String], $search: String, $limit: Int!) {
+    notifications(status: $status, search: $search, limit: $limit) {
         id
         candidate_id
         reference_id

@@ -81,6 +81,22 @@ interface JobLandingService {
         types: List<String>
     ): UploadResponseId
 
+    suspend fun createApplicationWithFileExistingIds(
+        referenceJobId: String,
+        subdomain: String,
+        jobTitle: String,
+        status: String,
+        appliedDate: String,
+        candidateId: String,
+        currentJobTitle: String,
+        currentCompany: String,
+        workingSince: String,
+        fileName: MutableList<String?>,
+        files: MutableList<Uri?>,
+        types: List<String>,
+        existingFileId: List<String>,
+    ): UploadResponseId
+
     suspend fun updateApplication(
         id: String
     ): ApolloCall<UpdateApplicationMutation.Data>
@@ -90,6 +106,14 @@ interface JobLandingService {
         fileName: String,
         type: String,
         candidateId: String
+    ): UploadResponseId
+
+    suspend fun updateUserFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        candidateId: String,
+        fileId: String
     ): UploadResponseId
 
 }

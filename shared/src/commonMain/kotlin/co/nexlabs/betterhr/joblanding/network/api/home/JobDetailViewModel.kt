@@ -73,6 +73,17 @@ class JobDetailViewModel(
         return localStorage.bearerToken
     }
 
+    fun checkBearToken(jobId: String) {
+        if (localStorage.bearerToken != "") {
+            fetchSaveJobsById(jobId)
+           /* _uiState.update {
+                it.copy(
+                    isBearerTokenExist = true
+                )
+            }*/
+        }
+    }
+
     fun updateBearerToken(bearerToken: String) {
         localStorage.bearerToken = bearerToken
     }
@@ -91,6 +102,7 @@ class JobDetailViewModel(
                 .catch { e ->
                     _uiState.update {
                         it.copy(
+                            isSuccessGetJobDetail = false,
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
                                     .any { it is ApolloNetworkException || it is ApolloParseException })
@@ -121,6 +133,7 @@ class JobDetailViewModel(
                 }.collectLatest { data ->
                     _uiState.update {
                         it.copy(
+                            isSuccessGetJobDetail = false,
                             isLoading = true,
                             error = UIErrorType.Nothing
                         )
@@ -128,6 +141,7 @@ class JobDetailViewModel(
                     if (!data.hasErrors()) {
                         _uiState.update {
                             it.copy(
+                                isSuccessGetJobDetail = true,
                                 isLoading = false,
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                                 jobDetail = JobDetailViewModelMapper.mapDataToViewModel(data.data!!.jobLandingJob)
@@ -136,6 +150,7 @@ class JobDetailViewModel(
                     } else {
                         _uiState.update {
                             it.copy(
+                                isSuccessGetJobDetail = false,
                                 isLoading = true,
                                 error = UIErrorType.Other(data.errors.toString())
                             )
@@ -259,7 +274,9 @@ class JobDetailViewModel(
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    fetchSaveJobs = JobDetailViewModelMapper.mapFetchSaveJobDataToViewModel(data.data)
+                                    fetchSaveJobs = JobDetailViewModelMapper.mapFetchSaveJobDataToViewModel(
+                                        data.data
+                                    )
                                 )
                             }
                         }
@@ -349,7 +366,8 @@ class JobDetailViewModel(
             try {
                 var response = jobDetailRepository.verifyOTP(code)
                 if (response.data.verifyPhoneNumber.token == null) {
-                    _uiStateForVerify.value = UiState.Error("Error: ${response.data.verifyPhoneNumber.message}")
+                    _uiStateForVerify.value =
+                        UiState.Error("Error: ${response.data.verifyPhoneNumber.message}")
                 } else {
                     _uiStateForVerify.value = UiState.Success(response.data.verifyPhoneNumber.token)
                 }
@@ -376,7 +394,9 @@ class JobDetailViewModel(
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
                                     .any { it is ApolloNetworkException || it is ApolloParseException })
-                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                                UIErrorType.Network else UIErrorType.Other(
+                                e.message ?: "Something went wrong!"
+                            )
                         )
                     }
                     when (e) {
@@ -439,6 +459,7 @@ class JobDetailViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
                 it.copy(
+                    isSuccessCreateApplication = false,
                     isLoading = true,
                     error = UIErrorType.Nothing,
                     idFromCreateApplication = ""
@@ -446,10 +467,22 @@ class JobDetailViewModel(
             }
             try {
                 var response = jobDetailRepository.createApplication(
-                    referenceJobId, subdomain, jobTitle, "applied", appliedDate, localStorage.candidateId, currentJobTitle, currentCompany, workingSince, fileName, files, types
+                    referenceJobId,
+                    subdomain,
+                    jobTitle,
+                    "applied",
+                    appliedDate,
+                    localStorage.candidateId,
+                    currentJobTitle,
+                    currentCompany,
+                    workingSince,
+                    fileName,
+                    files,
+                    types
                 )
                 _uiState.update {
                     it.copy(
+                        isSuccessCreateApplication = true,
                         isLoading = false,
                         error = UIErrorType.Nothing,
                         idFromCreateApplication = response.id
@@ -458,6 +491,66 @@ class JobDetailViewModel(
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
+                        isSuccessCreateApplication = false,
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString()),
+                        idFromCreateApplication = ""
+                    )
+                }
+            }
+        }
+    }
+
+    fun createApplicationWithFileIds(
+        referenceJobId: String,
+        subdomain: String,
+        jobTitle: String,
+        appliedDate: String,
+        currentJobTitle: String,
+        currentCompany: String,
+        workingSince: String,
+        fileName: MutableList<String?>,
+        files: MutableList<Uri?>,
+        types: MutableList<String>,
+        existingFileId: MutableList<String>
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update {
+                it.copy(
+                    isSuccessCreateApplication = false,
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    idFromCreateApplication = ""
+                )
+            }
+            try {
+                var response = jobDetailRepository.createApplicationWithExistingFileIds(
+                    referenceJobId,
+                    subdomain,
+                    jobTitle,
+                    "applied",
+                    appliedDate,
+                    localStorage.candidateId,
+                    currentJobTitle,
+                    currentCompany,
+                    workingSince,
+                    fileName,
+                    files,
+                    types,
+                    existingFileId
+                )
+                _uiState.update {
+                    it.copy(
+                        isSuccessCreateApplication = true,
+                        isLoading = false,
+                        error = UIErrorType.Nothing,
+                        idFromCreateApplication = response.id
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isSuccessCreateApplication = false,
                         isLoading = true,
                         error = UIErrorType.Other(e.message.toString()),
                         idFromCreateApplication = ""
@@ -484,7 +577,9 @@ class JobDetailViewModel(
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
                                     .any { it is ApolloNetworkException || it is ApolloParseException })
-                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                                UIErrorType.Network else UIErrorType.Other(
+                                e.message ?: "Something went wrong!"
+                            )
                         )
                     }
                     when (e) {
@@ -548,7 +643,49 @@ class JobDetailViewModel(
                 )
             }
             try {
-                var response = jobDetailRepository.uploadFile(file, fileName, type, localStorage.candidateId)
+                var response =
+                    jobDetailRepository.uploadFile(file, fileName, type, localStorage.candidateId)
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = UIErrorType.Nothing,
+                        idFromProfileUpload = response.id
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString()),
+                        idFromProfileUpload = ""
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        fileId: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    idFromProfileUpload = ""
+                )
+            }
+            try {
+                var response = jobDetailRepository.updateFile(
+                    file,
+                    fileName,
+                    type,
+                    localStorage.candidateId,
+                    fileId
+                )
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -664,7 +801,13 @@ class JobDetailViewModel(
         Log.d("jobId>>>", jobId)
         Log.d("subdomain>>", subDomain)
         viewModelScope.launch(Dispatchers.IO) {
-            jobDetailRepository.applyJob(referenceId, localStorage.candidateId, jobId, "applied", subDomain).toFlow()
+            jobDetailRepository.applyJob(
+                referenceId,
+                localStorage.candidateId,
+                jobId,
+                "applied",
+                subDomain
+            ).toFlow()
                 .catch { e ->
                     _uiState.update {
                         it.copy(

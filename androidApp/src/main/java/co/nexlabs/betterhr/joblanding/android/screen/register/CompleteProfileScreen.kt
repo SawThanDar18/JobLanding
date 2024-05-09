@@ -7,6 +7,9 @@ import android.provider.OpenableColumns
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -96,31 +99,30 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var phoneNumber by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    
+
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
     scope.launch {
         viewModel.getCandidateData()
     }
-    
-    if (uiState.candidateData != null) {
 
+    if(uiState.candidateData != null) {
         name = uiState.candidateData.name
         position = uiState.candidateData.desiredPosition
         phoneNumber = uiState.candidateData.phone
         email = uiState.candidateData.email
 
-        if (uiState.candidateData.profilePath != "") {
-            profilePath = uiState.candidateData.profilePath
+        if (uiState.candidateData.profile != null) {
+            profilePath = uiState.candidateData.profile.fullPath
         }
 
-        if (uiState.candidateData.cvFileName != "" && uiState.candidateData.cvFilePath != "") {
-            cvFileName = uiState.candidateData.cvFileName
+        if (uiState.candidateData.cv != null) {
+            cvFileName = uiState.candidateData.cv.name
         }
 
-        if (uiState.candidateData.coverFileName != "" && uiState.candidateData.coverFilePath != "") {
-            coverLetterName = uiState.candidateData.coverFileName
+        if (uiState.candidateData.coverLetter != null) {
+            coverLetterName = uiState.candidateData.coverLetter.name
         }
     }
 
@@ -132,7 +134,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     ) { uri: Uri? ->
         uri?.let {
             val contentResolver = applicationContext.contentResolver
-            val fileName = co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileName(applicationContext, it)
+            val fileName =
+                co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileName(
+                    applicationContext,
+                    it
+                )
             val file = File(applicationContext.cacheDir, fileName)
             contentResolver.openInputStream(it)?.use { input ->
                 file.outputStream().use { output ->
@@ -514,74 +520,83 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                FlowRow(
-                    maxItemsInEachRow = 1,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                AnimatedVisibility(
+                    visible = !coverLetterName.isNullOrBlank(),
+                    enter = fadeIn(),
+                    exit = fadeOut()
                 ) {
-                    repeat(1) { index ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                                .background(
-                                    color = Color(0xFFF2F6FC),
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .DashBorder(1.dp, Color(0xFFA7BAC5), 4.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-
-                            Row(
+                    FlowRow(
+                        maxItemsInEachRow = 1,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        repeat(1) { index ->
+                            Box(
                                 modifier = Modifier
-                                    .padding(10.dp)
-                                    .fillMaxSize(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                    .fillMaxWidth()
+                                    .height(50.dp)
+                                    .background(
+                                        color = Color(0xFFF2F6FC),
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .DashBorder(1.dp, Color(0xFFA7BAC5), 4.dp),
+                                contentAlignment = Alignment.Center
                             ) {
+
                                 Row(
-                                    modifier = Modifier.weight(1f),
-                                    horizontalArrangement = Arrangement.Start,
+                                    modifier = Modifier
+                                        .padding(10.dp)
+                                        .fillMaxSize(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.bank_logo),
-                                        contentDescription = "PDF Logo Icon",
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                    )
-
-                                    Spacer(modifier = Modifier.width(16.dp))
-
-                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(
-                                            text = coverLetterName,
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            fontWeight = FontWeight.W400,
-                                            color = Color(0xFF4A4A4A),
-                                            fontSize = 14.sp
+                                    Row(
+                                        modifier = Modifier.weight(1f),
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.pdf_file_icon),
+                                            contentDescription = "PDF Logo Icon",
+                                            modifier = Modifier
+                                                .size(24.dp)
                                         )
 
-                                        Text(
-                                            text = "5.6 MB",
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            fontWeight = FontWeight.W400,
-                                            color = Color(0xFF757575),
-                                            fontSize = 8.sp
-                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+
+                                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                            Text(
+                                                text = coverLetterName,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                fontWeight = FontWeight.W400,
+                                                color = Color(0xFF4A4A4A),
+                                                fontSize = 14.sp,
+                                                softWrap = true,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+
+                                            Text(
+                                                text = "138 KB",
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                fontWeight = FontWeight.W400,
+                                                color = Color(0xFF757575),
+                                                fontSize = 8.sp
+                                            )
+                                        }
                                     }
+
+                                    Image(
+                                        painter = painterResource(id = R.drawable.x),
+                                        contentDescription = "X Icon",
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                    )
                                 }
 
-                                Image(
-                                    painter = painterResource(id = R.drawable.x),
-                                    contentDescription = "X Icon",
-                                    modifier = Modifier
-                                        .size(16.dp)
-                                )
                             }
-
                         }
                     }
                 }
@@ -870,9 +885,10 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                         Spacer(modifier = Modifier.height(24.dp))
 
                         Column(
-                            modifier = Modifier.size(68.dp)
+                            modifier = Modifier
+                                .size(68.dp)
                                 .clickable {
-                                           launcher.launch("image/*")
+                                    launcher.launch("image/*")
                                 },
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -1247,7 +1263,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                 modifier = Modifier.fillMaxWidth(),
                 scrimColor = Color.Transparent
             ) {
-                
+
             }
         }
     }

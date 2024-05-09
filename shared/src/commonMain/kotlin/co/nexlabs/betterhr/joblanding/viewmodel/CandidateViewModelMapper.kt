@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.viewmodel
 
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CandidateUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.FilesUIModel
 
 object CandidateViewModelMapper {
     fun mapDataToViewModel(data: CandidateQuery.Me): CandidateUIModel {
@@ -12,17 +13,40 @@ object CandidateViewModelMapper {
         var coverLetterFileList: MutableList<String> = ArrayList()
         var coverLetterFileNameList: MutableList<String> = ArrayList()
 
+        var profile: FilesUIModel = FilesUIModel(
+            "", "", "", ""
+        )
+
+        var cv: FilesUIModel = FilesUIModel(
+            "", "", "", ""
+        )
+
+        var coverLetter: FilesUIModel = FilesUIModel(
+            "", "", "", ""
+        )
+
         data.files!!.map {
             if (it.type == "profile") {
+                profile = FilesUIModel(
+                    it.id ?: "", it.name ?: "", it.type, it.full_path ?: ""
+                )
                 profileList.add(it.full_path ?: "")
             }
 
             if (it.type == "cv") {
+                cv = FilesUIModel(
+                    it.id ?: "", it.name ?: "", it.type, it.full_path ?: ""
+                )
+
                 cvFileList.add(it.full_path ?: "")
                 cvFileNameList.add(it.name ?: "")
             }
 
             if (it.type == "cover_letter") {
+                coverLetter = FilesUIModel(
+                    it.id ?: "", it.name ?: "", it.type, it.full_path ?: ""
+                )
+
                 coverLetterFileList.add(it.full_path ?: "")
                 coverLetterFileNameList.add(it.name ?: "")
             }
@@ -92,6 +116,7 @@ object CandidateViewModelMapper {
             cvFilePath,
             coverLetterFileName.replace(" ", "_"),
             coverLetterFilePath,
+            profile, cv, coverLetter,
             emptyList(),
             emptyList(),
         )

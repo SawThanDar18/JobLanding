@@ -1,5 +1,5 @@
-query FetchApplication($page: Int!) {
-    applications(page: $page) {
+query FetchApplication ($updated_at: String, $limit: Int!, $status: String) {
+    applications(updated_at: $updated_at, limit: $limit, status: $status) {
         id
         subdomain
         reference_job_id
@@ -9,13 +9,5 @@ query FetchApplication($page: Int!) {
         current_job_title
         current_company
         working_since
-        files {
-            name
-            path
-            folder
-            extension
-            full_path
-            created_at
-        }
     }
 }

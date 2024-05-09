@@ -21,6 +21,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.request_response.ExistingFileIdTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
@@ -393,32 +394,99 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         }
 
         return response.body()
-            /*val response = client.post(baseUrlForCreateApplication) {
+    }
+
+    override suspend fun createApplicationWithFileExistingIds(
+        referenceJobId: String,
+        subdomain: String,
+        jobTitle: String,
+        status: String,
+        appliedDate: String,
+        candidateId: String,
+        currentJobTitle: String,
+        currentCompany: String,
+        workingSince: String,
+        fileName: MutableList<String?>,
+        files: MutableList<Uri?>,
+        types: List<String>,
+        existingFileId: List<String>
+    ): UploadResponseId {
+        val fileTypeObject = FileTypeObject(types)
+        val existingFileTypeObject = ExistingFileIdTypeObject(existingFileId)
+
+        Log.d("file>>>Object", fileTypeObject.toString())
+        Log.d("file>>>idObject", existingFileTypeObject.toString())
+
+        var parcelFileDescriptor: ParcelFileDescriptor
+        var inputStream: FileInputStream
+        var byteArray: ByteArray
+
+        val formData = formData {
+
+            files.forEachIndexed { index, file ->
+                parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
+                inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
+                byteArray = inputStream.readBytes()
+
+                append("file$index", byteArray, Headers.build {
+                    append(HttpHeaders.ContentDisposition, "filename=${fileName[index]}")
+                })
+            }
+            append(
+                "file_types",
+                Json.encodeToString(fileTypeObject),
+                Headers.build {
+                    append(HttpHeaders.ContentType, "application/json")
+                }
+            )
+            append(
+                "existing_file_ids",
+                Json.encodeToString(existingFileTypeObject),
+                Headers.build {
+                    append(HttpHeaders.ContentType, "application/json")
+                }
+            )
+            append("reference_job_id", referenceJobId)
+            append("subdomain", subdomain)
+            append("job_title", jobTitle)
+            append("status", status)
+            append("applied_date", appliedDate)
+            append("candidate_id", candidateId)
+            append("current_job_title", currentJobTitle)
+            append("current_company", currentCompany)
+            append("working_since", workingSince)
+        }
+
+        try {
+            val response = client.submitFormWithBinaryData(
+                url = baseUrlForCreateApplication,
+                formData = formData,
+            ) {
+                onUpload { bytesSentTotal, contentLength ->
+                    println("Uploaded $bytesSentTotal bytes from $contentLength")
+                }
                 headers {
-                    append(HttpHeaders.ContentType, "multipart/form-data")
                     append("Authorization", "bearer ${localStorage.bearerToken}")
                 }
-                setBody(
-                    formData {
-                        append("reference_job_id", referenceJobId)
-                        append("subdomain", subdomain)
-                        append("job_title", jobTitle)
-                        append("status", status)
-                        append("applied_date", appliedDate)
-                        append("candidate_id", candidateId)
-                        append("current_job_title", currentJobTitle)
-                        append("current_company", currentCompany)
-                        append("working_since", workingSince)
-                        files.forEach { file ->
-                            file.fileType.forEach {
-                                append(it.type, it.name)
-                            }
-                        }
-                        append("file_types", "")
-                    }
-                )
             }
-            return response.body()*/
+
+            return response.body()
+        } catch (e: Exception) {
+            Log.d("err>>", e.message.toString())
+        }
+        val response = client.submitFormWithBinaryData(
+            url = baseUrlForCreateApplication,
+            formData = formData,
+        ) {
+            onUpload { bytesSentTotal, contentLength ->
+                println("Uploaded $bytesSentTotal bytes from $contentLength")
+            }
+            headers {
+                append("Authorization", "bearer ${localStorage.bearerToken}")
+            }
+        }
+
+        return response.body()
     }
 
     override suspend fun updateApplication(
@@ -443,6 +511,41 @@ class JobLandingServiceImpl(private val application: Application, private val cl
             })
             append("type", type)
             append("candidate_id", candidateId)
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = baseUrlForUploadFile,
+            formData = formData,
+        ) {
+            onUpload { bytesSentTotal, contentLength ->
+                println("Uploaded $bytesSentTotal bytes from $contentLength")
+            }
+            headers {
+                append("Authorization", "bearer ${localStorage.bearerToken}")
+            }
+        }
+
+        return response.body()
+    }
+
+    override suspend fun updateUserFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        candidateId: String,
+        fileId: String
+    ): UploadResponseId {
+        val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
+        val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
+        val byteArray = inputStream.readBytes()
+
+        val formData = formData {
+            append("file", byteArray, Headers.build {
+                append(HttpHeaders.ContentDisposition, "filename=\"${fileName.replace(" ", "_")}\"")
+            })
+            append("type", type)
+            append("candidate_id", candidateId)
+            append("fileId", fileId)
         }
 
         val response = client.submitFormWithBinaryData(

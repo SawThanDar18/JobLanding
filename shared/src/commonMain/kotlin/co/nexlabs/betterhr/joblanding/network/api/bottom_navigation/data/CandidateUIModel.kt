@@ -13,6 +13,9 @@ data class CandidateUIModel(
     val cvFilePath: String,
     val coverFileName: String,
     val coverFilePath: String,
+    val profile: FilesUIModel,
+    val cv: FilesUIModel,
+    val coverLetter: FilesUIModel,
     val applications: List<ApplicationsUIModel>,
     val companies: List<CompaniesUIModel>
 )
@@ -39,6 +42,8 @@ data class ApplicationsUIModel(
 )
 
 data class FilesUIModel(
+    val id: String,
     val name: String,
+    val type: String,
     val fullPath: String
 )

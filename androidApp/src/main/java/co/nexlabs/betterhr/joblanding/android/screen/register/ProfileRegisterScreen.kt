@@ -158,30 +158,36 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
 
 
     if (uiState.isSuccessForCandidateId) {
-        scope.launch {
-            viewModel.updateCandidateId(uiState.candidateId)
-            viewModel.getBearerToken(viewModel.getToken())
+        LaunchedEffect(Unit) {
+            Log.d("inside>>", "candi")
+            scope.launch {
+                viewModel.updateCandidateId(uiState.candidateId)
+                viewModel.getBearerToken(viewModel.getToken())
+            }
         }
     }
 
     if (uiState.isSuccessForBearerToken) {
-        scope.launch {
-            viewModel.updateBearerToken(uiState.bearerToken)
+        LaunchedEffect(Unit) {
+            Log.d("inside>>", "bearer")
+            scope.launch {
+                viewModel.updateBearerToken(uiState.bearerToken)
 
-            selectedImageUri?.let { uri ->
-                viewModel.uploadFile(uri, imageFileName, "profile")
-            }
+                selectedImageUri?.let { uri ->
+                    viewModel.uploadFile(uri, imageFileName, "profile")
+                }
 
-            cvFile?.let { file ->
-                viewModel.uploadFile(file, cvFileName, "cv")
-            }
+                cvFile?.let { file ->
+                    viewModel.uploadFile(file, cvFileName, "cv")
+                }
 
-            coverLetterFile[0].let {
-                viewModel.uploadFile(it.uri, it.fileName ?: "", "cover_letter")
-            }
+                coverLetterFile[0].let {
+                    viewModel.uploadFile(it.uri, it.fileName ?: "", "cover_letter")
+                }
 
-            if (viewModel.getPageId().isNotBlank()) {
-                navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"profile"}")
+                if (viewModel.getPageId().isNotBlank()) {
+                    navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"profile"}")
+                }
             }
         }
     }
