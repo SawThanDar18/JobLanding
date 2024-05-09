@@ -1,0 +1,5 @@
+mutation UpdateApplication($id: String!, $status: String!, $application_date: String!, $application_title: String!) {
+    updateApplication(id: $id, status: $status, application_date: $application_date, application_title: $application_title) {
+        id
+    }
+}

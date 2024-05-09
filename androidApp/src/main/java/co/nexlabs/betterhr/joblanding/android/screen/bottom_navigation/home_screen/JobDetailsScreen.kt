@@ -12,6 +12,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -51,6 +52,9 @@ import androidx.compose.material.contentColorFor
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Button
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,14 +93,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.net.toFile
 import co.nexlabs.betterhr.joblanding.android.data.CurrentDateTimeFormatted
+import co.nexlabs.betterhr.joblanding.android.data.convertDate
 import co.nexlabs.betterhr.joblanding.android.screen.register.MultiStyleText
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.ImageLoader
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
+import com.bumptech.glide.GenericTransitionOptions
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestOptions
 import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Dispatchers
@@ -107,6 +117,11 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStreamReader
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Locale
 
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalLayoutApi::class, ExperimentalLayoutApi::class,
@@ -117,7 +132,20 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
     var isJobSaved by remember { mutableStateOf(false) }
 
+    val currentDateTime = remember { Calendar.getInstance().time }
+    val formattedDateTime = remember {
+        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(currentDateTime)
+    }
+
     val items = (0..4).toList()
+    var monthList = listOf(
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    )
+    var selectedItemMonth by remember { mutableStateOf("Start Month") }
+    var workingSince by remember { mutableStateOf("") }
+
     var bottomBarVisibleAfterSignUp by remember { mutableStateOf(false) }
     var bottomBarVisible by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
@@ -125,6 +153,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     var isJobSaveSuccessVisible by remember { mutableStateOf(false) }
 
     var applicationContext = LocalContext.current.applicationContext
+    var monthDropDownExpanded by remember { mutableStateOf(false) }
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var jobTitle by remember { mutableStateOf("") }
@@ -132,8 +161,6 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     var startMonth by remember { mutableStateOf("") }
     var startYear by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    val gifPainter: Painter = painterResource(R.drawable.marked)
 
     var step by remember { mutableStateOf("stepOne") }
 
@@ -296,6 +323,32 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         email = uiState.candidateData.email
     }*/
 
+    if (uiState.idFromCreateApplication != "") {
+        scope.launch {
+            viewModel.updateApplication(uiState.idFromCreateApplication)
+        }
+    }
+
+    if (uiState.isSuccessUpdateApplication) {
+        if (uiState.idFromCreateApplication != "" && uiState.jobDetail.id != "" && uiState.jobDetail.company.subDomain != "") {
+            scope.launch {
+                viewModel.applyJob(
+                    uiState.idFromCreateApplication,
+                    uiState.jobDetail.id,
+                    uiState.jobDetail.company.subDomain
+                )
+            }
+        }
+    }
+
+    if (uiState.isApplyJobSuccess) {
+        step = if (bottomBarVisibleAfterSignUp) {
+            "stepThree"
+        } else {
+            "stepFour"
+        }
+    }
+
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var imageFileName by remember { mutableStateOf("") }
     val launcher = rememberLauncherForActivityResult(
@@ -309,15 +362,18 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         }
     }
 
-
     var cvFileName by remember { mutableStateOf("") }
     var cvFile by remember { mutableStateOf<Uri?>(null) }
 
     var coverLetterFile by remember { mutableStateOf<List<FileInfo>>(emptyList()) }
+    var coverLetterFileList by remember { mutableStateOf<List<Uri>?>(emptyList()) }
 
     val fileListChooserLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents(),
         onResult = { uris: List<Uri>? ->
+            coverLetterFileList = uris?.mapNotNull { uri ->
+                uri
+            } ?: emptyList()
             coverLetterFile = uris?.mapNotNull { uri ->
                 if (applicationContext.contentResolver.getType(uri) == "application/pdf") {
                     FileInfo(
@@ -347,12 +403,23 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
         AnimatedVisibility(
+            uiState.isLoading,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            CircularProgressIndicator(
+                color = Color(0xFF1ED292)
+            )
+        }
+
+        AnimatedVisibility(
             uiState.error != UIErrorType.Nothing,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
             ErrorLayout(uiState.error)
         }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -963,7 +1030,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        if (uiState.fetchSaveJobs.data.id == "" || uiState.isUnSaveJobSuccess) {
+        if (uiState.fetchSaveJobs.data!!.id == "" || uiState.isUnSaveJobSuccess) {
             Box(
                 modifier = Modifier
                     .width(70.dp)
@@ -1006,7 +1073,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                     .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
                     .clickable {
                         scope.launch {
-                            viewModel.unSaveJob(uiState.fetchSaveJobs.data.id)
+                            viewModel.unSaveJob(uiState.fetchSaveJobs.data!!.id)
                         }
                     },
                 contentAlignment = Alignment.Center,
@@ -1640,7 +1707,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                     modifier = Modifier
                                                                         .size(16.dp)
                                                                         .clickable {
-                                                                            isClearCoverLetter = true
+                                                                            isClearCoverLetter =
+                                                                                true
                                                                         }
                                                                 )
                                                             }
@@ -1751,7 +1819,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 modifier = Modifier
                                                                     .size(16.dp)
                                                                     .clickable {
-                                                                        coverLetterFile = emptyList()
+                                                                        coverLetterFile =
+                                                                            emptyList()
                                                                     }
                                                             )
                                                         }
@@ -1923,7 +1992,11 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(45.dp)
-                                        .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp))
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFA7BAC5),
+                                            RoundedCornerShape(4.dp)
+                                        )
                                         .background(
                                             color = Color.Transparent,
                                             shape = MaterialTheme.shapes.medium
@@ -1935,6 +2008,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     placeholder = {
                                         Text(
                                             "Enter your current job title",
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             color = Color(0xFFAAAAAA)
                                         )
                                     },
@@ -1980,7 +2056,11 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(45.dp)
-                                        .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp))
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFA7BAC5),
+                                            RoundedCornerShape(4.dp)
+                                        )
                                         .background(
                                             color = Color.Transparent,
                                             shape = MaterialTheme.shapes.medium
@@ -1992,6 +2072,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     placeholder = {
                                         Text(
                                             "Enter your current company name",
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             color = Color(0xFFAAAAAA)
                                         )
                                     },
@@ -2038,11 +2121,14 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    OutlinedTextField(
+                                    Box(
                                         modifier = Modifier
                                             .weight(1f)
                                             .fillMaxWidth()
                                             .height(45.dp)
+                                            .clickable {
+                                                monthDropDownExpanded = true
+                                            }
                                             .border(
                                                 1.dp,
                                                 Color(0xFFA7BAC5),
@@ -2052,40 +2138,97 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                 color = Color.Transparent,
                                                 shape = MaterialTheme.shapes.medium
                                             ),
-                                        value = startMonth,
-                                        onValueChange = {
-                                            startMonth = it
-                                        },
-                                        placeholder = {
-                                            Text(
-                                                "Start month",
-                                                color = Color(0xFFAAAAAA)
-                                            )
-                                        },
-                                        textStyle = TextStyle(
-                                            fontWeight = FontWeight.W400,
-                                            fontSize = 14.sp,
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        Text(
+                                            text = selectedItemMonth,
+                                            modifier = Modifier.padding(start = 8.dp),
                                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            color = Color(0xFFAAAAAA)
-                                        ),
-                                        colors = TextFieldDefaults.textFieldColors(
-                                            textColor = Color(0xFFAAAAAA),
-                                            backgroundColor = Color.Transparent,
-                                            cursorColor = Color(0xFF1ED292),
-                                            focusedIndicatorColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Text,
-                                            imeAction = ImeAction.Next
-                                        ),
-                                        keyboardActions = KeyboardActions(
-                                            onDone = {
-                                                keyboardController?.hide()
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFFAAAAAA),
+                                            fontSize = 14.sp,
+                                        )
+                                    }
+
+                                    DropdownMenu(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .background(color = Color.Transparent)
+                                            .fillMaxWidth()
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFE4E7ED),
+                                                RoundedCornerShape(8.dp)
+                                            ),
+                                        expanded = monthDropDownExpanded,
+                                        onDismissRequest = { monthDropDownExpanded = false }
+                                    ) {
+                                        monthList.forEach { month ->
+                                            DropdownMenuItem(
+                                                modifier = Modifier.fillMaxSize(),
+                                                onClick = {
+                                                    selectedItemMonth = month
+                                                    monthDropDownExpanded = false
+                                                }
+                                            ) {
+                                                Text(
+                                                    text = month,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W400,
+                                                    color = Color(0xFFAAAAAA),
+                                                    fontSize = 14.sp,
+                                                )
                                             }
+                                        }
+                                    }
+                                    /*OutlinedTextField(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth()
+                                        .height(45.dp)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFA7BAC5),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
                                         ),
-                                        singleLine = true,
-                                    )
+                                    value = startMonth,
+                                    onValueChange = {
+                                        startMonth = it
+                                    },
+                                    placeholder = {
+                                        Text(
+                                            "Start month",
+                                            color = Color(0xFFAAAAAA)
+                                        )
+                                    },
+                                    textStyle = TextStyle(
+                                        fontWeight = FontWeight.W400,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFFAAAAAA)
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        textColor = Color(0xFFAAAAAA),
+                                        backgroundColor = Color.Transparent,
+                                        cursorColor = Color(0xFF1ED292),
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Next
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboardController?.hide()
+                                        }
+                                    ),
+                                    singleLine = true,
+                                )*/
 
                                     OutlinedTextField(
                                         modifier = Modifier
@@ -2108,6 +2251,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                         placeholder = {
                                             Text(
                                                 "Start year",
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                 color = Color(0xFFAAAAAA)
                                             )
                                         },
@@ -2125,7 +2271,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             unfocusedIndicatorColor = Color.Transparent
                                         ),
                                         keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Text,
+                                            keyboardType = KeyboardType.Number,
                                             imeAction = ImeAction.Done
                                         ),
                                         keyboardActions = KeyboardActions(
@@ -2146,29 +2292,147 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     Box(
                                         modifier = Modifier
                                             .clickable {
-                                                if (jobTitle.isNotBlank() && companyName.isNotBlank() && startMonth.isNotBlank() && startYear.isNotBlank()) {
-                                                    //go to complete state
+                                                var cvFilePathForCreateApplication = ""
+                                                var coverLetterFilePathForCreateApplication = ""
+                                                var files: MutableList<Uri?> = ArrayList()
+                                                var fileNames: MutableList<String?> =
+                                                    ArrayList()
+                                                var fileTypes: MutableList<String> = ArrayList()
+
+                                                /*if (cvFileName == "" || cvFileName == null) {
+                                                if (uiState.candidateData != null) {
+                                                    if (uiState.candidateData.cvFilePath != "") {
+                                                        cvFilePathForCreateApplication =
+                                                            uiState.candidateData.cvFilePath
+                                                    }
+                                                }
+                                            }
+
+                                            coverLetterFile.map { file ->
+                                                if (file.fileName == "" || file.fileName == null) {
+                                                    if (uiState.candidateData != null) {
+                                                        if (uiState.candidateData.coverFilePath != "") {
+                                                            coverLetterFilePathForCreateApplication =
+                                                                uiState.candidateData.coverFilePath
+                                                        }
+                                                    }
+                                                }
+                                            }*/
+
+                                                if (cvFile == null) {
+                                                    files.clear()
+                                                    fileNames.clear()
+                                                    fileTypes.clear()
+                                                    files.add(null)
+                                                    fileNames.add(null)
+                                                    fileTypes.add("cv")
+                                                    if (coverLetterFile.isNotEmpty()) {
+                                                        coverLetterFile.let { file ->
+                                                            file.forEach {
+                                                                files.add(it.uri)
+                                                                fileNames.add(it.fileName)
+                                                                fileTypes.add("cover_letter")
+                                                            }
+                                                        }
+                                                    } else {
+                                                        files.add(null)
+                                                        fileNames.add(null)
+                                                        fileTypes.add("cover_letter")
+                                                    }
+
+                                                } else {
+                                                    files.clear()
+                                                    fileNames.clear()
+                                                    files.add(cvFile)
+                                                    fileNames.add(cvFileName)
+                                                    fileTypes.add("cv")
+                                                    if (coverLetterFile.isNotEmpty()) {
+                                                        coverLetterFile.let { file ->
+                                                            file.forEach {
+                                                                files.add(it.uri)
+                                                                fileNames.add(it.fileName)
+                                                                fileTypes.add("cover_letter")
+                                                            }
+                                                        }
+                                                    } else {
+                                                        files.add(null)
+                                                        fileNames.add(null)
+                                                        fileTypes.add("cover_letter")
+                                                    }
+                                                }
+
+                                                Log.d("files>>>", files.toString())
+                                                Log.d("files>>>name", fileNames.toString())
+                                                Log.d("files>>>type", fileTypes.toString())
+
+                                                val validate =
+                                                    (files.isNotEmpty() && jobTitle.isNotBlank() && companyName.isNotBlank() && selectedItemMonth.isNotBlank() && startYear.isNotBlank())
+
+                                                if (!validate) {
+                                                    if (files.isEmpty()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Upload CV!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+
+                                                    if (jobTitle.isNullOrBlank()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Fill Job Title!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+
+                                                    if (companyName.isNullOrBlank()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Fill Company Name!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+
+                                                    if (selectedItemMonth.isNullOrBlank()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Choose Working Month!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+
+                                                    if (startYear.isNullOrBlank()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Choose Working Year!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+                                                } else {
                                                     scope.launch {
-                                                        /*viewModel.createApplication(
+                                                        viewModel.createApplication(
                                                             uiState.jobDetail.id,
                                                             uiState.jobDetail.company.subDomain,
                                                             uiState.jobDetail.position,
-                                                            CurrentDateTimeFormatted(),
+                                                            formattedDateTime,
                                                             jobTitle,
                                                             companyName,
-                                                            "",
-                                                            emptyList()
-                                                        )*/
-                                                    }
-                                                    step = "stepThree"
-                                                } else {
-                                                    Toast
-                                                        .makeText(
-                                                            applicationContext,
-                                                            "Please fill information!",
-                                                            Toast.LENGTH_LONG
+                                                            convertDate("$selectedItemMonth $startYear"),
+                                                            fileNames,
+                                                            files,
+                                                            fileTypes
                                                         )
-                                                        .show()
+                                                    }
                                                 }
                                             }
                                             .fillMaxWidth()
@@ -2245,7 +2509,17 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                 Spacer(modifier = Modifier.height(24.dp))
 
                                 Image(
-                                    painter = gifPainter,
+                                    painter = rememberGlidePainter(
+                                        request = {
+                                            Glide.with(applicationContext)
+                                                .asGif()
+                                                .load(R.drawable.apply_job_success)
+                                                .apply(RequestOptions().centerCrop())
+                                            /*.transition(GenericTransitionOptions.with(
+                                                GifDrawable()
+                                            ))*/
+                                        }
+                                    ),
                                     contentDescription = "GIF",
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -2277,6 +2551,11 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             .clickable {
                                                 bottomBarVisibleAfterSignUp = false
                                                 step = "stepOne"
+                                                if (viewModel.getPageId() != "") {
+                                                    scope.launch {
+                                                        navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"home"}")
+                                                    }
+                                                }
                                             }
                                             .fillMaxWidth()
                                             .height(40.dp)
@@ -3212,7 +3491,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 modifier = Modifier
                                                                     .size(16.dp)
                                                                     .clickable {
-                                                                        coverLetterFile = emptyList()
+                                                                        coverLetterFile =
+                                                                            emptyList()
                                                                     }
                                                             )
                                                         }
@@ -3428,7 +3708,11 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(45.dp)
-                                        .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp))
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFA7BAC5),
+                                            RoundedCornerShape(4.dp)
+                                        )
                                         .background(
                                             color = Color.Transparent,
                                             shape = MaterialTheme.shapes.medium
@@ -3440,6 +3724,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     placeholder = {
                                         Text(
                                             "Enter your current job title",
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             color = Color(0xFFAAAAAA)
                                         )
                                     },
@@ -3485,7 +3772,11 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(45.dp)
-                                        .border(1.dp, Color(0xFFA7BAC5), RoundedCornerShape(4.dp))
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFA7BAC5),
+                                            RoundedCornerShape(4.dp)
+                                        )
                                         .background(
                                             color = Color.Transparent,
                                             shape = MaterialTheme.shapes.medium
@@ -3497,6 +3788,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     placeholder = {
                                         Text(
                                             "Enter your current company name",
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             color = Color(0xFFAAAAAA)
                                         )
                                     },
@@ -3543,11 +3837,15 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    OutlinedTextField(
+
+                                    Box(
                                         modifier = Modifier
                                             .weight(1f)
                                             .fillMaxWidth()
                                             .height(45.dp)
+                                            .clickable {
+                                                monthDropDownExpanded = true
+                                            }
                                             .border(
                                                 1.dp,
                                                 Color(0xFFA7BAC5),
@@ -3557,40 +3855,98 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                 color = Color.Transparent,
                                                 shape = MaterialTheme.shapes.medium
                                             ),
-                                        value = startMonth,
-                                        onValueChange = {
-                                            startMonth = it
-                                        },
-                                        placeholder = {
-                                            Text(
-                                                "Start month",
-                                                color = Color(0xFFAAAAAA)
-                                            )
-                                        },
-                                        textStyle = TextStyle(
-                                            fontWeight = FontWeight.W400,
-                                            fontSize = 14.sp,
+                                                contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        Text(
+                                            text = selectedItemMonth,
+                                            modifier = Modifier.padding(start = 8.dp),
                                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            color = Color(0xFFAAAAAA)
-                                        ),
-                                        colors = TextFieldDefaults.textFieldColors(
-                                            textColor = Color(0xFFAAAAAA),
-                                            backgroundColor = Color.Transparent,
-                                            cursorColor = Color(0xFF1ED292),
-                                            focusedIndicatorColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Text,
-                                            imeAction = ImeAction.Next
-                                        ),
-                                        keyboardActions = KeyboardActions(
-                                            onDone = {
-                                                keyboardController?.hide()
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFFAAAAAA),
+                                            fontSize = 14.sp,
+                                        )
+                                    }
+
+                                    DropdownMenu(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .background(color = Color.Transparent)
+                                            .fillMaxWidth()
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFE4E7ED),
+                                                RoundedCornerShape(8.dp)
+                                            ),
+                                        expanded = monthDropDownExpanded,
+                                        onDismissRequest = { monthDropDownExpanded = false }
+                                    ) {
+                                        monthList.forEach { month ->
+                                            DropdownMenuItem(
+                                                modifier = Modifier.fillMaxSize(),
+                                                onClick = {
+                                                    selectedItemMonth = month
+                                                    monthDropDownExpanded = false
+                                                }
+                                            ) {
+                                                Text(
+                                                    text = month,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W400,
+                                                    color = Color(0xFFAAAAAA),
+                                                    fontSize = 14.sp,
+                                                )
                                             }
+                                        }
+                                    }
+
+                                    /*OutlinedTextField(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth()
+                                        .height(45.dp)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFA7BAC5),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
                                         ),
-                                        singleLine = true,
-                                    )
+                                    value = startMonth,
+                                    onValueChange = {
+                                        startMonth = it
+                                    },
+                                    placeholder = {
+                                        Text(
+                                            "Start month",
+                                            color = Color(0xFFAAAAAA)
+                                        )
+                                    },
+                                    textStyle = TextStyle(
+                                        fontWeight = FontWeight.W400,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFFAAAAAA)
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        textColor = Color(0xFFAAAAAA),
+                                        backgroundColor = Color.Transparent,
+                                        cursorColor = Color(0xFF1ED292),
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Next
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboardController?.hide()
+                                        }
+                                    ),
+                                    singleLine = true,
+                                )*/
 
                                     OutlinedTextField(
                                         modifier = Modifier
@@ -3613,6 +3969,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                         placeholder = {
                                             Text(
                                                 "Start year",
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                 color = Color(0xFFAAAAAA)
                                             )
                                         },
@@ -3630,7 +3989,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             unfocusedIndicatorColor = Color.Transparent
                                         ),
                                         keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Text,
+                                            keyboardType = KeyboardType.Number,
                                             imeAction = ImeAction.Done
                                         ),
                                         keyboardActions = KeyboardActions(
@@ -3651,17 +4010,105 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     Box(
                                         modifier = Modifier
                                             .clickable {
-                                                if (jobTitle.isNotBlank() && companyName.isNotBlank() && startMonth.isNotBlank() && startYear.isNotBlank()) {
-                                                    //go to complete state
-                                                    step = "stepFour"
+                                                var files: MutableList<Uri?> = ArrayList()
+                                                var fileNames: MutableList<String?> =
+                                                    ArrayList()
+                                                var fileTypes: MutableList<String> = ArrayList()
+
+                                                if (cvFile != null) {
+                                                    files.clear()
+                                                    fileNames.clear()
+                                                    fileTypes.clear()
+                                                    files.add(cvFile)
+                                                    fileNames.add(cvFileName)
+                                                    fileTypes.add("cv")
+                                                    if (coverLetterFile.isNotEmpty()) {
+                                                        coverLetterFile.let { file ->
+                                                            file.forEach {
+                                                                files.add(it.uri)
+                                                                fileNames.add(it.fileName)
+                                                                fileTypes.add("cover_letter")
+                                                            }
+                                                        }
+                                                    } else {
+                                                        files.add(null)
+                                                        fileNames.add(null)
+                                                        fileTypes.add("cover_letter")
+                                                    }
+                                                }
+
+                                                Log.d("files>>>", files.toString())
+                                                Log.d("files>>>name", fileNames.toString())
+                                                Log.d("files>>>type", fileTypes.toString())
+
+                                                val validate =
+                                                    (files.isNotEmpty() && jobTitle.isNotBlank() && companyName.isNotBlank() && selectedItemMonth.isNotBlank() && startYear.isNotBlank())
+
+                                                if (!validate) {
+                                                    if (files.isEmpty()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Upload CV!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+
+                                                    if (jobTitle.isNullOrBlank()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Fill Job Title!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+
+                                                    if (companyName.isNullOrBlank()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Fill Company Name!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+
+                                                    if (selectedItemMonth.isNullOrBlank()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Choose Working Month!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+
+                                                    if (startYear.isNullOrBlank()) {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please Choose Working Year!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
                                                 } else {
-                                                    Toast
-                                                        .makeText(
-                                                            applicationContext,
-                                                            "Please fill information!",
-                                                            Toast.LENGTH_LONG
+                                                    scope.launch {
+                                                        viewModel.createApplication(
+                                                            uiState.jobDetail.id,
+                                                            uiState.jobDetail.company.subDomain,
+                                                            uiState.jobDetail.position,
+                                                            formattedDateTime,
+                                                            jobTitle,
+                                                            companyName,
+                                                            convertDate("$selectedItemMonth $startYear"),
+                                                            fileNames,
+                                                            files,
+                                                            fileTypes
                                                         )
-                                                        .show()
+                                                    }
                                                 }
                                             }
                                             .fillMaxWidth()
@@ -3738,7 +4185,17 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                 Spacer(modifier = Modifier.height(24.dp))
 
                                 Image(
-                                    painter = gifPainter,
+                                    painter = rememberGlidePainter(
+                                        request = {
+                                            Glide.with(applicationContext)
+                                                .asGif()
+                                                .load(R.drawable.apply_job_success)
+                                                .apply(RequestOptions().centerCrop())
+                                            /*.transition(GenericTransitionOptions.with(
+                                                GifDrawable()
+                                            ))*/
+                                        }
+                                    ),
                                     contentDescription = "GIF",
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -3770,6 +4227,11 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             .clickable {
                                                 bottomBarVisible = false
                                                 step = "stepOne"
+                                                if (viewModel.getPageId() != "") {
+                                                    scope.launch {
+                                                        navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"home"}")
+                                                    }
+                                                }
                                             }
                                             .fillMaxWidth()
                                             .height(40.dp)

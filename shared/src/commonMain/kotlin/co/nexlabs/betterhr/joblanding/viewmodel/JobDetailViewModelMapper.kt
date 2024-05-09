@@ -19,14 +19,11 @@ object JobDetailViewModelMapper {
                 )
             )
         } else {
-            FetchSaveJobsUIModel(data = FetchSaveJobDatUIModel(
-                "", "", ""
-            ))
+            FetchSaveJobsUIModel(
+                data = null)
         }
 
-        return FetchSaveJobsUIModel(data = FetchSaveJobDatUIModel(
-            "", "", ""
-        ))
+        return FetchSaveJobsUIModel(data = null)
     }
 
     fun mapDataToViewModel(data: JobLandingJobDetailQuery.JobLandingJob): JobDetailUIModel {

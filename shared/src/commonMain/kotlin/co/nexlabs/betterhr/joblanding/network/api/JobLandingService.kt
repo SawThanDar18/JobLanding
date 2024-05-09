@@ -7,6 +7,7 @@ import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
+import co.nexlabs.betterhr.job.with_auth.UpdateApplicationMutation
 import co.nexlabs.betterhr.job.with_auth.VerifySmsTokenAndAuthMutation
 import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
@@ -22,6 +23,7 @@ import co.nexlabs.betterhr.joblanding.network.api.request_response.UploadRespons
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyOTPRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyPhoneNumResponse
 import com.apollographql.apollo3.ApolloCall
+import java.io.File
 
 interface JobLandingService {
 
@@ -74,9 +76,14 @@ interface JobLandingService {
         currentJobTitle: String,
         currentCompany: String,
         workingSince: String,
-        files: List<FileRequest>,
+        fileName: MutableList<String?>,
+        files: MutableList<Uri?>,
         types: List<String>
-    ): String
+    ): UploadResponseId
+
+    suspend fun updateApplication(
+        id: String
+    ): ApolloCall<UpdateApplicationMutation.Data>
 
     suspend fun uploadUserFile(
         file: Uri,

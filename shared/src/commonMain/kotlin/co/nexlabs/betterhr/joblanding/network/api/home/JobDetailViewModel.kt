@@ -147,6 +147,7 @@ class JobDetailViewModel(
 
     fun saveJob(jobId: String) {
         Log.d("candi>>", localStorage.candidateId)
+        Log.d("jobId>>", jobId)
         viewModelScope.launch(Dispatchers.IO) {
             jobDetailRepository.saveJob(localStorage.candidateId, jobId).toFlow()
                 .catch { e ->
@@ -206,6 +207,7 @@ class JobDetailViewModel(
 
     fun fetchSaveJobsById(jobId: String) {
         Log.d("bearer>>", localStorage.bearerToken)
+        Log.d("can>>", localStorage.candidateId)
         Log.d("jobid>>", jobId)
         viewModelScope.launch(Dispatchers.IO) {
             jobDetailRepository.fetchSaveJobsById(jobId).toFlow()
@@ -251,14 +253,12 @@ class JobDetailViewModel(
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                                 )
                             }
                         } else {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                                     fetchSaveJobs = JobDetailViewModelMapper.mapFetchSaveJobDataToViewModel(data.data)
                                 )
                             }
@@ -432,13 +432,105 @@ class JobDetailViewModel(
         currentJobTitle: String,
         currentCompany: String,
         workingSince: String,
-        files: List<FileRequest>,
-        types: List<String>
+        fileName: MutableList<String?>,
+        files: MutableList<Uri?>,
+        types: MutableList<String>
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            jobDetailRepository.createApplication(
-                referenceJobId, subdomain, jobTitle, "applied", appliedDate, localStorage.candidateId, currentJobTitle, currentCompany, workingSince, files, types
-            )
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    idFromCreateApplication = ""
+                )
+            }
+            try {
+                var response = jobDetailRepository.createApplication(
+                    referenceJobId, subdomain, jobTitle, "applied", appliedDate, localStorage.candidateId, currentJobTitle, currentCompany, workingSince, fileName, files, types
+                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = UIErrorType.Nothing,
+                        idFromCreateApplication = response.id
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString()),
+                        idFromCreateApplication = ""
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateApplication(id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing
+                )
+            }
+
+            jobDetailRepository.updateApplication(id).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isSuccessUpdateApplication = false,
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                        )
+                    }
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isSuccessUpdateApplication = false,
+                            isLoading = true,
+                            error = UIErrorType.Nothing
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isSuccessUpdateApplication = true,
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isSuccessUpdateApplication = false,
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
+                    }
+                }
         }
     }
 
@@ -564,6 +656,70 @@ class JobDetailViewModel(
     }
 
 
+    fun applyJob(
+        referenceId: String, jobId: String, subDomain: String
+    ) {
+        Log.d("reference>>>", referenceId)
+        Log.d("candidate>>>", localStorage.candidateId)
+        Log.d("jobId>>>", jobId)
+        Log.d("subdomain>>", subDomain)
+        viewModelScope.launch(Dispatchers.IO) {
+            jobDetailRepository.applyJob(referenceId, localStorage.candidateId, jobId, "applied", subDomain).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isApplyJobSuccess = false,
+                            isLoading = true,
+                            error = UIErrorType.Other(e.message.toString())
+                        )
+                    }
+
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isApplyJobSuccess = false,
+                            isLoading = true,
+                            error = UIErrorType.Nothing
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isApplyJobSuccess = true,
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isApplyJobSuccess = false,
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
+                    }
+                }
+        }
+    }
 
     fun getBearerTokenFromAPI(token: String) {
 

@@ -4,11 +4,13 @@ import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.Candida
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 
 data class JobDetailUIState(
+    val isSuccessUpdateApplication: Boolean = false,
     val isSuccessForCandidateId: Boolean = false,
     val isSuccessForBearerToken: Boolean = false,
     val candidateId: String = "",
     val bearerToken: String = "",
     val saveJobSuccessMsg: String = "",
+    var isApplyJobSuccess: Boolean = false,
     var isSaveJobSuccess: Boolean = false,
     val isUnSaveJobSuccess: Boolean = false,
     val isLoading: Boolean = true,
@@ -27,5 +29,6 @@ data class JobDetailUIState(
         "", "", "", "", "", "", "", "", "", "", "", "",
         emptyList(), emptyList()
     ),
-    val idFromProfileUpload: String = ""
+    val idFromProfileUpload: String = "",
+    val idFromCreateApplication: String = ""
 )

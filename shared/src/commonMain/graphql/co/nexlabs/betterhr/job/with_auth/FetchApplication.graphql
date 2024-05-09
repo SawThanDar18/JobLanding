@@ -1,5 +1,5 @@
-query FetchApplication {
-    applications {
+query FetchApplication($page: Int!) {
+    applications(page: $page) {
         id
         subdomain
         reference_job_id

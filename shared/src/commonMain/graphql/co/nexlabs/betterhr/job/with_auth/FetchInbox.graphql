@@ -1,13 +1,11 @@
-query FetchNotifications($status: [String], $is_pined: Boolean, $search: String, $page: Int!, $limit: Int!) {
-    notifications(status: $status, is_pined: $is_pined ,search: $search, page: $page, limit: $limit) {
+query FetchNotifications($status: [String], $search: String, $page: Int!, $limit: Int!) {
+    notifications(status: $status, search: $search, page: $page, limit: $limit) {
         id
         candidate_id
         reference_id
-        company_logo
-        company_name
+        job_id
         title
         status
-        is_pined
         noti_type
         updated_at
     }

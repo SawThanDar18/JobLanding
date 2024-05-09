@@ -1,6 +1,6 @@
 query FetchNotificationById($id: String!) {
     notification(id: $id) {
         title
-        description
+        render_view
     }
 }

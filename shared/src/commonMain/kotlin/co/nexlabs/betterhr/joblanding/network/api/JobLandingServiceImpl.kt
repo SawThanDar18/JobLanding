@@ -2,12 +2,16 @@ package co.nexlabs.betterhr.joblanding.network.api
 
 import android.app.Application
 import android.net.Uri
+import android.os.ParcelFileDescriptor
+import android.util.Log
+import androidx.core.net.toFile
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
+import co.nexlabs.betterhr.job.with_auth.UpdateApplicationMutation
 import co.nexlabs.betterhr.job.with_auth.VerifySmsTokenAndAuthMutation
 import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
@@ -18,6 +22,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
+import co.nexlabs.betterhr.joblanding.network.api.request_response.FileTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
@@ -53,9 +58,12 @@ import com.apollographql.apollo3.network.okHttpClient
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import java.io.File
 import java.io.FileInputStream
 
 class JobLandingServiceImpl(private val application: Application, private val client: HttpClient) :
@@ -313,10 +321,79 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         currentJobTitle: String,
         currentCompany: String,
         workingSince: String,
-        files: List<FileRequest>,
+        fileName: MutableList<String?>,
+        files: MutableList<Uri?>,
         types: List<String>
-    ): String {
-            val response = client.post(baseUrlForCreateApplication) {
+    ): UploadResponseId {
+
+        val fileTypeObject = FileTypeObject(types)
+
+        Log.d("file>>>Object", fileTypeObject.toString())
+
+        var parcelFileDescriptor: ParcelFileDescriptor
+        var inputStream: FileInputStream
+        var byteArray: ByteArray
+
+        val formData = formData {
+
+            files.forEachIndexed { index, file ->
+                parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
+                inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
+                byteArray = inputStream.readBytes()
+
+                append("file$index", byteArray, Headers.build {
+                    append(HttpHeaders.ContentDisposition, "filename=${fileName[index]}")
+                })
+            }
+            append(
+                "file_types",
+                Json.encodeToString(fileTypeObject),
+                Headers.build {
+                    append(HttpHeaders.ContentType, "application/json")
+                }
+            )
+            append("reference_job_id", referenceJobId)
+            append("subdomain", subdomain)
+            append("job_title", jobTitle)
+            append("status", status)
+            append("applied_date", appliedDate)
+            append("candidate_id", candidateId)
+            append("current_job_title", currentJobTitle)
+            append("current_company", currentCompany)
+            append("working_since", workingSince)
+        }
+
+        try {
+            val response = client.submitFormWithBinaryData(
+                url = baseUrlForCreateApplication,
+                formData = formData,
+            ) {
+                onUpload { bytesSentTotal, contentLength ->
+                    println("Uploaded $bytesSentTotal bytes from $contentLength")
+                }
+                headers {
+                    append("Authorization", "bearer ${localStorage.bearerToken}")
+                }
+            }
+
+            return response.body()
+        } catch (e: Exception) {
+            Log.d("err>>", e.message.toString())
+        }
+        val response = client.submitFormWithBinaryData(
+            url = baseUrlForCreateApplication,
+            formData = formData,
+        ) {
+            onUpload { bytesSentTotal, contentLength ->
+                println("Uploaded $bytesSentTotal bytes from $contentLength")
+            }
+            headers {
+                append("Authorization", "bearer ${localStorage.bearerToken}")
+            }
+        }
+
+        return response.body()
+            /*val response = client.post(baseUrlForCreateApplication) {
                 headers {
                     append(HttpHeaders.ContentType, "multipart/form-data")
                     append("Authorization", "bearer ${localStorage.bearerToken}")
@@ -341,7 +418,13 @@ class JobLandingServiceImpl(private val application: Application, private val cl
                     }
                 )
             }
-            return response.body()
+            return response.body()*/
+    }
+
+    override suspend fun updateApplication(
+        id: String
+    ): ApolloCall<UpdateApplicationMutation.Data> {
+        return apolloClientWithAuth.mutation(UpdateApplicationMutation(id, "applied", "2021-05-02", "title"))
     }
 
     override suspend fun uploadUserFile(
