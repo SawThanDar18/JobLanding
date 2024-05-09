@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.BottomNavigation
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.applications.ApplicationDetailScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionCompaniesListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionJobsListsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CompanyDetailsScreen
@@ -48,6 +49,9 @@ fun MyApp() {
             .background(color = Color.White)
     ) {
         NavHost(navController, startDestination = "screen-portal") {
+            composable("application-detail-screen") {
+                ApplicationDetailScreen()
+            }
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
