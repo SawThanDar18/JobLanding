@@ -8,6 +8,8 @@ import androidx.core.net.toFile
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
+import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
+import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
@@ -561,5 +563,13 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         }
 
         return response.body()
+    }
+
+    override suspend fun fetchApplication(limit: Int): ApolloCall<FetchApplicationQuery.Data> {
+        return apolloClientWithAuth.query(FetchApplicationQuery( Optional.present(null), limit, Optional.present("")))
+    }
+
+    override suspend fun fetchApplicationById(id: String): ApolloCall<FetchApplicationByIdQuery.Data> {
+        return apolloClientWithAuth.query(FetchApplicationByIdQuery(Optional.present(id)))
     }
 }

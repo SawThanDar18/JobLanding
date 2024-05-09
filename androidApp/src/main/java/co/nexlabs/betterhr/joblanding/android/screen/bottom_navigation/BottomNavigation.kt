@@ -32,6 +32,7 @@ import co.nexlabs.betterhr.joblanding.android.screen.register.CompleteProfileScr
 import co.nexlabs.betterhr.joblanding.android.screen.register.ProfileRegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
@@ -136,7 +137,10 @@ fun BottomNavigation(
                 val viewModel: HomeViewModel = getKoin().get()
                 HomeScreen(viewModel, nav, pageId)
             }
-            composable("application") { ApplicationsScreen() }
+            composable("application") {
+                val viewModel: ApplicationViewModel = getKoin().get()
+                ApplicationsScreen(viewModel, navController)
+            }
             composable("inbox") { NotificationScreen() }
             composable("interviews") { InterviewsScreen() }
             composable("profile") {
@@ -154,7 +158,10 @@ fun BottomNavigation(
                     HomeScreen(viewModel, nav, pageId)
                 }
 
-                "application" -> composable("application") { ApplicationsScreen() }
+                "application" -> composable("application") {
+                    val viewModel: ApplicationViewModel = getKoin().get()
+                    ApplicationsScreen(viewModel, navController)
+                }
                 "inbox" -> composable("inbox") { NotificationScreen() }
                 "interviews" -> composable("interviews") { InterviewsScreen() }
                 "profile" -> composable("profile") {

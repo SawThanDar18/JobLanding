@@ -31,6 +31,7 @@ import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobBeforeSignUp
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobScreens
+import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -49,8 +50,11 @@ fun MyApp() {
             .background(color = Color.White)
     ) {
         NavHost(navController, startDestination = "screen-portal") {
-            composable("application-detail-screen") {
-                ApplicationDetailScreen()
+            composable("application-detail-screen/{applicationId}") {
+                val viewModel: ApplicationViewModel = getKoin().get()
+                if (it.arguments?.getString("applicationId") != "") {
+                    ApplicationDetailScreen(viewModel, navController, it.arguments?.getString("applicationId") ?: "")
+                }
             }
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()

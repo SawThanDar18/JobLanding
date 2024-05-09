@@ -4,6 +4,8 @@ import android.net.Uri
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
+import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
+import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
@@ -115,5 +117,13 @@ interface JobLandingService {
         candidateId: String,
         fileId: String
     ): UploadResponseId
+
+    suspend fun fetchApplication(
+        limit: Int
+    ): ApolloCall<FetchApplicationQuery.Data>
+
+    suspend fun fetchApplicationById(
+        id: String
+    ): ApolloCall<FetchApplicationByIdQuery.Data>
 
 }

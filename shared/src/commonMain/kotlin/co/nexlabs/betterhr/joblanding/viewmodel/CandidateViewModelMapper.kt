@@ -13,15 +13,15 @@ object CandidateViewModelMapper {
         var coverLetterFileList: MutableList<String> = ArrayList()
         var coverLetterFileNameList: MutableList<String> = ArrayList()
 
-        var profile: FilesUIModel = FilesUIModel(
+        var profile = FilesUIModel(
             "", "", "", ""
         )
 
-        var cv: FilesUIModel = FilesUIModel(
+        var cv = FilesUIModel(
             "", "", "", ""
         )
 
-        var coverLetter: FilesUIModel = FilesUIModel(
+        var coverLetter = FilesUIModel(
             "", "", "", ""
         )
 

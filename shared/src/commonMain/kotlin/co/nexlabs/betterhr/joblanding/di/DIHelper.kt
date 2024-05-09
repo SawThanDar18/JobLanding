@@ -6,6 +6,8 @@ import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingServiceImpl
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationRepository
+import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.data.ApplyJobRepository
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.ApplyJobViewModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
@@ -79,6 +81,7 @@ fun initKoin(application: Application) {
                 single { ProfileRegisterRepository(get()) }
                 single { ApplyJobRepository(get()) }
                 single { CompleteProfileRepository(get()) }
+                single { ApplicationRepository(get()) }
                 factory { ScreenPortalViewModel(application) }
                 factory { RegisterViewModel(application, get()) }
                 factory { ChooseCountryViewModel(application, get()) }
@@ -92,6 +95,7 @@ fun initKoin(application: Application) {
                 factory { ProfileRegisterViewModel(application, get()) }
                 factory { ApplyJobViewModel(application, get()) }
                 factory { CompleteProfileViewModel(application, get()) }
+                factory { ApplicationViewModel(application, get()) }
             }
         )
     }
