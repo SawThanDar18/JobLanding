@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.applications
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -29,9 +30,13 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +54,7 @@ import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -84,10 +90,11 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
         }
 
         AnimatedVisibility(
-            uiState.application.isNotEmpty(),
+            (uiState.application.isNotEmpty() && uiState.companyData.isNotEmpty()),
             enter = fadeIn(),
             exit = fadeOut()
         ) {
+
             Column(
                 modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp),
                 verticalArrangement = Arrangement.Top,
@@ -142,7 +149,9 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.padding(bottom = 80.dp)
+                ) {
                     item {
                         FlowRow(
                             maxItemsInEachRow = 1,
@@ -167,7 +176,8 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                                 ) {
                                     Row(
                                         modifier = Modifier
-                                            .fillMaxSize().padding(horizontal = 16.dp),
+                                            .fillMaxSize()
+                                            .padding(horizontal = 16.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -178,7 +188,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                                         ) {
 
                                             Image(
-                                                painter = painterResource(id = R.drawable.bank_logo),
+                                                painter = rememberGlidePainter(request = uiState.companyData[0].company.companyLogo),
                                                 contentDescription = "Company Icon",
                                                 modifier = Modifier
                                                     .size(32.dp)
@@ -216,7 +226,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
                                                 Text(
                                                     modifier = Modifier.width(120.dp),
-                                                    text = "Yoma Strategic Ho.......",
+                                                    text = uiState.companyData[0].company.companyName,
                                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                     fontWeight = FontWeight.W400,
                                                     color = Color(0xFF757575),
@@ -229,33 +239,49 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
                                         }
 
-                                        Box(
-                                            modifier = Modifier
-                                                .width(62.dp)
-                                                .height(26.dp)
-                                                .border(
-                                                    1.dp,
-                                                    Color(0xFFEDFCF7),
-                                                    RoundedCornerShape(4.dp)
-                                                )
-                                                .background(
-                                                    color = Color(0xFFEDFCF7),
-                                                    shape = MaterialTheme.shapes.medium
-                                                ),
-                                            contentAlignment = Alignment.Center
+                                        Column(
+                                            horizontalAlignment = Alignment.End,
+                                            verticalArrangement = Arrangement.Bottom
                                         ) {
-                                            Text(
-                                                modifier = Modifier.width(46.dp),
-                                                text = uiState.application[index].status,
-                                                textAlign = TextAlign.Center,
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                fontWeight = FontWeight.W400,
-                                                color = Color(0xFF1ED292),
-                                                fontSize = 12.sp,
-                                                maxLines = 1,
-                                                softWrap = true,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .width(62.dp)
+                                                    .height(26.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFEDFCF7),
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .background(
+                                                        color = Color(0xFFEDFCF7),
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    modifier = Modifier.width(46.dp),
+                                                    text = uiState.application[index].status,
+                                                    textAlign = TextAlign.Center,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W400,
+                                                    color = Color(0xFF1ED292),
+                                                    fontSize = 12.sp,
+                                                    maxLines = 1,
+                                                    softWrap = true,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+
+                                            if (uiState.application[index].haveAssignment && !uiState.application[index].isAssignmentSubmmitted) {
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.pending_assignment),
+                                                    contentDescription = "Pending Assignment Icon",
+                                                    modifier = Modifier
+                                                        .size(124.dp, 16.dp),
+                                                    alignment = Alignment.Center
+                                                )
+                                            }
+
                                         }
                                     }
                                 }

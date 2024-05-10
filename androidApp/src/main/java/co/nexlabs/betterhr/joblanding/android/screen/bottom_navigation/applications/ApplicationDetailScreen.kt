@@ -58,13 +58,10 @@ import java.util.Locale
 @Composable
 fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavController, applicationId: String) {
     var lineHeight by remember { mutableStateOf(0.dp) }
+    var statusImage by remember { mutableStateOf(R.drawable.step) }
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
-
-    scope.launch {
-        viewModel.fetchApplication()
-    }
 
     if (applicationId != "") {
         scope.launch {
@@ -278,13 +275,22 @@ fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavC
                                 ) {
                                     repeat(uiState.applicationById.applicationHistories.size) { index ->
                                         var item = uiState.applicationById.applicationHistories[index]
+
+                                        statusImage = if (item.applicationStatus == "rejected") {
+                                            R.drawable.application_reject
+                                        } else if (item.applicationStatus == "pending") {
+                                            R.drawable.application_pending
+                                        } else {
+                                            R.drawable.step
+                                        }
+
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.Start,
                                             verticalAlignment = Alignment.Top
                                         ) {
                                             Image(
-                                                painter = painterResource(id = R.drawable.step),
+                                                painter = painterResource(id = statusImage),
                                                 contentDescription = "Step Icon",
                                                 modifier = Modifier
                                                     .size(20.dp)
@@ -359,11 +365,25 @@ fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavC
                                 ) {
                                     repeat(uiState.applicationById.applicationHistories.size) { index ->
                                         var item = uiState.applicationById.applicationHistories[index]
+
+                                        statusImage = when (item.applicationStatus) {
+                                            "rejected" -> {
+                                                R.drawable.application_reject
+                                            }
+                                            "pending" -> {
+                                                R.drawable.application_pending
+                                            }
+                                            else -> {
+                                                R.drawable.step
+                                            }
+                                        }
+
                                         lineHeight = if (index == uiState.applicationById.applicationHistories.size-1) {
                                             32.dp
                                         } else {
                                             60.dp
                                         }
+
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.Start,
@@ -376,7 +396,7 @@ fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavC
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 Image(
-                                                    painter = painterResource(id = R.drawable.step),
+                                                    painter = painterResource(id = statusImage),
                                                     contentDescription = "Step Icon",
                                                     modifier = Modifier
                                                         .size(20.dp)

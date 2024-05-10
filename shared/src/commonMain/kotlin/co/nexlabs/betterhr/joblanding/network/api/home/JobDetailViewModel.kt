@@ -483,7 +483,7 @@ class JobDetailViewModel(
                 _uiState.update {
                     it.copy(
                         isSuccessCreateApplication = true,
-                        isLoading = false,
+                        isLoading = true,
                         error = UIErrorType.Nothing,
                         idFromCreateApplication = response.id
                     )
@@ -612,7 +612,7 @@ class JobDetailViewModel(
                         _uiState.update {
                             it.copy(
                                 isSuccessUpdateApplication = true,
-                                isLoading = false,
+                                isLoading = true,
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                             )
                         }
@@ -805,8 +805,8 @@ class JobDetailViewModel(
                 referenceId,
                 localStorage.candidateId,
                 jobId,
-                "applied",
-                subDomain
+                "screening",
+                "tenantrickshaw"
             ).toFlow()
                 .catch { e ->
                     _uiState.update {

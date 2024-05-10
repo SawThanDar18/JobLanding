@@ -50,18 +50,16 @@ fun MyApp() {
             .background(color = Color.White)
     ) {
         NavHost(navController, startDestination = "screen-portal") {
-            composable("application-detail-screen/{applicationId}") {
+
+            composable("application-detail-screen") {
                 val viewModel: ApplicationViewModel = getKoin().get()
                 if (it.arguments?.getString("applicationId") != "") {
                     ApplicationDetailScreen(viewModel, navController, it.arguments?.getString("applicationId") ?: "")
-                }
+               }
             }
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
-            }
-            composable("inbox-screen") {
-                UnregisterProfileScreen(navController)
             }
             composable("register-screen") {
                 val viewModel: RegisterViewModel = getKoin().get()

@@ -7,6 +7,8 @@ class ApplicationRepository(private val jobLandingService: JobLandingService) {
         limit: Int
     ) = jobLandingService.fetchApplication(limit)
 
+    suspend fun getJobLandingJobList(jobIds: List<String>) = jobLandingService.getJobLandingJobList(jobIds)
+
     suspend fun fetchApplicationById(
         id: String
     ) = jobLandingService.fetchApplicationById(id)

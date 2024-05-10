@@ -20,6 +20,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
@@ -569,7 +570,12 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         return apolloClientWithAuth.query(FetchApplicationQuery( Optional.present(null), limit, Optional.present("")))
     }
 
+    override suspend fun getJobLandingJobList(jobIds: List<String>): ApolloCall<JobLandingJobListQuery.Data> {
+        return apolloClient.query(JobLandingJobListQuery(jobIds))
+    }
+
     override suspend fun fetchApplicationById(id: String): ApolloCall<FetchApplicationByIdQuery.Data> {
-        return apolloClientWithAuth.query(FetchApplicationByIdQuery(Optional.present(id)))
+        Log.d("api>>", "callfetchappbyid")
+        return apolloClientWithAuth.query(FetchApplicationByIdQuery(id))
     }
 }

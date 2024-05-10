@@ -2407,18 +2407,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     )
 
                                                     val validate =
-                                                        (files.isNotEmpty() && jobTitle.isNotBlank() && companyName.isNotBlank() && selectedItemMonth.isNotBlank() && startYear.isNotBlank())
+                                                        (jobTitle.isNotBlank() && companyName.isNotBlank() && selectedItemMonth.isNotBlank() && startYear.isNotBlank())
 
                                                     if (!validate) {
-                                                        if (files.isEmpty()) {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Please Upload CV!",
-                                                                    Toast.LENGTH_LONG
-                                                                )
-                                                                .show()
-                                                        }
 
                                                         if (jobTitle.isNullOrBlank()) {
                                                             Toast

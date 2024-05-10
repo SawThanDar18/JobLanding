@@ -1,4 +1,4 @@
-query FetchApplicationById($id: String) {
+query FetchApplicationById($id: String!) {
     application(id: $id) {
         id
         subdomain

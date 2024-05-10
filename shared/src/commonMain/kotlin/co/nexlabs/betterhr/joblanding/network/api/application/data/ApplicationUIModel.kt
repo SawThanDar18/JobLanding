@@ -9,6 +9,9 @@ data class ApplicationUIModel(
     val appliedDate: String,
     val currentJobTitle: String,
     val currentCompany: String,
-    val workingSince: String
+    val workingSince: String,
+    val haveAssignment: Boolean,
+    val isAssignmentSubmmitted: Boolean
 )
+
 

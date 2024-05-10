@@ -9,5 +9,7 @@ query FetchApplication ($updated_at: String, $limit: Int!, $status: String) {
         current_job_title
         current_company
         working_since
+        have_assignment
+        assignment_submitted
     }
 }

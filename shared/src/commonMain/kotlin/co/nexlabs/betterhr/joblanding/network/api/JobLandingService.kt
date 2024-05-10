@@ -16,6 +16,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
@@ -122,8 +123,11 @@ interface JobLandingService {
         limit: Int
     ): ApolloCall<FetchApplicationQuery.Data>
 
+    suspend fun getJobLandingJobList(jobIds: List<String>): ApolloCall<JobLandingJobListQuery.Data>
+
     suspend fun fetchApplicationById(
         id: String
     ): ApolloCall<FetchApplicationByIdQuery.Data>
+
 
 }
