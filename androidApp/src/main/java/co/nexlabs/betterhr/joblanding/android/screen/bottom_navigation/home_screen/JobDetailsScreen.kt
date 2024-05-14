@@ -99,6 +99,7 @@ import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.UiState
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobsUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.ImageLoader
 import coil.compose.rememberImagePainter
@@ -226,6 +227,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     var isClearCV by remember { mutableStateOf(false) }
     var isClearCoverLetter by remember { mutableStateOf(false) }
 
+    var fetchSaveJobId by remember { mutableStateOf("") }
+
     var focusRequesters = remember {
         List(6) { FocusRequester() }
     }
@@ -289,15 +292,43 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         }
     }
 
+    var isSaveItem by remember { mutableStateOf(false) }
+
     scope.launch {
         viewModel.getJobDetail(jobId)
     }
 
-    if (uiState.isSuccessGetJobDetail) {
+     if (uiState.isSuccessGetJobDetail) {
+         LaunchedEffect(Unit) {
+             scope.launch {
+                 if (viewModel.getBearerToken() != "") {
+                     viewModel.fetchSaveJobsById(jobId)
+                 }
+             }
+         }
+     }
+
+    if (uiState.fetchSaveJobs.data!!.id != "") {
+        isSaveItem = true
+        fetchSaveJobId = uiState.fetchSaveJobs.data!!.id
+    } else {
+        isSaveItem = false
+    }
+
+    if (uiState.isUnSaveJobSuccess) {
+        isSaveItem = false
         LaunchedEffect(Unit) {
             viewModel.fetchSaveJobsById(jobId)
         }
     }
+
+    if (uiState.isSaveJobSuccess) {
+        isSaveItem = true
+        LaunchedEffect(Unit) {
+            viewModel.fetchSaveJobsById(jobId)
+        }
+    }
+
 
     /* if (uiState.isBearerTokenExist) {
          LaunchedEffect(Unit) {
@@ -981,7 +1012,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     }
 
     AnimatedVisibility(
-        visible = (uiState.isSaveJobSuccess),
+        visible = (isSaveItem),
         enter = fadeIn(),
         exit = fadeOut()
     ) {
@@ -1060,7 +1091,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        if (uiState.fetchSaveJobs.data == null || uiState.isUnSaveJobSuccess || !uiState.isSaveJobSuccess) {
+        if (!isSaveItem) {
+            Log.d("state>>", "uiState.fetchSaveJobs.data!!.id null")
             Box(
                 modifier = Modifier
                     .width(70.dp)
@@ -1070,7 +1102,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                     .clickable {
                         scope.launch {
                             if (viewModel.getToken() != "") {
-                                viewModel.saveJob(uiState.jobDetail.id)
+                                viewModel.saveJob(jobId)
                             } else {
                                 if (viewModel.getPageId() != "") {
                                     Toast
@@ -1095,6 +1127,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                 )
             }
         } else {
+            Log.d("state>>else", uiState.fetchSaveJobs.data!!.id)
             Box(
                 modifier = Modifier
                     .width(70.dp)

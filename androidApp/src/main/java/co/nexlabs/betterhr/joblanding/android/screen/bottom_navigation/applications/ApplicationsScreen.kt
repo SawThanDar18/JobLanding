@@ -66,20 +66,31 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
+    var jobIds by remember { mutableStateOf<List<String>>(emptyList()) }
+
     scope.launch {
         viewModel.fetchApplication()
     }
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        AnimatedVisibility(
-            uiState.isLoading,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            CircularProgressIndicator(
-                color = Color(0xFF1ED292)
-            )
+    if (uiState.isSuccessGetApplicationData) {
+        LaunchedEffect(Unit) {
+            if (uiState.application.isNotEmpty()) {
+                jobIds = uiState.application.map {
+                    it.referenceJobId
+                }
+            }
         }
+    }
+
+    if (jobIds.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            scope.launch {
+                viewModel.getCompanyInfo(jobIds)
+            }
+        }
+    }
+
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
         AnimatedVisibility(
             uiState.error != UIErrorType.Nothing,
@@ -96,7 +107,9 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
         ) {
 
             Column(
-                modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp),
+                modifier = Modifier
+                    .padding(16.dp, 16.dp, 16.dp, 0.dp)
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -168,16 +181,16 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                                         .background(
                                             color = Color.Transparent,
                                             shape = MaterialTheme.shapes.medium
-                                        )
-                                        .clickable {
-                                            navController.navigate("application-detail-screen/${uiState.application[index].id}")
-                                        },
+                                        ),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .padding(horizontal = 16.dp),
+                                            .padding(horizontal = 16.dp)
+                                            .clickable {
+                                                navController.navigate("application-details/${uiState.application[index].id}")
+                                            },
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -188,7 +201,8 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                                         ) {
 
                                             Image(
-                                                painter = rememberGlidePainter(request = uiState.companyData[0].company.companyLogo),
+                                                painter = painterResource(id = R.drawable.bank_logo),
+                                                //painter = rememberGlidePainter(request = uiState.companyData[0].company.companyLogo),
                                                 contentDescription = "Company Icon",
                                                 modifier = Modifier
                                                     .size(32.dp)
@@ -226,7 +240,8 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
                                                 Text(
                                                     modifier = Modifier.width(120.dp),
-                                                    text = uiState.companyData[0].company.companyName,
+                                                    text = "Oway",
+                                                    //text = uiState.companyData[0].company.companyName,
                                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                     fontWeight = FontWeight.W400,
                                                     color = Color(0xFF757575),

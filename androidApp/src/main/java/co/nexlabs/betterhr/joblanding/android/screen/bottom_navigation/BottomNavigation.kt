@@ -139,7 +139,7 @@ fun BottomNavigation(
             }
             composable("application") {
                 val viewModel: ApplicationViewModel = getKoin().get()
-                ApplicationsScreen(viewModel, navController)
+                ApplicationsScreen(viewModel, nav)
             }
             composable("inbox") { NotificationScreen() }
             composable("interviews") { InterviewsScreen() }
@@ -160,7 +160,7 @@ fun BottomNavigation(
 
                 "application" -> composable("application") {
                     val viewModel: ApplicationViewModel = getKoin().get()
-                    ApplicationsScreen(viewModel, navController)
+                    ApplicationsScreen(viewModel, nav)
                 }
                 "inbox" -> composable("inbox") { NotificationScreen() }
                 "interviews" -> composable("interviews") { InterviewsScreen() }

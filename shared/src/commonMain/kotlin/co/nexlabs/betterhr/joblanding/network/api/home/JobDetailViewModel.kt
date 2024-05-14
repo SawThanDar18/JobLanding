@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobDatUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobsUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIModel
@@ -268,16 +269,20 @@ class JobDetailViewModel(
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
+                                    fetchSaveJobId = "",
+                                    fetchSaveJobs = FetchSaveJobsUIModel(FetchSaveJobDatUIModel(
+                                        "", "", ""
+                                    ))
                                 )
                             }
                         } else {
+                            Log.d("fetch>>", "not null")
                             _uiState.update {
                                 it.copy(
+                                    fetchSaveJobId = data.data!!.fetchSaveJobByJobId!!.id ?: "",
                                     isLoading = false,
-                                    fetchSaveJobs = JobDetailViewModelMapper.mapFetchSaveJobDataToViewModel(
-                                        data.data
+                                    fetchSaveJobs = JobDetailViewModelMapper.mapFetchSaveJobDataToViewModel(data.data!!)
                                     )
-                                )
                             }
                         }
                     } else {

@@ -53,6 +53,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -74,6 +75,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -107,7 +109,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         viewModel.getCandidateData()
     }
 
-    if(uiState.candidateData != null) {
+    if (uiState.candidateData != null) {
         name = uiState.candidateData.name
         position = uiState.candidateData.desiredPosition
         phoneNumber = uiState.candidateData.phone
@@ -197,12 +199,23 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (profilePath != "") {
+                        val imageRequest = remember(profilePath) {
+                            ImageRequest.Builder(applicationContext)
+                                .data(profilePath).build()
+                        }
+
                         Image(
-                            painter = rememberGlidePainter(request = profilePath),
-                            contentDescription = "Edit Camera Logo",
+                            painter = rememberImagePainter(
+                                request = imageRequest,
+                            ),
+                            contentDescription = "Profile Icon",
                             modifier = Modifier
                                 .size(64.dp)
-                                .clip(CircleShape),
+                                .clip(CircleShape)
+                                .graphicsLayer {
+                                    shape = CircleShape
+                                },
+                            contentScale = ContentScale.Crop
                         )
                     } else {
                         Image(
@@ -443,62 +456,78 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                         .DashBorder(1.dp, Color(0xFF757575), 4.dp),
                 ) {
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp, vertical = 16.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-                        Box(
+                    if (cvFileName != "") {
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.5f),
-                            contentAlignment = Alignment.TopEnd,
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp, vertical = 16.dp),
+                            verticalArrangement = Arrangement.SpaceBetween,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.x),
-                                contentDescription = "X Icon",
-                                modifier = Modifier
-                                    .size(14.dp),
-                                alignment = Alignment.CenterEnd
-                            )
-                        }
 
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(0.5f),
+                                contentAlignment = Alignment.TopEnd,
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.x),
+                                    contentDescription = "X Icon",
+                                    modifier = Modifier
+                                        .size(14.dp),
+                                    alignment = Alignment.CenterEnd
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(2f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.pdf_file_icon),
+                                    contentDescription = "Attach File Icon",
+                                    modifier = Modifier
+                                        .size(width = 39.08.dp, height = 48.dp),
+                                    alignment = Alignment.Center
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    maxLines = 2,
+                                    softWrap = true,
+                                    overflow = TextOverflow.Ellipsis,
+                                    text = cvFileName,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFF757575),
+                                    fontSize = 14.sp,
+                                    modifier = Modifier
+                                        .width(114.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    } else {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(2f),
+                                .fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.pdf_file_icon),
+                                painter = painterResource(id = R.drawable.attach_file),
                                 contentDescription = "Attach File Icon",
                                 modifier = Modifier
-                                    .size(width = 39.08.dp, height = 48.dp),
+                                    .size(width = 114.dp, height = 180.dp),
                                 alignment = Alignment.Center
-                            )
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                maxLines = 2,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis,
-                                text = cvFileName,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFF757575),
-                                fontSize = 14.sp,
-                                modifier = Modifier
-                                    .width(114.dp),
-                                textAlign = TextAlign.Center
                             )
                         }
                     }
@@ -932,8 +961,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                 contentDescription = "Profile Icon",
                                                 modifier = Modifier
                                                     .size(64.dp)
-                                                    .clip(CircleShape),
-                                                contentScale = ContentScale.Fit
+                                                    .clip(CircleShape)
+                                                    .graphicsLayer {
+                                                        shape = CircleShape
+                                                    },
+                                                contentScale = ContentScale.Crop
                                             )
                                         } else {
                                             Image(

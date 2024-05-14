@@ -51,12 +51,6 @@ fun MyApp() {
     ) {
         NavHost(navController, startDestination = "screen-portal") {
 
-            composable("application-detail-screen") {
-                val viewModel: ApplicationViewModel = getKoin().get()
-                if (it.arguments?.getString("applicationId") != "") {
-                    ApplicationDetailScreen(viewModel, navController, it.arguments?.getString("applicationId") ?: "")
-               }
-            }
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
@@ -95,6 +89,12 @@ fun MyApp() {
                 val viewModel: JobDetailViewModel = getKoin().get()
                 if (it.arguments?.getString("jobId") != "") {
                     JobDetailsScreen(viewModel, navController, it.arguments?.getString("jobId") ?: "")
+                }
+            }
+            composable("application-details/{applicationDetailId}") {
+                val viewModel: ApplicationViewModel = getKoin().get()
+                if (it.arguments?.getString("applicationDetailId") != "") {
+                    ApplicationDetailScreen(viewModel, navController, it.arguments?.getString("applicationDetailId") ?: "")
                 }
             }
             composable("company-details/{companyId}") {

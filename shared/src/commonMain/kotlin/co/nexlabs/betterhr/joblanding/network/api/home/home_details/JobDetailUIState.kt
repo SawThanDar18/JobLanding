@@ -5,6 +5,7 @@ import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.FilesUI
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 
 data class JobDetailUIState(
+    val fetchSaveJobId: String = "",
     val isSuccessGetJobDetail: Boolean = false,
     val isBearerTokenExist: Boolean = false,
     val isSuccessUpdateApplication: Boolean = false,
@@ -26,7 +27,7 @@ data class JobDetailUIState(
             "", "", ""
         )
     ),
-    val fetchSaveJobs: FetchSaveJobsUIModel = FetchSaveJobsUIModel(
+    var fetchSaveJobs: FetchSaveJobsUIModel = FetchSaveJobsUIModel(
         data = FetchSaveJobDatUIModel("", "", "")
     ),
     val candidateData: CandidateUIModel = CandidateUIModel(

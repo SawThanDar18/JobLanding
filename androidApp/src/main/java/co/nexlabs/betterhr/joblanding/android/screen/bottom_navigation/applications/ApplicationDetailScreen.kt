@@ -56,7 +56,11 @@ import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavController, applicationId: String) {
+fun ApplicationDetailScreen(
+    viewModel: ApplicationViewModel,
+    navController: NavController,
+    applicationId: String
+) {
     var lineHeight by remember { mutableStateOf(0.dp) }
     var statusImage by remember { mutableStateOf(R.drawable.step) }
 
@@ -70,15 +74,6 @@ fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavC
     }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        AnimatedVisibility(
-            uiState.isLoading,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            CircularProgressIndicator(
-                color = Color(0xFF1ED292)
-            )
-        }
 
         AnimatedVisibility(
             uiState.error != UIErrorType.Nothing,
@@ -120,6 +115,9 @@ fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavC
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
+                        modifier = Modifier.clickable {
+                            navController.navigate("job-details/${uiState.applicationById.referenceJobId}")
+                        },
                         text = "View Job details",
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
@@ -264,17 +262,14 @@ fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavC
                             .padding(bottom = 32.dp)
                     ) {
                         item {
-                            AnimatedVisibility(
-                                uiState.applicationById.applicationHistories.size == 1,
-                                enter = fadeIn(),
-                                exit = fadeOut()
-                            ) {
+                            if (uiState.applicationById.applicationHistories.size == 1) {
                                 FlowRow(
                                     maxItemsInEachRow = 1,
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
                                     repeat(uiState.applicationById.applicationHistories.size) { index ->
-                                        var item = uiState.applicationById.applicationHistories[index]
+                                        var item =
+                                            uiState.applicationById.applicationHistories[index]
 
                                         statusImage = if (item.applicationStatus == "rejected") {
                                             R.drawable.application_reject
@@ -349,40 +344,36 @@ fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavC
                                         }
                                     }
                                 }
-                            }
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            AnimatedVisibility(
-                                uiState.applicationById.applicationHistories.isNotEmpty(),
-                                enter = fadeIn(),
-                                exit = fadeOut()
-                            ) {
+                            } else {
                                 FlowRow(
                                     maxItemsInEachRow = 1,
                                     modifier = Modifier
                                         .fillMaxWidth(),
                                 ) {
                                     repeat(uiState.applicationById.applicationHistories.size) { index ->
-                                        var item = uiState.applicationById.applicationHistories[index]
+                                        var item =
+                                            uiState.applicationById.applicationHistories[index]
 
                                         statusImage = when (item.applicationStatus) {
                                             "rejected" -> {
                                                 R.drawable.application_reject
                                             }
+
                                             "pending" -> {
                                                 R.drawable.application_pending
                                             }
+
                                             else -> {
                                                 R.drawable.step
                                             }
                                         }
 
-                                        lineHeight = if (index == uiState.applicationById.applicationHistories.size-1) {
-                                            32.dp
-                                        } else {
-                                            60.dp
-                                        }
+                                        lineHeight =
+                                            if (index == uiState.applicationById.applicationHistories.size - 1) {
+                                                32.dp
+                                            } else {
+                                                60.dp
+                                            }
 
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
@@ -464,6 +455,8 @@ fun ApplicationDetailScreen(viewModel: ApplicationViewModel, navController: NavC
                                     }
                                 }
                             }
+
+                            //Spacer(modifier = Modifier.height(24.dp))
                         }
                     }
                 }
