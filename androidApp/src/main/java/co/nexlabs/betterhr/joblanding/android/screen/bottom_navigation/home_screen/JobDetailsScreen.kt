@@ -61,6 +61,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -406,9 +407,22 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     var cvFileName by remember { mutableStateOf("") }
     var cvFile by remember { mutableStateOf<Uri?>(null) }
 
-    var coverLetterFile by remember { mutableStateOf<List<FileInfo>>(emptyList()) }
-    var coverLetterFileList by remember { mutableStateOf<List<Uri>?>(emptyList()) }
+    var coverLetterFileList = remember { mutableStateListOf<FileInfo>() }
+    val fileListChooserLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            coverLetterFileList.add(FileInfo(
+                "cover_letter",
+                uri,
+                getFileName(applicationContext, uri),
+                getFileSize(applicationContext, uri)
+            ))
+        }
 
+    }
+
+    //var coverLetterFile = remember { mutableStateListOf<FileInfo>() }
+    /*var coverLetterFileList by remember { mutableStateOf<List<Uri>?>(emptyList()) }
     val fileListChooserLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents(),
         onResult = { uris: List<Uri>? ->
@@ -428,7 +442,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                 }
             } ?: emptyList()
         }
-    )
+    )*/
 
     val fileChooserLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -1687,7 +1701,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             Spacer(modifier = Modifier.height(10.dp))
 
                                             AnimatedVisibility(
-                                                visible = (uiState.candidateData != null && coverLetterFile.isEmpty() && !isClearCoverLetter),
+                                                visible = (uiState.candidateData != null && coverLetterFileList.isEmpty() && !isClearCoverLetter),
                                                 enter = fadeIn(),
                                                 exit = fadeOut()
                                             ) {
@@ -1806,7 +1820,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                             }
 
                                             AnimatedVisibility(
-                                                visible = coverLetterFile.isNotEmpty(),
+                                                visible = coverLetterFileList.isNotEmpty(),
                                                 enter = fadeIn(),
                                                 exit = fadeOut()
                                             ) {
@@ -1817,15 +1831,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                         .padding(bottom = 12.dp),
                                                     verticalArrangement = Arrangement.spacedBy(8.dp)
                                                 ) {
-                                                    repeat(coverLetterFile.size) { fileInfo ->
-                                                        Log.d(
-                                                            "fileName>>",
-                                                            coverLetterFile[fileInfo].fileName ?: ""
-                                                        )
-                                                        Log.d(
-                                                            "fileSize>>",
-                                                            coverLetterFile[fileInfo].fileSize ?: ""
-                                                        )
+                                                    repeat(coverLetterFileList.size) { fileInfo ->
                                                         Box(
                                                             modifier = Modifier
                                                                 .fillMaxWidth()
@@ -1873,7 +1879,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                         )
                                                                     ) {
                                                                         Text(
-                                                                            text = coverLetterFile[fileInfo].fileName
+                                                                            text = coverLetterFileList[fileInfo].fileName
                                                                                 ?: "",
                                                                             fontFamily = FontFamily(
                                                                                 Font(
@@ -1889,7 +1895,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                         )
 
                                                                         Text(
-                                                                            text = coverLetterFile[fileInfo].fileSize
+                                                                            text = coverLetterFileList[fileInfo].fileSize
                                                                                 ?: "",
                                                                             fontFamily = FontFamily(
                                                                                 Font(
@@ -1909,8 +1915,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                     modifier = Modifier
                                                                         .size(16.dp)
                                                                         .clickable {
-                                                                            coverLetterFile =
-                                                                                emptyList()
+                                                                            coverLetterFileList.remove(coverLetterFileList[fileInfo])
                                                                         }
                                                                 )
                                                             }
@@ -2417,9 +2422,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                         }
                                                     }
 
-                                                    if (coverLetterFile.isNotEmpty()) {
-                                                        coverLetterFile.let { file ->
-                                                            file.forEach {
+                                                    if (coverLetterFileList.isNotEmpty()) {
+                                                        coverLetterFileList.let { file ->
+                                                            file.map {
                                                                 files.add(it.uri)
                                                                 fileNames.add(it.fileName)
                                                                 fileTypes.add("cover_letter")
@@ -3484,7 +3489,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                         Spacer(modifier = Modifier.height(10.dp))
 
                                         AnimatedVisibility(
-                                            visible = coverLetterFile.isNotEmpty(),
+                                            visible = coverLetterFileList.isNotEmpty(),
                                             enter = fadeIn(),
                                             exit = fadeOut()
                                         ) {
@@ -3495,7 +3500,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     .padding(bottom = 12.dp),
                                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                repeat(coverLetterFile.size) { fileInfo ->
+                                                repeat(coverLetterFileList.size) { fileInfo ->
                                                     Box(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
@@ -3539,7 +3544,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                     )
                                                                 ) {
                                                                     Text(
-                                                                        text = coverLetterFile[fileInfo].fileName
+                                                                        text = coverLetterFileList[fileInfo].fileName
                                                                             ?: "",
                                                                         fontFamily = FontFamily(
                                                                             Font(
@@ -3555,7 +3560,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                     )
 
                                                                     Text(
-                                                                        text = coverLetterFile[fileInfo].fileSize
+                                                                        text = coverLetterFileList[fileInfo].fileSize
                                                                             ?: "",
                                                                         fontFamily = FontFamily(
                                                                             Font(
@@ -3575,8 +3580,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 modifier = Modifier
                                                                     .size(16.dp)
                                                                     .clickable {
-                                                                        coverLetterFile =
-                                                                            emptyList()
+                                                                        coverLetterFileList.remove(coverLetterFileList[fileInfo])
                                                                     }
                                                             )
                                                         }
@@ -4100,9 +4104,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     files.add(cvFile)
                                                     fileNames.add(cvFileName)
                                                     fileTypes.add("cv")
-                                                    if (coverLetterFile.isNotEmpty()) {
-                                                        coverLetterFile.let { file ->
-                                                            file.forEach {
+                                                    if (coverLetterFileList.isNotEmpty()) {
+                                                        coverLetterFileList.let { file ->
+                                                            file.map {
                                                                 files.add(it.uri)
                                                                 fileNames.add(it.fileName)
                                                                 fileTypes.add("cover_letter")

@@ -13,7 +13,7 @@ object ApplicationByIdViewModelMapper {
                 it?.let {
                     applicationHistoriesList.add(
                         ApplicationHistoryUIModel(
-                            it.id, it.application_status ?: "", it.application_date ?: ""
+                            it.id, it.application_status ?: "", it.application_date ?: "", it.have_assignment ?: false, it.assignment_submitted ?: false
                         )
                     )
                 }

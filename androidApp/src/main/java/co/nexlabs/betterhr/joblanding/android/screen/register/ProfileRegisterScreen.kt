@@ -45,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -86,6 +87,7 @@ import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.FileInfo
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileName
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileSize
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.SelectedFileInfo
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.register.ProfileRegisterViewModel
@@ -122,9 +124,17 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
     var cvFileName by remember { mutableStateOf("") }
     var cvFile by remember { mutableStateOf<Uri?>(null) }
 
-    var coverLetterFile by remember { mutableStateOf<List<FileInfo>>(emptyList()) }
+    var coverLetterFile = remember { mutableStateListOf<FileInfo>() }
 
     val fileListChooserLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            coverLetterFile.add(FileInfo(fileType = "cover_letter", uri = uri, fileName = getFileName(applicationContext, uri), fileSize = getFileSize(applicationContext, uri)))
+        }
+
+    }
+
+   /* val fileListChooserLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents(),
         onResult = { uris: List<Uri>? ->
             coverLetterFile = uris?.mapNotNull { uri ->
@@ -140,7 +150,7 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
                 }
             } ?: emptyList()
         }
-    )
+    )*/
 
     val fileChooserLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -642,7 +652,7 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
                                             modifier = Modifier
                                                 .size(16.dp)
                                                 .clickable {
-                                                    coverLetterFile = emptyList()
+                                                    coverLetterFile.remove(coverLetterFile[fileInfo])
                                                 }
                                         )
                                     }

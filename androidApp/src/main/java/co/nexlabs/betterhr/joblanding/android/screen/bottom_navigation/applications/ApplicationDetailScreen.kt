@@ -273,7 +273,7 @@ fun ApplicationDetailScreen(
 
                                         statusImage = if (item.applicationStatus == "rejected") {
                                             R.drawable.application_reject
-                                        } else if (item.applicationStatus == "pending") {
+                                        } else if (item.haveAssignment && !item.isAssignmentSubmmitted) {
                                             R.drawable.application_pending
                                         } else {
                                             R.drawable.step

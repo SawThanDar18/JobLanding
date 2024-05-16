@@ -31,7 +31,11 @@ import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobBeforeSignUp
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobScreens
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationDetailScreen
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.SubmitAssignmentScreen
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewModel
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -103,8 +107,11 @@ fun MyApp() {
                     CompanyDetailsScreen(viewModel, navController, it.arguments?.getString("companyId") ?: "")
                 }
             }
-            composable("inbox-screen") {
-                NotificationScreen()
+            composable("notification-details/{notificationId}/{notiType}") {
+                val viewModel: InboxDetailViewModel = getKoin().get()
+                if (it.arguments?.getString("notificationId") != "" || it.arguments?.getString("notiType") != "") {
+                    NotificationDetailScreen(viewModel, navController, it.arguments?.getString("notificationId") ?: "", it.arguments?.getString("notiType") ?: "")
+                }
             }
             composable("profile-edit-detail-screen") {
                 ProfileDetailEditScreen()
@@ -119,6 +126,22 @@ fun MyApp() {
             composable("apply-job") {
                 val viewModel: ApplyJobViewModel = getKoin().get()
                 ApplyJobScreens(viewModel, navController)
+            }
+
+            composable("submit-assignment/{jobId}/{referenceId}/{title}/{status}/{subDomain}/{referenceApplicationId}") {
+                val viewModel: SubmitAssignmentViewModel = getKoin().get()
+                if (it.arguments?.getString("jobId") != "" && it.arguments?.getString("referenceId") != "" &&
+                    it.arguments?.getString("title") != "" && it.arguments?.getString("status") != "" &&
+                    it.arguments?.getString("subDomain") != "" && it.arguments?.getString("referenceApplicationId") != "") {
+                    SubmitAssignmentScreen(viewModel, navController,
+                        it.arguments?.getString("jobId") ?: "",
+                        it.arguments?.getString("referenceId") ?: "",
+                        it.arguments?.getString("title") ?: "",
+                        it.arguments?.getString("status") ?: "",
+                        it.arguments?.getString("subDomain") ?: "",
+                        it.arguments?.getString("referenceApplicationId") ?: ""
+                    )
+                }
             }
         }
     }

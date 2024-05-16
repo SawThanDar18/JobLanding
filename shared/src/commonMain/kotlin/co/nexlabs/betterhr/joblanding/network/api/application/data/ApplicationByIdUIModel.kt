@@ -16,5 +16,7 @@ data class ApplicationByIdUIModel(
 data class ApplicationHistoryUIModel(
     val id: String,
     val applicationStatus: String,
-    val applicationDate: String
+    val applicationDate: String,
+    val haveAssignment: Boolean,
+    val isAssignmentSubmmitted: Boolean
 )

@@ -10,7 +10,11 @@ import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
+import co.nexlabs.betterhr.job.with_auth.FetchNotificationByIdQuery
+import co.nexlabs.betterhr.job.with_auth.FetchNotificationsQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
+import co.nexlabs.betterhr.job.with_auth.ResponseAssignmentMutation
+import co.nexlabs.betterhr.job.with_auth.ResponseOfferMutation
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateApplicationMutation
@@ -27,6 +31,7 @@ import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.request_response.ExistingFileIdTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileTypeObject
+import co.nexlabs.betterhr.joblanding.network.api.request_response.FileUploadResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
@@ -40,6 +45,7 @@ import co.nexlabs.betterhr.joblanding.util.baseUrl
 import co.nexlabs.betterhr.joblanding.util.baseUrlForAuth
 import co.nexlabs.betterhr.joblanding.util.baseUrlForCreateApplication
 import co.nexlabs.betterhr.joblanding.util.baseUrlForJob
+import co.nexlabs.betterhr.joblanding.util.baseUrlForMultipleUploadFile
 import co.nexlabs.betterhr.joblanding.util.baseUrlForUploadFile
 import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
@@ -367,7 +373,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
             append("working_since", workingSince)
         }
 
-        try {
+        /*try {
             val response = client.submitFormWithBinaryData(
                 url = baseUrlForCreateApplication,
                 formData = formData,
@@ -383,7 +389,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
             return response.body()
         } catch (e: Exception) {
             Log.d("err>>", e.message.toString())
-        }
+        }*/
         val response = client.submitFormWithBinaryData(
             url = baseUrlForCreateApplication,
             formData = formData,
@@ -577,5 +583,149 @@ class JobLandingServiceImpl(private val application: Application, private val cl
     override suspend fun fetchApplicationById(id: String): ApolloCall<FetchApplicationByIdQuery.Data> {
         Log.d("api>>", "callfetchappbyid")
         return apolloClientWithAuth.query(FetchApplicationByIdQuery(id))
+    }
+
+    override suspend fun fetchNotification(
+        status: List<String>,
+        search: String,
+        limit: Int
+    ): ApolloCall<FetchNotificationsQuery.Data> {
+        return apolloClientWithAuth.query(FetchNotificationsQuery(Optional.present(status), Optional.present(search), limit))
+    }
+
+    override suspend fun fetchNotificationById(id: String): ApolloCall<FetchNotificationByIdQuery.Data> {
+        return apolloClientWithAuth.query(FetchNotificationByIdQuery(id))
+    }
+
+    override suspend fun uploadMultipleFiles(
+        files: MutableList<Uri?>,
+        fileNames: MutableList<String?>,
+        types: List<String>,
+        candidateId: String
+    ): List<FileUploadResponse> {
+        val fileTypeObject = FileTypeObject(types)
+
+        var parcelFileDescriptor: ParcelFileDescriptor
+        var inputStream: FileInputStream
+        var byteArray: ByteArray
+
+        val formData = formData {
+
+            files.forEachIndexed { index, file ->
+                parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
+                inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
+                byteArray = inputStream.readBytes()
+
+                append("files$index", byteArray, Headers.build {
+                    append(HttpHeaders.ContentDisposition, "filename=${fileNames[index]}")
+                })
+            }
+            append(
+                "types",
+                Json.encodeToString(fileTypeObject),
+                Headers.build {
+                    append(HttpHeaders.ContentType, "application/json")
+                }
+            )
+            append("candidate_id", candidateId)
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = baseUrlForMultipleUploadFile,
+            formData = formData,
+        ) {
+            onUpload { bytesSentTotal, contentLength ->
+                println("Uploaded $bytesSentTotal bytes from $contentLength")
+            }
+            headers {
+                append("Authorization", "bearer ${localStorage.bearerToken}")
+            }
+        }
+
+        return response.body()
+    }
+
+    override suspend fun uploadSingleFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        candidateId: String
+    ): FileUploadResponse {
+        val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
+        val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
+        val byteArray = inputStream.readBytes()
+
+        val formData = formData {
+            append("file", byteArray, Headers.build {
+                append(HttpHeaders.ContentDisposition, "filename=\"${fileName.replace(" ", "_")}\"")
+            })
+            append("type", type)
+            append("candidate_id", candidateId)
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = baseUrlForUploadFile,
+            formData = formData,
+        ) {
+            onUpload { bytesSentTotal, contentLength ->
+                println("Uploaded $bytesSentTotal bytes from $contentLength")
+            }
+            headers {
+                append("Authorization", "bearer ${localStorage.bearerToken}")
+            }
+        }
+
+        return response.body()
+    }
+
+    override suspend fun responseAssignment(
+        candidateId: String,
+        jobId: String,
+        referenceId: String,
+        title: String,
+        description: String,
+        status: String,
+        summitedDate: String,
+        candidateDescription: String,
+        endTime: String,
+        attachments: String,
+        subDomain: String,
+        referenceApplicationId: String
+    ): ApolloCall<ResponseAssignmentMutation.Data> {
+        return apolloClientWithAuth.mutation(ResponseAssignmentMutation(
+            Optional.present(candidateId),
+            Optional.present(jobId),
+            Optional.present(referenceId),
+            Optional.present(title),
+            Optional.present(description),
+            Optional.present(""),
+            Optional.present(status),
+            Optional.present(summitedDate),
+            Optional.present(candidateDescription),
+            Optional.present(""),
+            Optional.present(endTime),
+            Optional.present(""),
+            Optional.present(attachments),
+            subDomain,
+            Optional.present(referenceApplicationId)
+        ))
+    }
+
+    override suspend fun responseOffer(
+        id: String,
+        note: String,
+        status: String,
+        responseDate: String,
+        attachments: String,
+        subDomain: String
+    ): ApolloCall<ResponseOfferMutation.Data> {
+        return apolloClientWithAuth.mutation(ResponseOfferMutation(
+            Optional.present(id),
+            Optional.present(note),
+            Optional.present(status),
+            Optional.present(responseDate),
+            Optional.present(attachments),
+            subDomain
+        ))
     }
 }

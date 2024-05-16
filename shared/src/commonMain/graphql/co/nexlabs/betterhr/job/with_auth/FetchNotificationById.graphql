@@ -1,6 +1,16 @@
 query FetchNotificationById($id: String!) {
     notification(id: $id) {
+        id
+        candidate_id
+        reference_id
+        reference_application_id
+        job_id
         title
+        status
+        sender_name
+        sender_position
+        updated_at
         render_view
+        sub_domain
     }
 }

@@ -1,10 +1,12 @@
-package co.nexlabs.betterhr.joblanding.network.api.home
+package co.nexlabs.betterhr.joblanding.network.api.inbox
 
-import android.util.Log
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsRepository
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIState
+import android.app.Application
+import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
+import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
-import co.nexlabs.betterhr.joblanding.viewmodel.CollectionJobsViewModelMapper
+import co.nexlabs.betterhr.joblanding.viewmodel.InboxViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
@@ -19,14 +21,29 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJobsRepository): ViewModel() {
+class InboxViewModel(application: Application, private val inboxRepository: InboxRepository): ViewModel() {
 
-    private val _uiState = MutableStateFlow(CollectionJobsUIState())
+    private val localStorage: LocalStorage
+
+    init {
+        localStorage = AndroidLocalStorageImpl(application)
+    }
+
+    private val _uiState = MutableStateFlow(InboxUIState())
     val uiState = _uiState.asStateFlow()
 
-    fun getCollectionJobs(collectionId: String, isPaginate: Boolean) {
+    fun fetchNotification(
+        status: List<String>
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
-            collectionJobsRepository.getCollectionJobs(collectionId, isPaginate).toFlow()
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing
+                )
+            }
+
+            inboxRepository.fetchInbox(status, "", 20).toFlow()
                 .catch { e ->
                     _uiState.update {
                         it.copy(
@@ -62,12 +79,12 @@ class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJo
                             error = UIErrorType.Nothing
                         )
                     }
-                    if (!data.hasErrors()) {
+                    if(!data.hasErrors()) {
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
-                                collectionJobsList = CollectionJobsViewModelMapper.mapResponseToViewModel(data.data!!)
+                                notificationList = InboxViewModelMapper.mapResponseToViewModel(data.data!!)
                             )
                         }
                     } else {
@@ -81,5 +98,4 @@ class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJo
                 }
         }
     }
-
 }

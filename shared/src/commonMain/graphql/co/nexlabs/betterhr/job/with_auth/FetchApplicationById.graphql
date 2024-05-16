@@ -21,6 +21,8 @@ query FetchApplicationById($id: String!) {
             id
             application_status
             application_date
+            have_assignment
+            assignment_submitted
         }
     }
 }

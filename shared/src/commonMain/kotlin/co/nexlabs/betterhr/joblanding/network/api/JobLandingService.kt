@@ -6,7 +6,11 @@ import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
+import co.nexlabs.betterhr.job.with_auth.FetchNotificationByIdQuery
+import co.nexlabs.betterhr.job.with_auth.FetchNotificationsQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
+import co.nexlabs.betterhr.job.with_auth.ResponseAssignmentMutation
+import co.nexlabs.betterhr.job.with_auth.ResponseOfferMutation
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateApplicationMutation
@@ -19,6 +23,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
+import co.nexlabs.betterhr.joblanding.network.api.request_response.FileUploadResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationCodeRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.SendVerificationResponse
@@ -129,5 +134,52 @@ interface JobLandingService {
         id: String
     ): ApolloCall<FetchApplicationByIdQuery.Data>
 
+    suspend fun fetchNotification(
+        status: List<String>,
+        search: String,
+        limit: Int
+    ): ApolloCall<FetchNotificationsQuery.Data>
+
+    suspend fun fetchNotificationById(
+        id: String
+    ): ApolloCall<FetchNotificationByIdQuery.Data>
+
+    suspend fun uploadMultipleFiles(
+        files: MutableList<Uri?>,
+        fileNames: MutableList<String?>,
+        types: List<String>,
+        candidateId: String
+    ): List<FileUploadResponse>
+
+    suspend fun uploadSingleFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        candidateId: String
+    ): FileUploadResponse
+
+    suspend fun responseAssignment(
+        candidateId: String,
+        jobId: String,
+        referenceId: String,
+        title: String,
+        description: String,
+        status: String,
+        summitedDate: String,
+        candidateDescription: String,
+        endTime: String,
+        attachments: String,
+        subDomain: String,
+        referenceApplicationId: String
+    ): ApolloCall<ResponseAssignmentMutation.Data>
+
+    suspend fun responseOffer(
+        id: String,
+        note: String,
+        status: String,
+        responseDate: String,
+        attachments: String,
+        subDomain: String
+    ): ApolloCall<ResponseOfferMutation.Data>
 
 }

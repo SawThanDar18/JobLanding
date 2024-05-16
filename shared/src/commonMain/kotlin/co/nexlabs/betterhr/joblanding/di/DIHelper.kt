@@ -21,6 +21,10 @@ import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJo
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRepository
+import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
@@ -82,6 +86,7 @@ fun initKoin(application: Application) {
                 single { ApplyJobRepository(get()) }
                 single { CompleteProfileRepository(get()) }
                 single { ApplicationRepository(get()) }
+                single { InboxRepository(get()) }
                 factory { ScreenPortalViewModel(application) }
                 factory { RegisterViewModel(application, get()) }
                 factory { ChooseCountryViewModel(application, get()) }
@@ -96,6 +101,9 @@ fun initKoin(application: Application) {
                 factory { ApplyJobViewModel(application, get()) }
                 factory { CompleteProfileViewModel(application, get()) }
                 factory { ApplicationViewModel(application, get()) }
+                factory { InboxViewModel(application, get()) }
+                factory { InboxDetailViewModel(application, get()) }
+                factory { SubmitAssignmentViewModel(application, get()) }
             }
         )
     }

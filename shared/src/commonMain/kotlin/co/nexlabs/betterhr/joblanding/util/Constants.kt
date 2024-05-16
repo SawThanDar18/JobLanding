@@ -7,6 +7,7 @@ val baseUrlForJob = "https://jobdev.better.hr/api/graphql"
 val baseUrlForAuth = "https://joblandingdev.better.hr/api/graphql"
 val baseUrlForCreateApplication = "https://joblandingdev.better.hr/api/api/applications/create"
 val baseUrlForUploadFile = "https://joblandingdev.better.hr/api/api/user/file-upload"
+val baseUrlForMultipleUploadFile = "https://joblandingdev.better.hr/api/user/file-upload-multiple"
 val smsUrl = "/graphql"
 val getCountriesUrl = "https://jobdev.better.hr/portal/api/get/countries"
 
