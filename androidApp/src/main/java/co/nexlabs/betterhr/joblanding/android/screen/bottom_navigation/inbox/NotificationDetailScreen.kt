@@ -222,13 +222,25 @@ fun NotificationDetailScreen(
                             ),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(
-                            text = "View on google map",
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W600,
-                            color = Color(0xFFFFFFFF),
-                            fontSize = 14.sp,
-                        )
+                        if (uiState.notificationDetail != null) {
+                            if (uiState.notificationDetail.interviewType == "in_person") {
+                                Text(
+                                    text = "View on google map",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFFFFFFFF),
+                                    fontSize = 14.sp,
+                                )
+                            } else {
+                                Text(
+                                    text = "Join the meeting",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFFFFFFFF),
+                                    fontSize = 14.sp,
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -249,7 +261,13 @@ fun NotificationDetailScreen(
                             .background(
                                 color = Color(0xFF1ED292),
                                 shape = MaterialTheme.shapes.medium
-                            ),
+                            )
+                            .clickable {
+                                if (uiState.notificationDetail != null) {
+                                    var item = uiState.notificationDetail
+                                    navController.navigate("submit-offer/${item.id}/${item.offerAndInterviewLink}")
+                                }
+                            },
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(

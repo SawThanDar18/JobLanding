@@ -272,7 +272,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                             Image(
                                 painter = painterResource(id = R.drawable.chevron_right),
-                                contentDescription = "X Icon",
+                                contentDescription = "Arrow Icon",
                                 modifier = Modifier
                                     .size(20.dp)
                             )
@@ -587,7 +587,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Image(
-                                            painter = painterResource(id = R.drawable.pdf_file_icon),
+                                            painter = painterResource(id = R.drawable.pdf_file_logo),
                                             contentDescription = "PDF Logo Icon",
                                             modifier = Modifier
                                                 .size(24.dp)
@@ -647,7 +647,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.attach_file),
+                            painter = painterResource(id = R.drawable.upload_icon),
                             contentDescription = "Upload Icon",
                             modifier = Modifier
                                 .size(20.dp)

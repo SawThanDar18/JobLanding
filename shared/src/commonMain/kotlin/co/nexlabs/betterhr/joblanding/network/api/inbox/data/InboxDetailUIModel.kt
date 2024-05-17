@@ -12,5 +12,7 @@ data class InboxDetailUIModel(
     val senderName: String,
     val senderPosition: String,
     val updatedAt: String,
-    val renderView: String
+    val renderView: String,
+    val interviewType: String,
+    val offerAndInterviewLink: String
 )

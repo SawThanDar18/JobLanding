@@ -40,7 +40,7 @@ fun ScreenPortal(navController: NavController, viewModel: ScreenPortalViewModel)
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.better_job_logo),
+            painter = painterResource(id = R.drawable.better_icon),
             contentDescription = "Better Job Logo",
             modifier = Modifier.size(100.dp)
         )

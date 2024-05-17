@@ -33,7 +33,9 @@ object InboxDetailViewModelMapper {
             data.sender_name ?: "",
             data.sender_position ?: "",
             data.updated_at ?: "",
-            generateHTML(data.render_view ?: "")
+            generateHTML(data.render_view ?: ""),
+            data.interview_type ?: "",
+            data.offer_link ?: ""
         )
     }
 

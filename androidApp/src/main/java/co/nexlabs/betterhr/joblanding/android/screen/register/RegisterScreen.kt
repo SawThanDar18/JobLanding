@@ -420,7 +420,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.alert_circle_outline),
+                    painter = painterResource(id = R.drawable.alert_circle),
                     contentDescription = "Alert Icon",
                     modifier = Modifier.size(16.dp)
                 )

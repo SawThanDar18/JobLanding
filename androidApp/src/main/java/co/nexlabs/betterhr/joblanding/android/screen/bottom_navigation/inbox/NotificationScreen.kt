@@ -273,7 +273,7 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clickable {
-                                                       navController.navigate("notification-details/${item.id}/${item.notiType}")
+                                                       navController.navigate("notification-details/${item.id}/${item.notiType}/${""}")
                                             },
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically

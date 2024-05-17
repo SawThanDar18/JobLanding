@@ -24,6 +24,7 @@ import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRep
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
@@ -104,6 +105,7 @@ fun initKoin(application: Application) {
                 factory { InboxViewModel(application, get()) }
                 factory { InboxDetailViewModel(application, get()) }
                 factory { SubmitAssignmentViewModel(application, get()) }
+                factory { SubmitOfferViewModel(application, get()) }
             }
         )
     }

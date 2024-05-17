@@ -35,6 +35,13 @@ class InboxRepository(private val jobLandingService: JobLandingService) {
         referenceApplicationId: String
     ) = jobLandingService.responseAssignment(candidateId, jobId, referenceId, title, description, status, summitedDate, candidateDescription, endTime, attachments, subDomain, referenceApplicationId)
 
+    suspend fun uploadSingleFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        candidateId: String
+    ) = jobLandingService.uploadSingleFile(file, fileName, type, candidateId)
+
     suspend fun responseOffer(
         id: String,
         note: String,

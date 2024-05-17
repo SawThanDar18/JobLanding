@@ -32,10 +32,12 @@ import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobBeforeSignUp
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobScreens
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationDetailScreen
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.OfferResponse
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.SubmitAssignmentScreen
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -54,7 +56,6 @@ fun MyApp() {
             .background(color = Color.White)
     ) {
         NavHost(navController, startDestination = "screen-portal") {
-
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
@@ -107,7 +108,7 @@ fun MyApp() {
                     CompanyDetailsScreen(viewModel, navController, it.arguments?.getString("companyId") ?: "")
                 }
             }
-            composable("notification-details/{notificationId}/{notiType}") {
+            composable("notification-details/{notificationId}/{notiType}/{link}") {
                 val viewModel: InboxDetailViewModel = getKoin().get()
                 if (it.arguments?.getString("notificationId") != "" || it.arguments?.getString("notiType") != "") {
                     NotificationDetailScreen(viewModel, navController, it.arguments?.getString("notificationId") ?: "", it.arguments?.getString("notiType") ?: "")
@@ -141,6 +142,14 @@ fun MyApp() {
                         it.arguments?.getString("subDomain") ?: "",
                         it.arguments?.getString("referenceApplicationId") ?: ""
                     )
+                }
+            }
+
+            composable("submit-offer/{id}/{link}") {
+                val viewModel: SubmitOfferViewModel = getKoin().get()
+                if (it.arguments?.getString("id") != "" && it.arguments?.getString("status") != "" &&
+                    it.arguments?.getString("subDomain") != "" && it.arguments?.getString("link") != "") {
+                    OfferResponse(viewModel, navController, it.arguments?.getString("id") ?: "", it.arguments?.getString("status") ?: "", it.arguments?.getString("subDomain") ?: "", it.arguments?.getString("link") ?: "")
                 }
             }
         }

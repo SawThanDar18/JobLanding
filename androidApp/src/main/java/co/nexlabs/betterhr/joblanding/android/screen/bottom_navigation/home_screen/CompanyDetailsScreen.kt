@@ -404,7 +404,7 @@ fun AboutScreen(uiModel: CompanyDetailUIModel, uriHandler: UriHandler) {
                 .fillMaxWidth(),
         ) {
             Image(
-                painter = painterResource(id = R.drawable.mail),
+                painter = painterResource(id = R.drawable.emil_icon),
                 contentDescription = "Mail Icon",
                 modifier = Modifier.size(16.dp)
             )

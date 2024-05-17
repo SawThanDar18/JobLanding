@@ -12,5 +12,7 @@ query FetchNotificationById($id: String!) {
         updated_at
         render_view
         sub_domain
+        interview_type
+        offer_link
     }
 }

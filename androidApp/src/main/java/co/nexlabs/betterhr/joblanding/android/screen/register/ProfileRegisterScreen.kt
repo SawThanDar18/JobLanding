@@ -415,7 +415,7 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
                         singleLine = true,
                         trailingIcon = {
                             Image(
-                                painter = painterResource(id = R.drawable.email),
+                                painter = painterResource(id = R.drawable.emil_icon),
                                 contentDescription = "Email Icon",
                                 modifier = Modifier
                                     .size(16.dp)
@@ -682,7 +682,7 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.attach_file),
+                                painter = painterResource(id = R.drawable.upload_icon),
                                 contentDescription = "Upload Icon",
                                 modifier = Modifier
                                     .size(20.dp)

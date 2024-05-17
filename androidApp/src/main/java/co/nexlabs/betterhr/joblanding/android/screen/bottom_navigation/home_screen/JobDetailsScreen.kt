@@ -1750,7 +1750,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                     ) {
                                                                         Image(
                                                                             painter = painterResource(
-                                                                                id = R.drawable.pdf_file_icon
+                                                                                id = R.drawable.pdf_file_logo
                                                                             ),
                                                                             contentDescription = "PDF Logo Icon",
                                                                             modifier = Modifier
@@ -1861,7 +1861,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                     verticalAlignment = Alignment.CenterVertically
                                                                 ) {
                                                                     Image(
-                                                                        painter = painterResource(id = R.drawable.pdf_file_icon),
+                                                                        painter = painterResource(id = R.drawable.pdf_file_logo),
                                                                         contentDescription = "PDF Logo Icon",
                                                                         modifier = Modifier
                                                                             .size(24.dp)
@@ -1949,7 +1949,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     horizontalArrangement = Arrangement.Center
                                                 ) {
                                                     Image(
-                                                        painter = painterResource(id = R.drawable.attach_file),
+                                                        painter = painterResource(id = R.drawable.upload_icon),
                                                         contentDescription = "Upload Icon",
                                                         modifier = Modifier
                                                             .size(20.dp)
@@ -3530,7 +3530,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 verticalAlignment = Alignment.CenterVertically
                                                             ) {
                                                                 Image(
-                                                                    painter = painterResource(id = R.drawable.pdf_file_icon),
+                                                                    painter = painterResource(id = R.drawable.pdf_file_logo),
                                                                     contentDescription = "PDF Logo Icon",
                                                                     modifier = Modifier
                                                                         .size(24.dp)
@@ -3614,7 +3614,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                 horizontalArrangement = Arrangement.Center
                                             ) {
                                                 Image(
-                                                    painter = painterResource(id = R.drawable.attach_file),
+                                                    painter = painterResource(id = R.drawable.upload_icon),
                                                     contentDescription = "Upload Icon",
                                                     modifier = Modifier
                                                         .size(20.dp)
