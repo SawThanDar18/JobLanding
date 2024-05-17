@@ -28,6 +28,7 @@ import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.applications.ApplicationsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.HomeScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationScreen
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.interviews.InterviewsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.CompleteProfileScreen
 import co.nexlabs.betterhr.joblanding.android.screen.register.ProfileRegisterScreen
 import co.nexlabs.betterhr.joblanding.android.screen.unregister_profile.UnregisterProfileScreen
@@ -182,11 +183,6 @@ fun BottomNavigation(
             }
         }
     }
-}
-
-@Composable
-fun InterviewsScreen() {
-    //Text(text = "Interviews", modifier = Modifier.padding(16.dp))
 }
 
 data class BottomNavItem(

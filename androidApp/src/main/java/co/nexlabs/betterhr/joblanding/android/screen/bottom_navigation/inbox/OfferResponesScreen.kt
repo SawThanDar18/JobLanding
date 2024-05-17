@@ -78,6 +78,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.AboutScreen
@@ -98,6 +99,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+var bottomBarVisible: MutableLiveData<Boolean> = MutableLiveData()
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController, id: String, status: String, subDomain: String, link: String) {
@@ -105,8 +108,6 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
 
     var tabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Draw", "Upload")
-
-    var bottomBarVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.padding(16.dp, 16.dp, 0.dp, 0.dp),
@@ -142,7 +143,8 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
 
         Box(
             modifier = Modifier
-                .fillMaxWidth().wrapContentHeight()
+                .fillMaxWidth()
+                .wrapContentHeight()
                 .background(
                     color = Color(0xFF4A4A4A),
                     shape = MaterialTheme.shapes.medium
@@ -166,7 +168,9 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
         Image(
             painter = painterResource(id = R.drawable.black_line),
             contentDescription = "Line Icon",
-            modifier = Modifier.fillMaxWidth().height(2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp),
             alignment = Alignment.Center
         )
 
@@ -185,9 +189,11 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
         Image(
             painter = painterResource(id = R.drawable.sign_box),
             contentDescription = "Sign Box Icon",
-            modifier = Modifier.fillMaxWidth().height(155.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(155.dp)
                 .clickable {
-                           bottomBarVisible = true
+                    bottomBarVisible.postValue(true)
                 },
             alignment = Alignment.Center
         )
@@ -231,7 +237,7 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
             .systemBarsPadding()
     ) {
 
-        if (bottomBarVisible) {
+        if (bottomBarVisible.value == true) {
             ModalBottomSheetLayout(
                 sheetContent = {
                     Column(
@@ -262,8 +268,7 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
                             },
                             contentColor = Color(0xFF1ED292),
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 22.dp),
+                                .fillMaxWidth(),
                             selectedTabIndex = tabIndex
                         ) {
                             tabs.forEachIndexed { index, title ->
@@ -287,56 +292,6 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
                         when (tabIndex) {
                             0 -> DrawScreen()
                             1 -> UploadScreen()
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(40.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Box(modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .clickable {
-                                    bottomBarVisible = false
-                                }) {
-                                Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(35.dp),
-                                    text = "Cancel",
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W600,
-                                    color = Color(0xFFAAAAAA),
-                                    fontSize = 14.sp,
-                                )
-                            }
-
-                            Box(modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .border(
-                                    1.dp,
-                                    color = Color(0xFF1ED292),
-                                    RoundedCornerShape(8.dp)
-                                )
-                                .clickable {
-                                    //upload sign & response offer
-
-                                }) {
-                                Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(40.dp),
-                                    text = "Next",
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W600,
-                                    color = Color(0xFFFFFFFF),
-                                    fontSize = 14.sp,
-                                )
-                            }
                         }
 
                     }
@@ -364,28 +319,85 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
 
 @Composable
 fun DrawScreen() {
-    Box(
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(502.dp)
-            .padding(16.dp)
-            .background(
-                color = Color(0xFFF0F8FE),
-                shape = MaterialTheme.shapes.medium
-            )
-            .border(
-                1.dp,
-                Color(0xFFF0F8FE),
-                RoundedCornerShape(4.dp)
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.draw),
-            contentDescription = "Draw Image",
+        .fillMaxSize()
+        .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+
+        Box(
             modifier = Modifier
-                .size(200.dp)
-        )
+                .fillMaxWidth()
+                .height(502.dp).padding(bottom = 22.dp)
+                .background(
+                    color = Color(0xFFF0F8FE),
+                    shape = MaterialTheme.shapes.medium
+                )
+                .border(
+                    1.dp,
+                    Color(0xFFF0F8FE),
+                    RoundedCornerShape(4.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.draw),
+                contentDescription = "Draw Image",
+                modifier = Modifier
+                    .size(200.dp)
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clickable {
+                    bottomBarVisible.postValue(false)
+                }) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(35.dp),
+                    text = "Cancel",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFFAAAAAA),
+                    fontSize = 14.sp,
+                )
+            }
+
+            Box(modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .border(
+                    1.dp,
+                    color = Color(0xFF1ED292),
+                    RoundedCornerShape(8.dp)
+                )
+                .clickable {
+                    //upload draw sign & response offer
+
+                }) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    text = "Next",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFFFFFFFF),
+                    fontSize = 14.sp,
+                )
+            }
+        }
     }
 }
 
@@ -405,11 +417,17 @@ fun UploadScreen() {
 
     }
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(502.dp)
-            .padding(16.dp)
+            .height(502.dp).padding(bottom = 22.dp)
             .background(
                 color = Color(0xFFF0F8FE),
                 shape = MaterialTheme.shapes.medium
@@ -529,6 +547,57 @@ fun UploadScreen() {
             }
         }
     }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clickable {
+                    bottomBarVisible.postValue(false)
+                }) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(35.dp),
+                    text = "Cancel",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFFAAAAAA),
+                    fontSize = 14.sp,
+                )
+            }
+
+            Box(modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .border(
+                    1.dp,
+                    color = Color(0xFF1ED292),
+                    RoundedCornerShape(8.dp)
+                )
+                .clickable {
+                    //upload file sign & response offer
+
+                }) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    text = "Next",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFFFFFFFF),
+                    fontSize = 14.sp,
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -641,7 +710,9 @@ fun ReasonDialog(viewModel: SubmitOfferViewModel, id: String, status: String, su
                 verticalArrangement = Arrangement.Center
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
@@ -656,9 +727,11 @@ fun ReasonDialog(viewModel: SubmitOfferViewModel, id: String, status: String, su
                     Image(
                         painter = painterResource(id = R.drawable.x),
                         contentDescription = "Close Icon",
-                        modifier = Modifier.size(24.dp).clickable {
-                            onDismiss
-                        }
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable {
+                                onDismiss
+                            }
                     )
                 }
 
@@ -728,7 +801,13 @@ fun ReasonDialog(viewModel: SubmitOfferViewModel, id: String, status: String, su
                         )
                         .clickable {
                             if (reason.isNullOrBlank()) {
-                                Toast.makeText(applicationContext, "Please fill reason!", Toast.LENGTH_LONG).show()
+                                Toast
+                                    .makeText(
+                                        applicationContext,
+                                        "Please fill reason!",
+                                        Toast.LENGTH_LONG
+                                    )
+                                    .show()
                             } else {
                                 scope.launch {
                                     viewModel.responseOffer(
