@@ -91,8 +91,11 @@ import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
+import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import coil.size.Size
 import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -319,6 +322,8 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
 
 @Composable
 fun DrawScreen() {
+    val applicationContext = LocalContext.current
+
     Column(
         modifier = Modifier
         .fillMaxSize()
@@ -341,11 +346,16 @@ fun DrawScreen() {
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.draw),
-                contentDescription = "Draw Image",
+            AsyncImage(
+                model = ImageRequest.Builder(applicationContext)
+                    .data(R.drawable.apply_job_success)
+                    .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                    .size(Size.ORIGINAL)
+                    .build(),
+                contentDescription = "GIF",
                 modifier = Modifier
-                    .size(200.dp)
+                    .fillMaxWidth()
+                    .height(200.dp),
             )
         }
 

@@ -103,8 +103,11 @@ import co.nexlabs.betterhr.joblanding.network.api.home.UiState
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobsUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.ImageLoader
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
+import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
+import coil.size.Size
 import com.bumptech.glide.GenericTransitionOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.gif.GifDrawable
@@ -2596,23 +2599,16 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
                                     Spacer(modifier = Modifier.height(24.dp))
 
-                                    Image(
-                                        painter = rememberGlidePainter(
-                                            request = {
-                                                Glide.with(applicationContext)
-                                                    .asGif()
-                                                    .load(R.drawable.apply_job_success)
-                                                    .apply(RequestOptions().centerCrop())
-                                                /*.transition(GenericTransitionOptions.with(
-                                                GifDrawable()
-                                            ))*/
-                                            }
-                                        ),
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(context)
+                                            .data(R.drawable.apply_job_success)
+                                            .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                                            .size(Size.ORIGINAL)
+                                            .build(),
                                         contentDescription = "GIF",
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(200.dp),
-                                        contentScale = ContentScale.Fit
                                     )
 
                                     Spacer(modifier = Modifier.height(16.dp))
@@ -4262,23 +4258,16 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
                                 Spacer(modifier = Modifier.height(24.dp))
 
-                                Image(
-                                    painter = rememberGlidePainter(
-                                        request = {
-                                            Glide.with(applicationContext)
-                                                .asGif()
-                                                .load(R.drawable.apply_job_success)
-                                                .apply(RequestOptions().centerCrop())
-                                            /*.transition(GenericTransitionOptions.with(
-                                                GifDrawable()
-                                            ))*/
-                                        }
-                                    ),
+                                AsyncImage(
+                                    model = ImageRequest.Builder(context)
+                                        .data(R.drawable.apply_job_success)
+                                        .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                                        .size(Size.ORIGINAL)
+                                        .build(),
                                     contentDescription = "GIF",
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(200.dp),
-                                    contentScale = ContentScale.Fit
                                 )
 
                                 Spacer(modifier = Modifier.height(32.dp))
