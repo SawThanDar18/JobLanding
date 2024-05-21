@@ -605,6 +605,7 @@ class JobDetailViewModel(
     }
 
     fun updateApplication(id: String) {
+        Log.d("updateid>>", id)
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
                 it.copy(

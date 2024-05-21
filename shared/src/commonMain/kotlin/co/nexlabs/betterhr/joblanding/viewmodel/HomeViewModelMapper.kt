@@ -61,10 +61,10 @@ object HomeViewModelMapper {
             data.collectionCompanies.map {
                 collectionCompaniesList.add(
                     CollectionCompaniesUIModel(
-                        it.id,
-                        it.collection_id,
-                        it.state_name,
-                        it.job_opening_count,
+                        it.id ?: "",
+                        it.collection_id ?: "",
+                        it.state_name ?: "",
+                        it.job_opening_count ?: 0,
                         it.last3_view_count ?: 0,
                         it.last3_conversation_rate ?: 0,
                         it.last3_cv_count ?: 0,

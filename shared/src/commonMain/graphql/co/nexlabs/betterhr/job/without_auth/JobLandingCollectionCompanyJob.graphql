@@ -3,7 +3,7 @@ query JobLandingCollectionCompanyJob($collection_company_id: String!){
     {
         collection_id
         company_id
-        state_name
+#        state_name
         job_opening_count
         jobs{
             id

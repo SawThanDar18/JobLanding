@@ -46,7 +46,7 @@ object CollectionJobsViewModelMapper {
             JobsCompanyUIModel(
                 data.company!!.id,
                 data.company.subdomain,
-                data.company.country,
+                data.company.country_id ?: "",
                 data.company.name,
                 data.company.description ?: "",
                 data.company.company_mail ?: "",

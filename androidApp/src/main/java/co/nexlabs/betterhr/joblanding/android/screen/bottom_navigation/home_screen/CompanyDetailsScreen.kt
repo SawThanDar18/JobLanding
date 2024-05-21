@@ -56,9 +56,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.style.TextOverflow
 import co.nexlabs.betterhr.joblanding.common.ErrorLayout
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailJobs
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailJobUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import kotlinx.coroutines.launch
 
@@ -78,6 +78,16 @@ fun CompanyDetailsScreen(viewModel: CompanyDetailViewModel, navController: NavCo
     scope.launch {
         if (companyId != null && companyId != "") {
             viewModel.getCompanyDetail(companyId)
+        }
+    }
+
+    if (uiState.isSuccessGetCompanyDetail) {
+        LaunchedEffect(Unit) {
+            scope.launch {
+                if (companyId != null && companyId != "") {
+                    viewModel.getCompanyDetailJob(companyId)
+                }
+            }
         }
     }
 
@@ -103,7 +113,7 @@ fun CompanyDetailsScreen(viewModel: CompanyDetailViewModel, navController: NavCo
         }
 
         AnimatedVisibility(
-            uiState.companyDetail.jobs.isNotEmpty(),
+            uiState.companyDetailJobList.isNotEmpty(),
             enter = fadeIn(),
             exit = fadeOut()
         ) {
@@ -211,7 +221,7 @@ fun CompanyDetailsScreen(viewModel: CompanyDetailViewModel, navController: NavCo
                     }
                 }
                 when (tabIndex) {
-                    0 -> JobsScreen(uiState.companyDetail.jobs, navController)
+                    0 -> JobsScreen(uiState.companyDetailJobList, navController)
                     1 -> AboutScreen(uiState.companyDetail, uriHandler)
                 }
 
@@ -235,7 +245,7 @@ fun CompanyDetailsScreen(viewModel: CompanyDetailViewModel, navController: NavCo
 }
 
 @Composable
-fun JobsScreen(jobList: List<CompanyDetailJobs>, navController: NavController) {
+fun JobsScreen(jobList: List<CompanyDetailJobUIModel>, navController: NavController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -260,7 +270,7 @@ fun JobsScreen(jobList: List<CompanyDetailJobs>, navController: NavController) {
                     .height(80.dp)
                     .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(8.dp))
                     .clickable {
-                               navController.navigate("job-details/${item.id}")
+                        navController.navigate("job-details/${item.id}")
                     },
             ) {
                 Row(

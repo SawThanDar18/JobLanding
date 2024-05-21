@@ -107,10 +107,47 @@ class CompleteProfileViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                var response = completeProfileRepository.uploadFile(file, fileName, type, localStorage.candidateId)
-                Log.d("response>>", response.id)
+                completeProfileRepository.uploadFile(file, fileName, type, localStorage.candidateId)
             } catch (e: Exception) {
                 Log.d("error>>", e.message.toString())
+            }
+        }
+    }
+
+    fun updateFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        fileId: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing
+                )
+            }
+            try {
+                completeProfileRepository.updateFile(
+                    file,
+                    fileName,
+                    type,
+                    localStorage.candidateId,
+                    fileId
+                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = UIErrorType.Nothing,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString()),
+                    )
+                }
             }
         }
     }

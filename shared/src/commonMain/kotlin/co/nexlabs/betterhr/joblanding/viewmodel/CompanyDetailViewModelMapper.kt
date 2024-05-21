@@ -1,15 +1,13 @@
 package co.nexlabs.betterhr.joblanding.viewmodel
 
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailCompanyUIModel
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailJobs
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIModel
 
 object CompanyDetailViewModelMapper {
 
-    public fun mapDataToViewModel(data: JobLandingCompanyDetailQuery.JobLandingCompany): CompanyDetailUIModel {
+    fun mapDataToViewModel(data: JobLandingCompanyDetailQuery.JobLandingCompany): CompanyDetailUIModel {
 
-        var collectionJobsList: MutableList<CompanyDetailJobs> = ArrayList()
+        /*var collectionJobsList: MutableList<CompanyDetailJobs> = ArrayList()
         if (data.jobs != null) {
             data.jobs.map {
                 collectionJobsList.add(
@@ -47,7 +45,7 @@ object CompanyDetailViewModelMapper {
                     )
                 )
             }
-        }
+        }*/
 
         return CompanyDetailUIModel(
             data.id,
@@ -58,7 +56,7 @@ object CompanyDetailViewModelMapper {
             data.company_mail ?: "",
             data.company_link ?: "",
             data.jobs_count ?: 0,
-            collectionJobsList
+            //collectionJobsList
         )
     }
 }

@@ -32,6 +32,7 @@ import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
@@ -78,6 +79,8 @@ interface JobLandingService {
     suspend fun getJobDetail(jobId: String): ApolloCall<JobLandingJobDetailQuery.Data>
 
     suspend fun getCompanyDetail(companyId: String): ApolloCall<JobLandingCompanyDetailQuery.Data>
+
+    suspend fun getCompanyDetailJob(companyId: String): ApolloCall<JobLandingCompanyJobsQuery.Data>
 
     suspend fun saveJob(candidateId: String, jobId: String): ApolloCall<SaveJobMutation.Data>
 
@@ -134,7 +137,7 @@ interface JobLandingService {
         fileName: String,
         type: String,
         candidateId: String
-    ): UploadResponseId
+    ): FileUploadResponse
 
     suspend fun updateUserFile(
         file: Uri,
@@ -142,7 +145,7 @@ interface JobLandingService {
         type: String,
         candidateId: String,
         fileId: String
-    ): UploadResponseId
+    ): FileUploadResponse
 
     suspend fun fetchApplication(
         limit: Int

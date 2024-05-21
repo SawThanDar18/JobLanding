@@ -72,8 +72,7 @@ class ProfileRegisterViewModel(
             }
 
             profileRegisterRepository.createCandidate(
-                //name, email, localStorage.phone, desiredPosition, summary, localStorage.countryId
-                name, "emememailemail@gmail.com", "+959254614870", desiredPosition, summary, localStorage.countryId
+                name, email, localStorage.phone, desiredPosition, summary, localStorage.countryId
             ).toFlow()
                 .catch { e ->
                     _uiState.update {
@@ -150,8 +149,7 @@ class ProfileRegisterViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                var response = profileRegisterRepository.uploadFile(file, fileName, type, localStorage.candidateId)
-                Log.d("response>>", response.id)
+                profileRegisterRepository.uploadFile(file, fileName, type, localStorage.candidateId)
             } catch (e: Exception) {
                 Log.d("error>>", e.message.toString())
             }

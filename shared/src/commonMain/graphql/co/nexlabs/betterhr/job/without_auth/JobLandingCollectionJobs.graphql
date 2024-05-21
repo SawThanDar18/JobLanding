@@ -38,7 +38,7 @@ query JobLandingCollectionJobs($collection_id: String!, $is_paginate: Boolean!){
             company{
                 id
                 subdomain
-                country
+                country_id
                 name
                 description
                 company_mail

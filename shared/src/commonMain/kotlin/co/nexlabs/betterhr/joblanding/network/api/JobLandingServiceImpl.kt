@@ -36,6 +36,7 @@ import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
@@ -302,6 +303,10 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         return apolloClient.query(JobLandingCompanyDetailQuery(companyId))
     }
 
+    override suspend fun getCompanyDetailJob(companyId: String): ApolloCall<JobLandingCompanyJobsQuery.Data> {
+        return apolloClient.query(JobLandingCompanyJobsQuery(companyId))
+    }
+
     override suspend fun saveJob(
         candidateId: String,
         jobId: String
@@ -396,6 +401,15 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         types: List<String>,
         fileIds: List<String>
     ): UploadResponseId {
+        Log.d("v>>", referenceJobId)
+        Log.d("v>>", subdomain)
+        Log.d("v>>", jobTitle)
+        Log.d("v>>", status)
+        Log.d("v>>", appliedDate)
+        Log.d("v>>", candidateId)
+        Log.d("v>>", currentJobTitle)
+        Log.d("v>>", currentCompany)
+        Log.d("v>>", workingSince)
 
         val fileIdsTypeObject = ExistingFileIdTypeObject(fileIds)
         val fileTypeObject = FileTypeObject(types)
@@ -578,7 +592,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         fileName: String,
         type: String,
         candidateId: String,
-    ): UploadResponseId {
+    ): FileUploadResponse {
         val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
         val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
         val byteArray = inputStream.readBytes()
@@ -612,7 +626,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         type: String,
         candidateId: String,
         fileId: String
-    ): UploadResponseId {
+    ): FileUploadResponse {
         val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
         val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
         val byteArray = inputStream.readBytes()

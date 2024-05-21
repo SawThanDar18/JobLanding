@@ -138,18 +138,19 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
     var applicationContext = LocalContext.current.applicationContext
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var selectedFileName by remember { mutableStateOf("") }
     var fileToUpload: File? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             val contentResolver = applicationContext.contentResolver
-            val fileName =
+            selectedFileName =
                 co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileName(
                     applicationContext,
                     it
                 )
-            val file = File(applicationContext.cacheDir, fileName)
+            val file = File(applicationContext.cacheDir, selectedFileName)
             contentResolver.openInputStream(it)?.use { input ->
                 file.outputStream().use { output ->
                     input.copyTo(output)
@@ -159,7 +160,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
             selectedImageUri = uri
             Log.d("imageFile>>", selectedImageUri.toString())
-            Log.d("imageFile>>", fileName)
+            Log.d("imageFile>>", selectedFileName)
         }
     }
 
@@ -1124,6 +1125,26 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     .size(24.dp)
                                     .clickable {
                                         bottomBarVisible = false
+                                        if (uiState.candidateData != null) {
+                                            if (uiState.candidateData.profile != null) {
+                                                selectedImageUri?.let { uri ->
+                                                    viewModel.updateFile(
+                                                        uri,
+                                                        selectedFileName,
+                                                        uiState.candidateData.profile.type,
+                                                        uiState.candidateData.profile.id,
+                                                    )
+                                                }
+                                            } else {
+                                                selectedImageUri?.let { uri ->
+                                                    viewModel.uploadFile(
+                                                        uri,
+                                                        selectedFileName,
+                                                        "profile"
+                                                    )
+                                                }
+                                            }
+                                        }
                                     },
                                 alignment = Alignment.Center
                             )

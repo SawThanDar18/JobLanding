@@ -362,15 +362,26 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
     if (uiState.isSuccessCreateApplication) {
         LaunchedEffect(Unit) {
+            if (uiState.idFromCreateApplication != "" && uiState.jobDetail.id != "" && uiState.jobDetail.company.subDomain != "") {
+                scope.launch {
+                    viewModel.applyJob(
+                        uiState.idFromCreateApplication,
+                        uiState.jobDetail.id,
+                        uiState.jobDetail.company.subDomain
+                    )
+                }
+            }
+        }
+       /* LaunchedEffect(Unit) {
             if (uiState.idFromCreateApplication != "") {
                 scope.launch {
                     viewModel.updateApplication(uiState.idFromCreateApplication)
                 }
             }
-        }
+        }*/
     }
 
-    if (uiState.isSuccessUpdateApplication) {
+   /* if (uiState.isSuccessUpdateApplication) {
         LaunchedEffect(Unit) {
             if (uiState.idFromCreateApplication != "" && uiState.jobDetail.id != "" && uiState.jobDetail.company.subDomain != "") {
                 scope.launch {
@@ -382,7 +393,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                 }
             }
         }
-    }
+    }*/
 
     if (uiState.isApplyJobSuccess) {
         LaunchedEffect(Unit) {
@@ -1994,7 +2005,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                             viewModel.uploadFile(
                                                                                 uri,
                                                                                 imageFileName,
-                                                                                uiState.candidateData.profile.type
+                                                                                "profile"
                                                                             )
                                                                         }
                                                                     }
@@ -2424,6 +2435,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     } else {
                                                         if (uiState.candidateData.cv != null) {
                                                             existingFileIds.add(uiState.candidateData.cv.id)
+                                                            fileTypes.add("cv")
                                                         }
                                                     }
 
@@ -2438,6 +2450,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     } else {
                                                         if (uiState.candidateData.coverLetter != null) {
                                                             existingFileIds.add(uiState.candidateData.coverLetter.id)
+                                                            fileTypes.add("cover_letter")
                                                         }
                                                     }
 
@@ -2496,7 +2509,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     } else {
                                                         if (existingFileIds.isNotEmpty()) {
                                                             scope.launch {
-                                                                viewModel.createApplicationWithFileIds(
+                                                                viewModel.createApplication(
                                                                     uiState.jobDetail.id,
                                                                     uiState.jobDetail.company.subDomain,
                                                                     uiState.jobDetail.position,

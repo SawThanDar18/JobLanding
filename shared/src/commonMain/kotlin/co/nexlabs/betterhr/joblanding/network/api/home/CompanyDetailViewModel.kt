@@ -4,6 +4,7 @@ import android.util.Log
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import co.nexlabs.betterhr.joblanding.viewmodel.CompanyDetailJobViewModelMapper
 import co.nexlabs.betterhr.joblanding.viewmodel.CompanyDetailViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
@@ -32,7 +33,8 @@ class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailR
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
                                     .any { it is ApolloNetworkException || it is ApolloParseException })
-                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                            isSuccessGetCompanyDetail = false
                         )
                     }
 
@@ -58,7 +60,8 @@ class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailR
                     _uiState.update {
                         it.copy(
                             isLoading = true,
-                            error = UIErrorType.Nothing
+                            error = UIErrorType.Nothing,
+                            isSuccessGetCompanyDetail = false
                         )
                     }
                     if (!data.hasErrors()) {
@@ -66,7 +69,67 @@ class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailR
                             it.copy(
                                 isLoading = false,
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
-                                companyDetail = CompanyDetailViewModelMapper.mapDataToViewModel(data.data!!.jobLandingCompany)
+                                companyDetail = CompanyDetailViewModelMapper.mapDataToViewModel(data.data!!.jobLandingCompany),
+                                isSuccessGetCompanyDetail = true
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isSuccessGetCompanyDetail = false
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    fun getCompanyDetailJob(companyId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            companyDetailRepository.getCompanyDetailJob(companyId).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                        )
+                    }
+
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing,
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                companyDetailJobList = CompanyDetailJobViewModelMapper.mapDataToViewModel(data.data!!)
                             )
                         }
                     } else {

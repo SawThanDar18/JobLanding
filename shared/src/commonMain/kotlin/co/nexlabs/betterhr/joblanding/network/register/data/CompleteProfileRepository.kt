@@ -12,4 +12,12 @@ class CompleteProfileRepository(private val jobLandingService: JobLandingService
         type: String,
         candidateId: String
     ) = jobLandingService.uploadUserFile(file, fileName, type, candidateId)
+
+    suspend fun updateFile(
+        file: Uri,
+        fileName: String,
+        type: String,
+        candidateId: String,
+        fileId: String
+    ) = jobLandingService.updateUserFile(file, fileName, type, candidateId, fileId)
 }
