@@ -1,0 +1,18 @@
+mutation CreateLanguage(
+    $name: String
+    $proficiency_level: String
+    $candidate_id: String
+) {
+    createLanguage (
+        name: $name
+        proficiency_level: $proficiency_level
+        candidate_id: $candidate_id
+    ) {
+        id
+        name
+        proficiency_level
+        candidate {
+            name
+        }
+    }
+}

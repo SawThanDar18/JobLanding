@@ -9,6 +9,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import co.nexlabs.betterhr.joblanding.android.data.SignaturePad
+import co.nexlabs.betterhr.joblanding.android.data.SignatureScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.BottomNavigation
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.applications.ApplicationDetailScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.CollectionCompaniesListsScreen
@@ -32,7 +34,7 @@ import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobBeforeSignUp
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.ApplyJobScreens
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationDetailScreen
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.OfferResponse
+import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.OfferResponseScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.SubmitAssignmentScreen
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
@@ -56,6 +58,9 @@ fun MyApp() {
             .background(color = Color.White)
     ) {
         NavHost(navController, startDestination = "screen-portal") {
+            composable("signature") {
+                SignatureScreen()
+            }
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
@@ -129,12 +134,13 @@ fun MyApp() {
                 ApplyJobScreens(viewModel, navController)
             }
 
-            composable("submit-assignment/{jobId}/{referenceId}/{title}/{status}/{subDomain}/{referenceApplicationId}") {
+            composable("submit-assignment/{notiId}/{jobId}/{referenceId}/{title}/{status}/{subDomain}/{referenceApplicationId}") {
                 val viewModel: SubmitAssignmentViewModel = getKoin().get()
-                if (it.arguments?.getString("jobId") != "" && it.arguments?.getString("referenceId") != "" &&
+                if (it.arguments?.getString("notiId") != "" && it.arguments?.getString("jobId") != "" && it.arguments?.getString("referenceId") != "" &&
                     it.arguments?.getString("title") != "" && it.arguments?.getString("status") != "" &&
                     it.arguments?.getString("subDomain") != "" && it.arguments?.getString("referenceApplicationId") != "") {
                     SubmitAssignmentScreen(viewModel, navController,
+                        it.arguments?.getString("notiId") ?: "",
                         it.arguments?.getString("jobId") ?: "",
                         it.arguments?.getString("referenceId") ?: "",
                         it.arguments?.getString("title") ?: "",
@@ -145,11 +151,11 @@ fun MyApp() {
                 }
             }
 
-            composable("submit-offer/{id}/{link}") {
+            composable("submit-offer/{id}/{referenceId}/{link}") {
                 val viewModel: SubmitOfferViewModel = getKoin().get()
-                if (it.arguments?.getString("id") != "" && it.arguments?.getString("status") != "" &&
+                if (it.arguments?.getString("referenceId") != "" && it.arguments?.getString("id") != "" && it.arguments?.getString("status") != "" &&
                     it.arguments?.getString("subDomain") != "" && it.arguments?.getString("link") != "") {
-                    OfferResponse(viewModel, navController, it.arguments?.getString("id") ?: "", it.arguments?.getString("status") ?: "", it.arguments?.getString("subDomain") ?: "", it.arguments?.getString("link") ?: "")
+                    OfferResponseScreen(viewModel, navController, it.arguments?.getString("id") ?: "", it.arguments?.getString("referenceId") ?: "", it.arguments?.getString("status") ?: "", it.arguments?.getString("subDomain") ?: "", it.arguments?.getString("link") ?: "")
                 }
             }
         }

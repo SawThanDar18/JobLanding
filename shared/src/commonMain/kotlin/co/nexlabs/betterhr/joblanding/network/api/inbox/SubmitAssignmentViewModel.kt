@@ -37,7 +37,8 @@ class SubmitAssignmentViewModel(application: Application, private val inboxRepos
     fun uploadMultipleFiles(
         files: MutableList<Uri?>,
         fileNames: MutableList<String?>,
-        types: List<String>
+        types: List<String>,
+        referenceId: String
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
@@ -48,7 +49,7 @@ class SubmitAssignmentViewModel(application: Application, private val inboxRepos
                 )
             }
             try {
-                var response = inboxRepository.uploadMultipleFiles(files, fileNames, types, localStorage.candidateId)
+                var response = inboxRepository.uploadMultipleFiles(files, fileNames, types, localStorage.candidateId, referenceId)
                 if (response.isNotEmpty()) {
                     _uiState.update {
                         it.copy(
@@ -88,7 +89,8 @@ class SubmitAssignmentViewModel(application: Application, private val inboxRepos
             _uiState.update {
                 it.copy(
                     isLoading = true,
-                    error = UIErrorType.Nothing
+                    error = UIErrorType.Nothing,
+                    isAssignmentResponseSuccess = false
                 )
             }
 
@@ -103,7 +105,8 @@ class SubmitAssignmentViewModel(application: Application, private val inboxRepos
                                     .any { it is ApolloNetworkException || it is ApolloParseException })
                                 UIErrorType.Network else UIErrorType.Other(
                                 e.message ?: "Something went wrong!"
-                            )
+                            ),
+                            isAssignmentResponseSuccess = false
                         )
                     }
                     when (e) {
@@ -128,7 +131,8 @@ class SubmitAssignmentViewModel(application: Application, private val inboxRepos
                     _uiState.update {
                         it.copy(
                             isLoading = true,
-                            error = UIErrorType.Nothing
+                            error = UIErrorType.Nothing,
+                            isAssignmentResponseSuccess = false
                         )
                     }
                     if (!data.hasErrors()) {
@@ -136,13 +140,89 @@ class SubmitAssignmentViewModel(application: Application, private val inboxRepos
                             it.copy(
                                 isLoading = false,
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                isAssignmentResponseSuccess = true
                             )
                         }
                     } else {
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isAssignmentResponseSuccess = false
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    fun updateNotification(
+        id: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    isSuccess = false
+                )
+            }
+
+            inboxRepository.updateNotification(
+                id, "complete", false
+            ).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(
+                                e.message ?: "Something went wrong!"
+                            ),
+                            isSuccess = false
+                        )
+                    }
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing,
+                            isSuccess = false
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                isSuccess = true
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isSuccess = false
                             )
                         }
                     }

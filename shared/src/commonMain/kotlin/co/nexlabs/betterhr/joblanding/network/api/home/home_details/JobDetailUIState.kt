@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.network.api.home.home_details
 
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CandidateUIModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.FilesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.request_response.FileUploadResponse
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 
 data class JobDetailUIState(
@@ -36,5 +37,7 @@ data class JobDetailUIState(
         emptyList(), emptyList()
     ),
     val idFromProfileUpload: String = "",
-    val idFromCreateApplication: String = ""
+    val idFromCreateApplication: String = "",
+    val isSuccessUploadMultipleFile: Boolean = false,
+    val multiFileList: List<FileUploadResponse> = ArrayList()
 )

@@ -65,7 +65,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SubmitAssignmentScreen(viewModel: SubmitAssignmentViewModel, navController: NavController,
+fun SubmitAssignmentScreen(viewModel: SubmitAssignmentViewModel, navController: NavController, notiId: String,
 jobId: String, referenceId: String, title: String, status: String, subDomain: String, referenceApplicationId: String) {
 
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -115,6 +115,22 @@ jobId: String, referenceId: String, title: String, status: String, subDomain: St
                     }
                 }
             }
+        }
+    }
+
+    if (uiState.isAssignmentResponseSuccess) {
+        LaunchedEffect(Unit) {
+            scope.launch {
+                viewModel.updateNotification(
+                    notiId
+                )
+            }
+        }
+    }
+
+    if (uiState.isSuccess) {
+        LaunchedEffect(Unit) {
+            navController.popBackStack()
         }
     }
 
@@ -371,7 +387,7 @@ jobId: String, referenceId: String, title: String, status: String, subDomain: St
                     }
                     scope.launch {
                         viewModel.uploadMultipleFiles(
-                            selectedFiles, selectedFileNames, fileTypes
+                            selectedFiles, selectedFileNames, fileTypes, referenceId
                         )
                     }
                 }

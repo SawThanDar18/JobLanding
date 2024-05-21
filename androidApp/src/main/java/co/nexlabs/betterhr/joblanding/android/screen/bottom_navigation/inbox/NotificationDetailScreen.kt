@@ -291,7 +291,7 @@ fun NotificationDetailScreen(
                         .clickable {
                             if (uiState.notificationDetail != null) {
                                 var item = uiState.notificationDetail
-                                navController.navigate("submit-assignment/${item.jobId}/${item.referenceId}${item.title}/${item.status}/${item.subDomain}/${item.referenceApplicationId}")
+                                navController.navigate("submit-assignment/${uiState.notificationDetail.id}/${item.jobId}/${item.referenceId}${item.title}/${item.status}/${item.subDomain}/${item.referenceApplicationId}")
                             }
                         },
                 ) {

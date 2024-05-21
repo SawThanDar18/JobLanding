@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -105,6 +106,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
+    var addSummaryVisible by remember { mutableStateOf(false) }
+    var addExperienceVisible by remember { mutableStateOf(false) }
+    var addEducationVisible by remember { mutableStateOf(false) }
+    var addLanguageVisible by remember { mutableStateOf(false) }
+    var addSkillVisible by remember { mutableStateOf(false) }
+    var addCertificationVisible by remember { mutableStateOf(false) }
+
     scope.launch {
         viewModel.getCandidateData()
     }
@@ -157,7 +165,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(bottom = 80.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -673,8 +682,14 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                         .background(color = Color(0xFFE4E7ED))
                 )
 
-                /*Row(
-                    modifier = Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 16.dp),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .padding(horizontal = 16.dp)
+                        .clickable {
+                            addSummaryVisible = true
+                        },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -705,7 +720,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .padding(horizontal = 16.dp)
+                        .clickable {
+                            addExperienceVisible = true
+                        },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -737,7 +758,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .padding(horizontal = 16.dp)
+                        .clickable {
+                            addEducationVisible = true
+                        },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -769,7 +796,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .padding(horizontal = 16.dp)
+                        .clickable {
+                            addLanguageVisible = true
+                        },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -801,7 +834,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .padding(horizontal = 16.dp)
+                        .clickable {
+                            addSkillVisible = true
+                        },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -833,7 +872,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(72.dp).padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .padding(horizontal = 16.dp)
+                        .clickable {
+                            addCertificationVisible = true
+                        },
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -859,14 +904,187 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth().padding(bottom = 72.dp)
+                        .fillMaxWidth()
+                        .padding(bottom = 72.dp)
                         .height(2.dp)
                         .background(color = Color(0xFFE4E7ED))
-                )*/
+                )
 
             }
         }
     }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
+            .systemBarsPadding()
+    ) {
+        var summary by remember { mutableStateOf("") }
+
+        if (addSummaryVisible) {
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "Let’s add your summary",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF4A4A4A),
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        bottomBarVisible = false
+                                    },
+                                alignment = Alignment.Center
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        MultiStyleTextForCompleteProfile(
+                            text1 = "Indicates required",
+                            color1 = Color(0xFF6A6A6A),
+                            text2 = "*",
+                            color2 = Color(0xFFffa558)
+                        )
+
+                        Text(
+                            text = "Tell employer about yourself",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 14.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(158.dp)
+                                .border(
+                                    1.dp,
+                                    Color(0xFFAAAAAA),
+                                    RoundedCornerShape(4.dp)
+                                )
+                                .background(
+                                    color = Color.Transparent,
+                                    shape = MaterialTheme.shapes.medium
+                                ),
+                            value = summary,
+                            onValueChange = {
+                                summary = it
+                            },
+                            placeholder = {
+                                Text(
+                                    "Type Something",
+                                    color = Color(0xFF6A6A6A),
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                )
+                            },
+                            textStyle = TextStyle(
+                                textAlign = TextAlign.Start,
+                                fontWeight = FontWeight.W400,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                color = Color(0xFF6A6A6A)
+                            ),
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Color(0xFF6A6A6A),
+                                backgroundColor = Color.Transparent,
+                                cursorColor = Color(0xFF1ED292),
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboardController?.hide()
+                                }
+                            ),
+                        )
+
+
+
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                                .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                                .background(
+                                    color = Color(0xFF1ED292),
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .clickable {
+                                           if (!summary.isNullOrBlank()) {
+
+                                           }
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "Update summary",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFFFFFFFF),
+                                fontSize = 14.sp,
+                            )
+                        }
+                    }
+                },
+                sheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                ),
+                sheetElevation = 16.dp,
+                sheetBackgroundColor = Color.White,
+                sheetContentColor = contentColorFor(Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                scrimColor = Color.Transparent
+            ) {
+
+            }
+        }
+    }
+
 
     Column(
         modifier = Modifier

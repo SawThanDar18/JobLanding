@@ -7,5 +7,7 @@ data class SubmitAssignmentUIState(
     val isLoading: Boolean = true,
     val error: UIErrorType = UIErrorType.Nothing,
     val isSuccessUploadMultipleFile: Boolean = false,
-    val multiFileList: List<FileUploadResponse> = ArrayList()
+    val multiFileList: List<FileUploadResponse> = ArrayList(),
+    val isAssignmentResponseSuccess: Boolean = false,
+    val isSuccess: Boolean = false
 )

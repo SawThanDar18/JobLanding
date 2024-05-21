@@ -449,6 +449,43 @@ class JobDetailViewModel(
         }
     }
 
+    fun uploadMultipleFiles(
+        files: MutableList<Uri?>,
+        fileNames: MutableList<String?>,
+        types: List<String>
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    isSuccessUploadMultipleFile = false
+                )
+            }
+            try {
+                var response = jobDetailRepository.uploadMultipleFiles(files, fileNames, types)
+                if (response.isNotEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = UIErrorType.Nothing,
+                            isSuccessUploadMultipleFile = true,
+                            multiFileList = response
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString()),
+                        isSuccessUploadMultipleFile = false
+                    )
+                }
+            }
+        }
+    }
+
     fun createApplication(
         referenceJobId: String,
         subdomain: String,
@@ -459,7 +496,8 @@ class JobDetailViewModel(
         workingSince: String,
         fileName: MutableList<String?>,
         files: MutableList<Uri?>,
-        types: MutableList<String>
+        types: MutableList<String>,
+        fileIds: MutableList<String>
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
@@ -483,7 +521,8 @@ class JobDetailViewModel(
                     workingSince,
                     fileName,
                     files,
-                    types
+                    types,
+                    fileIds
                 )
                 _uiState.update {
                     it.copy(

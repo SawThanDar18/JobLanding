@@ -1,0 +1,13 @@
+mutation updateNotification(
+    $id: String!
+    $status: String
+    $is_signed: Boolean
+) {
+    updateNotification (
+        id: $id
+        status: $status
+        is_signed: $is_signed
+    ) {
+        id
+    }
+}

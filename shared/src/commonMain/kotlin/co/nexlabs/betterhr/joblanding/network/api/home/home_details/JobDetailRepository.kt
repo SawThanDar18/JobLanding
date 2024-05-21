@@ -49,8 +49,9 @@ class JobDetailRepository(private val jobLandingService: JobLandingService) {
         workingSince: String,
         fileName: MutableList<String?>,
         files: MutableList<Uri?>,
-        types: List<String>
-    ) = jobLandingService.createApplication(referenceJobId, subdomain, jobTitle, status, appliedDate, candidateId, currentJobTitle, currentCompany, workingSince, fileName, files, types)
+        types: List<String>,
+        fileIds: List<String>
+    ) = jobLandingService.createApplication(referenceJobId, subdomain, jobTitle, status, appliedDate, candidateId, currentJobTitle, currentCompany, workingSince, fileName, files, types, fileIds)
 
     suspend fun createApplicationWithExistingFileIds(
         referenceJobId: String,
@@ -89,4 +90,10 @@ class JobDetailRepository(private val jobLandingService: JobLandingService) {
         candidateId: String,
         fileId: String
     ) = jobLandingService.updateUserFile(file, fileName, type, candidateId, fileId)
+
+    suspend fun uploadMultipleFiles(
+        files: MutableList<Uri?>,
+        fileNames: MutableList<String?>,
+        types: List<String>
+    ) = jobLandingService.uploadMultipleFilesForCreateApplication(files, fileNames, types)
 }

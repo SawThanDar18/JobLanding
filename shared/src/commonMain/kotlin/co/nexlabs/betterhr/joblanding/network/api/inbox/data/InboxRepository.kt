@@ -17,8 +17,9 @@ class InboxRepository(private val jobLandingService: JobLandingService) {
         files: MutableList<Uri?>,
         fileNames: MutableList<String?>,
         types: List<String>,
-        candidateId: String
-    ) = jobLandingService.uploadMultipleFiles(files, fileNames, types, candidateId)
+        candidateId: String,
+        referenceId: String
+    ) = jobLandingService.uploadMultipleFiles(files, fileNames, types, candidateId, referenceId)
 
     suspend fun responseAssignment(
         candidateId: String,
@@ -39,8 +40,9 @@ class InboxRepository(private val jobLandingService: JobLandingService) {
         file: Uri,
         fileName: String,
         type: String,
-        candidateId: String
-    ) = jobLandingService.uploadSingleFile(file, fileName, type, candidateId)
+        candidateId: String,
+        referenceId: String
+    ) = jobLandingService.uploadSingleFile(file, fileName, type, candidateId, referenceId)
 
     suspend fun responseOffer(
         id: String,
@@ -50,4 +52,10 @@ class InboxRepository(private val jobLandingService: JobLandingService) {
         attachments: String,
         subDomain: String
     ) = jobLandingService.responseOffer(id, note, status, responseDate, attachments, subDomain)
+
+    suspend fun updateNotification(
+        id: String,
+        status: String,
+        isSign: Boolean
+    ) = jobLandingService.updateNotification(id, status, isSign)
 }

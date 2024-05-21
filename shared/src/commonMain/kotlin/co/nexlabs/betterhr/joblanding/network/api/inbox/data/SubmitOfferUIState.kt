@@ -10,4 +10,6 @@ data class SubmitOfferUIState(
     val fileList: FileUploadResponse = FileUploadResponse(
         "", "", "", "", "", ""
     ),
+    val isOfferResponseSuccess: Boolean = false,
+    val isSuccess: Boolean = false
 )

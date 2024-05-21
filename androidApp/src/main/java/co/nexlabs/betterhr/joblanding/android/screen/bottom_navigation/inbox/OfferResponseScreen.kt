@@ -1,14 +1,12 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox
 
 import android.net.Uri
+import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,14 +24,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.IconButton
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.OutlinedTextField
@@ -48,6 +42,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,12 +51,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -81,23 +71,16 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.AboutScreen
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.FileInfo
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.JobsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileName
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileSize
-import co.nexlabs.betterhr.joblanding.android.screen.register.Overlap
-import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
-import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
-import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
-import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import okhttp3.internal.notify
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -106,11 +89,19 @@ var bottomBarVisible: MutableLiveData<Boolean> = MutableLiveData()
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController, id: String, status: String, subDomain: String, link: String) {
+fun OfferResponseScreen(viewModel: SubmitOfferViewModel, navController: NavController, id: String, referenceId: String, status: String, subDomain: String, link: String) {
     var showDialogForSure by remember { mutableStateOf(false) }
 
     var tabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Draw", "Upload")
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    if (uiState.isSuccess) {
+        LaunchedEffect(Unit) {
+            navController.popBackStack()
+        }
+    }
 
     Column(
         modifier = Modifier.padding(16.dp, 16.dp, 0.dp, 0.dp),
@@ -293,8 +284,8 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
                             }
                         }
                         when (tabIndex) {
-                            0 -> DrawScreen()
-                            1 -> UploadScreen()
+                            0 -> DrawScreen(viewModel, id, referenceId, status, subDomain)
+                            1 -> UploadScreen(viewModel, id, referenceId, status, subDomain)
                         }
 
                     }
@@ -321,20 +312,59 @@ fun OfferResponse(viewModel: SubmitOfferViewModel, navController: NavController,
 }
 
 @Composable
-fun DrawScreen() {
+fun DrawScreen(viewModel: SubmitOfferViewModel, notiId: String, referenceId: String, status: String, subDomain: String) {
     val applicationContext = LocalContext.current
+
+    val dateFormatWithHour = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    val currentDateWithHour = dateFormatWithHour.format(Date())
+
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
+
+    if (uiState.isSuccessUploadFile) {
+        LaunchedEffect(Unit) {
+            if (uiState.fileList != null) {
+                var attachments = Json.encodeToString(uiState.fileList)
+                Log.d("attachments>", attachments)
+
+                if (!attachments.isNullOrBlank()) {
+                    scope.launch {
+                        viewModel.responseOffer(
+                            referenceId,
+                            "note",
+                            status,
+                            currentDateWithHour,
+                            attachments,
+                            subDomain
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    if (uiState.isOfferResponseSuccess) {
+        LaunchedEffect(Unit) {
+            scope.launch {
+                viewModel.updateNotification(
+                    notiId, "complete"
+                )
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp),
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally) {
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(502.dp).padding(bottom = 22.dp)
+                .height(502.dp)
+                .padding(bottom = 22.dp)
                 .background(
                     color = Color(0xFFF0F8FE),
                     shape = MaterialTheme.shapes.medium
@@ -394,6 +424,12 @@ fun DrawScreen() {
                 )
                 .clickable {
                     //upload draw sign & response offer
+                    //check file empty or not
+                    scope.launch {
+                       /* viewModel.uploadSingleFile(
+
+                        )*/
+                    }
 
                 }) {
                 Text(
@@ -412,9 +448,15 @@ fun DrawScreen() {
 }
 
 @Composable
-fun UploadScreen() {
+fun UploadScreen(viewModel: SubmitOfferViewModel, notiId: String, referenceId: String, status: String, subDomain: String) {
+
+    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
 
     var applicationContext = LocalContext.current.applicationContext
+
+    val dateFormatWithHour = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    val currentDateWithHour = dateFormatWithHour.format(Date())
 
     var uploadFileName by remember { mutableStateOf("") }
     var uploadFile by remember { mutableStateOf<Uri?>(null) }
@@ -427,6 +469,30 @@ fun UploadScreen() {
 
     }
 
+    if (uiState.isSuccessUploadFile) {
+        LaunchedEffect(Unit) {
+            if (uiState.fileList != null) {
+                var attachments = Json.encodeToString(uiState.fileList)
+                viewModel.responseOffer(
+                    referenceId,
+                    "note",
+                    status,
+                    currentDateWithHour,
+                    attachments,
+                    subDomain
+                )
+            }
+        }
+    }
+
+    if (uiState.isOfferResponseSuccess) {
+        LaunchedEffect(Unit) {
+            viewModel.updateNotification(
+                notiId, "complete"
+            )
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -434,129 +500,130 @@ fun UploadScreen() {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally) {
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(502.dp).padding(bottom = 22.dp)
-            .background(
-                color = Color(0xFFF0F8FE),
-                shape = MaterialTheme.shapes.medium
-            )
-            .border(
-                1.dp,
-                Color(0xFFF0F8FE),
-                RoundedCornerShape(4.dp)
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        if (uploadFile != null) {
-
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = Color.Transparent,
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .fillMaxWidth()
-                    .height(470.dp)
-                    .padding(16.dp)
-                    .border(1.dp, Color(0xFFAAAAAA), RoundedCornerShape(0.dp))
-                    .clickable {
-                        fileChooserLauncher.launch("*/*")
-                    },
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.attach_file),
-                    contentDescription = "Attach File Image",
-                    modifier = Modifier
-                        .size(width = 114.dp, height = 81.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(502.dp)
+                .padding(bottom = 22.dp)
+                .background(
+                    color = Color(0xFFF0F8FE),
+                    shape = MaterialTheme.shapes.medium
                 )
-            }
-        } else {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = Color.Transparent,
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .fillMaxWidth()
-                    .height(470.dp)
-                    .padding(16.dp)
-                    .border(1.dp, Color(0xFFAAAAAA), RoundedCornerShape(0.dp)),
-            ) {
+                .border(
+                    1.dp,
+                    Color(0xFFF0F8FE),
+                    RoundedCornerShape(4.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (uploadFile != null) {
 
-                Column(
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 16.dp
-                        ),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .background(
+                            color = Color.Transparent,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .fillMaxWidth()
+                        .height(470.dp)
+                        .padding(16.dp)
+                        .border(1.dp, Color(0xFFAAAAAA), RoundedCornerShape(0.dp))
+                        .clickable {
+                            fileChooserLauncher.launch("*/*")
+                        },
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.attach_file),
+                        contentDescription = "Attach File Image",
+                        modifier = Modifier
+                            .size(width = 114.dp, height = 81.dp)
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Transparent,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .fillMaxWidth()
+                        .height(470.dp)
+                        .padding(16.dp)
+                        .border(1.dp, Color(0xFFAAAAAA), RoundedCornerShape(0.dp)),
                 ) {
 
-                    Box(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(0.5f),
-                        contentAlignment = Alignment.TopEnd,
+                            .fillMaxSize()
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 16.dp
+                            ),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.x),
-                            contentDescription = "X Icon",
+
+                        Box(
                             modifier = Modifier
-                                .size(14.dp)
-                                .clickable {
-                                    uploadFile = null
-                                },
-                            alignment = Alignment.CenterEnd
-                        )
+                                .fillMaxWidth()
+                                .weight(0.5f),
+                            contentAlignment = Alignment.TopEnd,
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .clickable {
+                                        uploadFile = null
+                                    },
+                                alignment = Alignment.CenterEnd
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(2f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.assignment_file_logo),
+                                contentDescription = "Attach File Icon",
+                                modifier = Modifier
+                                    .size(
+                                        width = 39.08.dp,
+                                        height = 48.dp
+                                    ),
+                                alignment = Alignment.Center
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                maxLines = 2,
+                                softWrap = true,
+                                overflow = TextOverflow.Ellipsis,
+                                text = uploadFileName,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W400,
+                                color = Color(0xFF757575),
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .width(114.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(2f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.assignment_file_logo),
-                            contentDescription = "Attach File Icon",
-                            modifier = Modifier
-                                .size(
-                                    width = 39.08.dp,
-                                    height = 48.dp
-                                ),
-                            alignment = Alignment.Center
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            maxLines = 2,
-                            softWrap = true,
-                            overflow = TextOverflow.Ellipsis,
-                            text = uploadFileName,
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W400,
-                            color = Color(0xFF757575),
-                            fontSize = 14.sp,
-                            modifier = Modifier
-                                .width(114.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
                 }
-
             }
         }
-    }
 
         Row(
             modifier = Modifier
@@ -593,6 +660,19 @@ fun UploadScreen() {
                 )
                 .clickable {
                     //upload file sign & response offer
+                    if (uploadFile != null) {
+                        scope.launch {
+                            viewModel.uploadSingleFile(uploadFile!!, uploadFileName, "offer", referenceId)
+                        }
+                    } else {
+                        Toast
+                            .makeText(
+                                applicationContext,
+                                "Please upload Signature!",
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
+                    }
 
                 }) {
                 Text(
@@ -703,8 +783,21 @@ fun ReasonDialog(viewModel: SubmitOfferViewModel, id: String, status: String, su
     val dateFormatWithHour = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     val currentDateWithHour = dateFormatWithHour.format(Date())
 
+    var reason by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+
+    if (uiState.isOfferResponseSuccess) {
+        LaunchedEffect(Unit) {
+            scope.launch {
+                viewModel.updateNotification(
+                    id, "reject"
+                )
+            }
+        }
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         Box(
@@ -745,8 +838,6 @@ fun ReasonDialog(viewModel: SubmitOfferViewModel, id: String, status: String, su
                     )
                 }
 
-                var reason by remember { mutableStateOf("") }
-                val keyboardController = LocalSoftwareKeyboardController.current
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()

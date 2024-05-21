@@ -191,8 +191,10 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
                     viewModel.uploadFile(file, cvFileName, "cv")
                 }
 
-                coverLetterFile[0].let {
-                    viewModel.uploadFile(it.uri, it.fileName ?: "", "cover_letter")
+                if (coverLetterFile.isNotEmpty()) {
+                    coverLetterFile[0].let {
+                        viewModel.uploadFile(it.uri, it.fileName ?: "", "cover_letter")
+                    }
                 }
 
                 if (viewModel.getPageId().isNotBlank()) {

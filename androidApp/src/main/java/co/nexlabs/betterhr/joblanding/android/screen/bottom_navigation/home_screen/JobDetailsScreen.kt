@@ -2407,6 +2407,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     var fileNames: MutableList<String?> =
                                                         ArrayList()
                                                     var fileTypes: MutableList<String> = ArrayList()
+                                                    var fileIds: MutableList<String> =
+                                                        ArrayList()
                                                     var existingFileIds: MutableList<String> =
                                                         ArrayList()
 
@@ -2510,18 +2512,35 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                             }
                                                         } else {
                                                             scope.launch {
-                                                                viewModel.createApplication(
-                                                                    uiState.jobDetail.id,
-                                                                    uiState.jobDetail.company.subDomain,
-                                                                    uiState.jobDetail.position,
-                                                                    formattedDateTime,
-                                                                    jobTitle,
-                                                                    companyName,
-                                                                    convertDate("$selectedItemMonth $startYear"),
-                                                                    fileNames,
-                                                                    files,
-                                                                    fileTypes
+                                                                viewModel.uploadMultipleFiles(
+                                                                    files, fileNames, fileTypes
                                                                 )
+                                                            }
+
+                                                            if (uiState.isSuccessUploadMultipleFile) {
+                                                                if (uiState.multiFileList.isNotEmpty()) {
+                                                                    uiState.multiFileList.map {
+                                                                        fileIds.add(it.id)
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            if (fileIds.isNotEmpty()) {
+                                                                scope.launch {
+                                                                    viewModel.createApplication(
+                                                                        uiState.jobDetail.id,
+                                                                        uiState.jobDetail.company.subDomain,
+                                                                        uiState.jobDetail.position,
+                                                                        formattedDateTime,
+                                                                        jobTitle,
+                                                                        companyName,
+                                                                        convertDate("$selectedItemMonth $startYear"),
+                                                                        fileNames,
+                                                                        files,
+                                                                        fileTypes,
+                                                                        fileIds
+                                                                    )
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -2600,7 +2619,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     Spacer(modifier = Modifier.height(24.dp))
 
                                     AsyncImage(
-                                        model = ImageRequest.Builder(context)
+                                        model = ImageRequest.Builder(applicationContext)
                                             .data(R.drawable.apply_job_success)
                                             .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
                                             .size(Size.ORIGINAL)
@@ -4091,10 +4110,13 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                 var fileNames: MutableList<String?> =
                                                     ArrayList()
                                                 var fileTypes: MutableList<String> = ArrayList()
+                                                var fileIds: MutableList<String> =
+                                                    ArrayList()
 
                                                 files.clear()
                                                 fileNames.clear()
                                                 fileTypes.clear()
+                                                fileIds.clear()
 
                                                 if (cvFile != null) {
                                                     files.add(cvFile)
@@ -4170,6 +4192,19 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     }
                                                 } else {
                                                     scope.launch {
+                                                        viewModel.uploadMultipleFiles(
+                                                            files, fileNames, fileTypes
+                                                        )
+                                                    }
+
+                                                    if (uiState.isSuccessUploadMultipleFile) {
+                                                        if (uiState.multiFileList.isNotEmpty()) {
+                                                            uiState.multiFileList.map {
+                                                                fileIds.add(it.id)
+                                                            }
+                                                        }
+                                                    }
+                                                    scope.launch {
                                                         viewModel.createApplication(
                                                             uiState.jobDetail.id,
                                                             uiState.jobDetail.company.subDomain,
@@ -4180,7 +4215,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                             convertDate("$selectedItemMonth $startYear"),
                                                             fileNames,
                                                             files,
-                                                            fileTypes
+                                                            fileTypes,
+                                                            fileIds
                                                         )
                                                     }
                                                 }
@@ -4259,7 +4295,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                 Spacer(modifier = Modifier.height(24.dp))
 
                                 AsyncImage(
-                                    model = ImageRequest.Builder(context)
+                                    model = ImageRequest.Builder(applicationContext)
                                         .data(R.drawable.apply_job_success)
                                         .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
                                         .size(Size.ORIGINAL)
