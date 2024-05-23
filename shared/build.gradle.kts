@@ -1,4 +1,28 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
+tasks.register<Sync>("packForXcode") {
+    group = "build"
+    description = "Packs the iOS framework for Xcode"
+
+    val mode = project.findProperty("XCODE_CONFIGURATION") as? String ?: "DEBUG"
+    val targetDir = buildDir.resolve("xcode-frameworks")
+
+    val iosTargets = listOf("iosX64", "iosArm64")
+
+    iosTargets.forEach { targetName ->
+        val target = kotlin.targets.getByName<KotlinNativeTarget>(targetName)
+        val framework = target.binaries.getFramework(mode)
+        dependsOn(framework.linkTask)
+        from(framework.outputDirectory)
+    }
+
+    into(targetDir)
+
+    doLast {
+        println("Framework is packed for Xcode in: $targetDir")
+    }
+}
+
 
 plugins {
     kotlin("multiplatform")
@@ -19,24 +43,11 @@ kotlin {
         }
     }
 
-    /*cocoapods {
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        ios.deploymentTarget = "14.1"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = Config.Shared.name
-        }
-    }*/
-    
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.binaries.framework {
-            baseName = "shared"
-            isStatic = true
+    ios {
+        binaries {
+            framework {
+                baseName = "shared"
+            }
         }
     }
 
@@ -69,14 +80,11 @@ kotlin {
                 api("androidx.core:core-ktx:1.10.1")
             }
         }
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
+
         val iosMain by getting{
-            dependsOn(commonMain)
-            iosX64Main.dependsOn(this)
-            iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
+            dependencies {
+                
+            }
         }
     }
 }
