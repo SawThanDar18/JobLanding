@@ -1,7 +1,9 @@
-query JobLandingCollectionCompanies($collection_id: String!, $is_paginate: Boolean!){
+query JobLandingCollectionCompanies($collection_id: String!, $is_paginate: Boolean!, $limit: Int, $page: Int){
     jobLandingCollectionCompanies(
         collection_id: $collection_id,
-        is_paginate: $is_paginate)
+        is_paginate: $is_paginate,
+        limit: $limit,
+        page: $page)
     {
         data {
             id
@@ -17,6 +19,7 @@ query JobLandingCollectionCompanies($collection_id: String!, $is_paginate: Boole
             company{
                 id
                 name
+                subdomain
             }
         }
         paginatorInfo{

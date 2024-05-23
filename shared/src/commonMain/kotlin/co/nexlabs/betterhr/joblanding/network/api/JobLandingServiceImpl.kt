@@ -283,16 +283,16 @@ class JobLandingServiceImpl(private val application: Application, private val cl
 
     override suspend fun getJobLandingCollectionCompanies(
         collectionId: String,
-        isPaginate: Boolean
+        isPaginate: Boolean, limit: Int, page: Int
     ): ApolloCall<JobLandingCollectionCompaniesQuery.Data> {
-        return apolloClient.query(JobLandingCollectionCompaniesQuery(collectionId, isPaginate))
+        return apolloClient.query(JobLandingCollectionCompaniesQuery(collectionId, isPaginate, Optional.present(limit), Optional.present(page)))
     }
 
     override suspend fun getJobLandingCollectionJobs(
         collectionId: String,
-        isPaginate: Boolean
+        isPaginate: Boolean, limit: Int, page: Int
     ): ApolloCall<JobLandingCollectionJobsQuery.Data> {
-        return apolloClient.query(JobLandingCollectionJobsQuery(collectionId, isPaginate))
+        return apolloClient.query(JobLandingCollectionJobsQuery(collectionId, isPaginate, Optional.present(limit), Optional.present(page)))
     }
 
     override suspend fun getJobDetail(jobId: String): ApolloCall<JobLandingJobDetailQuery.Data> {

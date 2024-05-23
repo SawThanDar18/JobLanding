@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,9 +63,10 @@ fun CollectionCompaniesListsScreen(
 ) {
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+    val items = viewModel.items.collectAsState().value
 
     scope.launch {
-        viewModel.getCollectionCompanies(collectionId, false)
+        viewModel.loadMoreItems(collectionId)
     }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -85,11 +89,10 @@ fun CollectionCompaniesListsScreen(
         }
 
         AnimatedVisibility(
-            viewModel.collectionCompaniesList.isNotEmpty(),
+            items.isNotEmpty(),
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            Log.d("dat>>", viewModel.collectionCompaniesList.toString())
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -129,7 +132,9 @@ fun CollectionCompaniesListsScreen(
                     )
                 }
 
+                val listState = rememberLazyGridState()
                 LazyVerticalGrid(
+                    state = listState,
                     modifier = Modifier.fillMaxWidth(),
                     //state = rememberLazyGridState(),
                     columns = GridCells.Fixed(3),
@@ -137,8 +142,8 @@ fun CollectionCompaniesListsScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(viewModel.collectionCompaniesList.size) { index ->
-                        val item = viewModel.collectionCompaniesList[index]
+                    items(items.size) { index ->
+                        val item = items[index]
 
                         Box(
                             modifier = Modifier
@@ -215,6 +220,17 @@ fun CollectionCompaniesListsScreen(
                             }
                         }
                     }
+                }
+
+                LaunchedEffect(key1 = listState) {
+                    snapshotFlow { listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size }
+                        .collect { visibleItems ->
+                            if (visibleItems >= uiState.collectionCompaniesList.size && !uiState.isLoading) {
+                                scope.launch {
+                                    viewModel.loadMoreItems(collectionId)
+                                }
+                            }
+                        }
                 }
 
                 /*Row(

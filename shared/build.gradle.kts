@@ -1,28 +1,4 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
-tasks.register<Sync>("packForXcode") {
-    group = "build"
-    description = "Packs the iOS framework for Xcode"
-
-    val mode = project.findProperty("XCODE_CONFIGURATION") as? String ?: "DEBUG"
-    val targetDir = buildDir.resolve("xcode-frameworks")
-
-    val iosTargets = listOf("iosX64", "iosArm64", "iosSimulatorArm64()")
-
-    iosTargets.forEach { targetName ->
-        val target = kotlin.targets.getByName<KotlinNativeTarget>(targetName)
-        val framework = target.binaries.getFramework(mode)
-        dependsOn(framework.linkTask)
-        from(framework.outputDirectory)
-    }
-
-    into(targetDir)
-
-    doLast {
-        println("Framework is packed for Xcode in: $targetDir")
-    }
-}
-
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
@@ -35,6 +11,8 @@ plugins {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 
 kotlin {
+    //targetHierarchy.default()
+
     android {
         compilations.all {
             kotlinOptions {
@@ -43,14 +21,25 @@ kotlin {
         }
     }
 
-    ios {
-        binaries {
-            framework {
-                baseName = "shared"
-            }
+    /*cocoapods {
+        summary = "Some description for the Shared Module"
+        homepage = "Link to the Shared Module homepage"
+        ios.deploymentTarget = "14.1"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = Config.Shared.name
         }
-    }
+    }*/
 
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach {
+//        it.binaries.framework {
+//            baseName = "shared"
+//        }
+//    }
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -123,13 +112,17 @@ kotlin {
             }
         }
 
-        /*val iosMain by creating{
+        val iosMain by creating{
+            //dependsOn(commonMain)
+            //iosX64Main.dependsOn(this)
+            //iosArm64Main.dependsOn(this)
+            //iosSimulatorArm64Main.dependsOn(this)
             dependencies {
                 implementation(KTOR.clientOKHttp)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
-        }*/
+        }
     }
 }
 

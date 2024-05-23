@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -85,7 +86,7 @@ fun ApplicationDetailScreen(
 
 
         AnimatedVisibility(
-            uiState.applicationById != null,
+            uiState.isLoading,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
@@ -212,7 +213,7 @@ fun ApplicationDetailScreen(
 
                     Box(
                         modifier = Modifier
-                            .width(69.dp)
+                            .wrapContentWidth()
                             .height(23.dp)
                             .border(
                                 1.dp,
@@ -226,7 +227,7 @@ fun ApplicationDetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            modifier = Modifier.width(46.dp),
+                            modifier = Modifier.padding(4.dp),
                             text = uiState.applicationById.status,
                             textAlign = TextAlign.Center,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),

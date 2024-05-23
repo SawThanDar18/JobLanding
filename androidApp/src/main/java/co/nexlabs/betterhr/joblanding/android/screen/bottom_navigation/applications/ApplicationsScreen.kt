@@ -72,7 +72,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
         viewModel.fetchApplication()
     }
 
-    if (uiState.isSuccessGetApplicationData) {
+    /*if (uiState.isSuccessGetApplicationData) {
         LaunchedEffect(Unit) {
             if (uiState.application.isNotEmpty()) {
                 jobIds = uiState.application.map {
@@ -88,7 +88,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                 viewModel.getCompanyInfo(jobIds)
             }
         }
-    }
+    }*/
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
@@ -101,7 +101,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
         }
 
         AnimatedVisibility(
-            (uiState.application.isNotEmpty() && uiState.companyData.isNotEmpty()),
+            (uiState.application.isNotEmpty()),
             enter = fadeIn(),
             exit = fadeOut()
         ) {

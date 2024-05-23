@@ -1,18 +1,21 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
-import android.util.Log
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIState
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionCompaniesViewModelMapper
+import co.nexlabs.betterhr.joblanding.viewmodel.CollectionJobsViewModelMapper
 import co.nexlabs.betterhr.joblanding.viewmodel.HomeViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -25,11 +28,23 @@ class CollectionCompaniesViewModel(private val collectionJobsRepository: Collect
     private val _uiState = MutableStateFlow(CollectionCompaniesUIState())
     val uiState = _uiState.asStateFlow()
 
-    val collectionCompaniesList: MutableList<CollectionCompaniesUIModel> = ArrayList()
+    //val collectionCompaniesList: MutableList<CollectionCompaniesUIModel> = ArrayList()
 
-    fun getCollectionCompanies(collectionId: String, isPaginate: Boolean) {
+    private var currentPage = 1
+
+    private val _items = MutableStateFlow<List<CollectionCompaniesUIModel>>(emptyList())
+    val items: StateFlow<List<CollectionCompaniesUIModel>> get() = _items
+
+    fun loadMoreItems(collectionId: String) {
+        viewModelScope.launch {
+            getCollectionCompanies(collectionId, true, PAGE_SIZE, currentPage)
+            currentPage++
+        }
+    }
+
+    fun getCollectionCompanies(collectionId: String, isPaginate: Boolean, limit: Int, page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            collectionJobsRepository.getCollectionCompanies(collectionId, isPaginate).toFlow()
+            collectionJobsRepository.getCollectionCompanies(collectionId, isPaginate, limit, page).toFlow()
                 .catch { e ->
                     _uiState.update {
                         it.copy(
@@ -65,7 +80,9 @@ class CollectionCompaniesViewModel(private val collectionJobsRepository: Collect
                         )
                     }
                     if (!data.hasErrors()) {
-                        collectionCompaniesList.addAll(CollectionCompaniesViewModelMapper.mapResponseToViewModel(data.data!!))
+                        _items.value = _items.value + CollectionCompaniesViewModelMapper.mapResponseToViewModel(data.data!!)
+
+                        //collectionCompaniesList.addAll(CollectionCompaniesViewModelMapper.mapResponseToViewModel(data.data!!))
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
@@ -74,10 +91,19 @@ class CollectionCompaniesViewModel(private val collectionJobsRepository: Collect
                             )
                         }
                     } else {
-                        Log.d("result>>", "it.hasErrors")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
                     }
                 }
         }
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 20
     }
 
 }

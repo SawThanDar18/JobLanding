@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
-import android.util.Log
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsRepository
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionJobsViewModelMapper
@@ -10,7 +10,9 @@ import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -24,9 +26,21 @@ class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJo
     private val _uiState = MutableStateFlow(CollectionJobsUIState())
     val uiState = _uiState.asStateFlow()
 
-    fun getCollectionJobs(collectionId: String, isPaginate: Boolean) {
+    private var currentPage = 1
+
+    private val _items = MutableStateFlow<List<CollectionJobsUIModel>>(emptyList())
+    val items: StateFlow<List<CollectionJobsUIModel>> get() = _items
+
+    fun loadMoreItems(collectionId: String) {
+        viewModelScope.launch {
+            getCollectionJobs(collectionId, true, PAGE_SIZE, currentPage)
+            currentPage++
+        }
+    }
+
+    fun getCollectionJobs(collectionId: String, isPaginate: Boolean, limit: Int, page: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            collectionJobsRepository.getCollectionJobs(collectionId, isPaginate).toFlow()
+            collectionJobsRepository.getCollectionJobs(collectionId, isPaginate, limit, page).toFlow()
                 .catch { e ->
                     _uiState.update {
                         it.copy(
@@ -63,6 +77,9 @@ class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJo
                         )
                     }
                     if (!data.hasErrors()) {
+
+                        _items.value = _items.value + CollectionJobsViewModelMapper.mapResponseToViewModel(data.data!!)
+
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
@@ -80,6 +97,10 @@ class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJo
                     }
                 }
         }
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 20
     }
 
 }

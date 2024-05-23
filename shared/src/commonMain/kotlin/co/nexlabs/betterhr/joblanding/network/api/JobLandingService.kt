@@ -72,9 +72,9 @@ interface JobLandingService {
 
     suspend fun getJobLandingSections(pageId: String): ApolloCall<JobLandingSectionsQuery.Data>
 
-    suspend fun getJobLandingCollectionCompanies(collectionId: String, isPaginate: Boolean): ApolloCall<JobLandingCollectionCompaniesQuery.Data>
+    suspend fun getJobLandingCollectionCompanies(collectionId: String, isPaginate: Boolean, limit: Int, page: Int): ApolloCall<JobLandingCollectionCompaniesQuery.Data>
 
-    suspend fun getJobLandingCollectionJobs(collectionId: String, isPaginate: Boolean): ApolloCall<JobLandingCollectionJobsQuery.Data>
+    suspend fun getJobLandingCollectionJobs(collectionId: String, isPaginate: Boolean, limit: Int, page: Int): ApolloCall<JobLandingCollectionJobsQuery.Data>
 
     suspend fun getJobDetail(jobId: String): ApolloCall<JobLandingJobDetailQuery.Data>
 

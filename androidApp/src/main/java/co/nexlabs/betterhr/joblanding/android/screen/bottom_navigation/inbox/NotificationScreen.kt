@@ -124,7 +124,8 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
             exit = fadeOut()
         ) {
             Column(
-                modifier = Modifier.padding(16.dp, 16.dp, 0.dp, 0.dp),
+                modifier = Modifier.padding(16.dp, 16.dp, 0.dp, 0.dp)
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -273,7 +274,7 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clickable {
-                                                       navController.navigate("notification-details/${item.id}/${item.notiType}/${""}")
+                                                       navController.navigate("notification-details/${item.id}/${item.notiType}/${"link"}")
                                             },
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically

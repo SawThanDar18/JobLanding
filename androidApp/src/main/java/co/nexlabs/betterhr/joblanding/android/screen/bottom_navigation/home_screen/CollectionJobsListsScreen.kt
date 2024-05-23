@@ -21,14 +21,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,9 +60,10 @@ fun CollectionJobsListsScreen(
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+    val items = viewModel.items.collectAsState().value
 
     scope.launch {
-        viewModel.getCollectionJobs(collectionId, false)
+        viewModel.loadMoreItems(collectionId)
     }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -82,7 +86,7 @@ fun CollectionJobsListsScreen(
         }
 
         AnimatedVisibility(
-            uiState.collectionJobsList.isNotEmpty(),
+            items.isNotEmpty(),
             enter = fadeIn(),
             exit = fadeOut()
         ) {
@@ -90,7 +94,7 @@ fun CollectionJobsListsScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp, bottom = 32.dp),
+                    .padding(top = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -126,11 +130,13 @@ fun CollectionJobsListsScreen(
                     )
                 }
 
+                val listState = rememberLazyListState()
                 LazyColumn(
+                    state = listState,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 32.dp),
+                        .padding(top = 16.dp),
                 ) {
                     item {
 
@@ -146,9 +152,9 @@ fun CollectionJobsListsScreen(
                         Spacer(modifier = Modifier.height(10.dp))
                     }
 
-                    items(uiState.collectionJobsList.size) { index ->
+                    items(items.size) { index ->
 
-                        val item = uiState.collectionJobsList[index]
+                        val item = items[index]
                         var currencyCode = ""
                         if (item.currencyCode == "MMK") {
                             currencyCode = "k"
@@ -322,6 +328,17 @@ fun CollectionJobsListsScreen(
                             }
                         }
                     }
+                }
+
+                LaunchedEffect(key1 = listState) {
+                    snapshotFlow { listState.firstVisibleItemIndex + listState.layoutInfo.visibleItemsInfo.size }
+                        .collect { visibleItems ->
+                            if (visibleItems >= items.size && !uiState.isLoading) {
+                                scope.launch {
+                                    viewModel.loadMoreItems(collectionId)
+                                }
+                            }
+                        }
                 }
             }
         }
