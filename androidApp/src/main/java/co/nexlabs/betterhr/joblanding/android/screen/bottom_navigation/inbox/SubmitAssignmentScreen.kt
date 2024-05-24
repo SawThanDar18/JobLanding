@@ -105,7 +105,7 @@ jobId: String, referenceId: String, title: String, status: String, subDomain: St
                             referenceId,
                             title,
                             referenceId,
-                            status,
+                            "received",
                             currentDate,
                             description,
                             currentDateWithHour,
@@ -355,43 +355,7 @@ jobId: String, referenceId: String, title: String, status: String, subDomain: St
         verticalAlignment = Alignment.Bottom,
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-            .clickable {
-                var validate = (description != "" && selectedFileList.isNotEmpty())
-                if (!validate) {
-                    if (description.isNullOrBlank()) {
-                        Toast.makeText(applicationContext, "Please fill description!", Toast.LENGTH_LONG).show()
-                    }
-
-                    if (selectedFileList.isEmpty()) {
-                        Toast.makeText(applicationContext, "Please upload Assignment File!", Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    var selectedFiles: MutableList<Uri?> = ArrayList()
-                    var selectedFileNames: MutableList<String?> = ArrayList()
-                    var fileTypes: MutableList<String> = ArrayList()
-
-                    if (selectedFileList.isNotEmpty()) {
-                        selectedFileList.map { fileInfo ->
-                            fileInfo.file.let {
-                                selectedFiles.add(fileInfo.file)
-                            }
-
-                            fileInfo.name.let {
-                                selectedFileNames.add(fileInfo.name)
-                            }
-
-                            fileTypes.add("assignment")
-
-                        }
-                    }
-                    scope.launch {
-                        viewModel.uploadMultipleFiles(
-                            selectedFiles, selectedFileNames, fileTypes, referenceId
-                        )
-                    }
-                }
-            },
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
     ) {
         Box(
             modifier = Modifier
@@ -401,7 +365,47 @@ jobId: String, referenceId: String, title: String, status: String, subDomain: St
                 .background(
                     color = Color(0xFF1ED292),
                     shape = MaterialTheme.shapes.medium
-                ),
+                )
+                .clickable {
+                    var validate = (description != "" && selectedFileList.isNotEmpty())
+                    if (!validate) {
+                        if (description.isNullOrBlank()) {
+                            Toast.makeText(applicationContext, "Please fill description!", Toast.LENGTH_LONG).show()
+                        }
+
+                        if (selectedFileList.isEmpty()) {
+                            Toast.makeText(applicationContext, "Please upload Assignment File!", Toast.LENGTH_LONG).show()
+                        }
+                    } else {
+                        var selectedFiles: MutableList<Uri?> = ArrayList()
+                        var selectedFileNames: MutableList<String?> = ArrayList()
+                        var fileTypes: MutableList<String> = ArrayList()
+
+                        selectedFiles.clear()
+                        selectedFileNames.clear()
+                        fileTypes.clear()
+
+                        if (selectedFileList.isNotEmpty()) {
+                            selectedFileList.map { fileInfo ->
+                                fileInfo.file.let {
+                                    selectedFiles.add(fileInfo.file)
+                                }
+
+                                fileInfo.name.let {
+                                    selectedFileNames.add(fileInfo.name)
+                                }
+
+                                fileTypes.add("assignment")
+
+                            }
+                        }
+                        scope.launch {
+                            viewModel.uploadMultipleFiles(
+                                selectedFiles, selectedFileNames, fileTypes, referenceId
+                            )
+                        }
+                    }
+                },
             contentAlignment = Alignment.Center,
         ) {
             Text(

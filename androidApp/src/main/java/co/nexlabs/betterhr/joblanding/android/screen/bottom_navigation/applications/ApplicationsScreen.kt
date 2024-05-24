@@ -108,7 +108,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
             Column(
                 modifier = Modifier
-                    .padding(16.dp, 16.dp, 16.dp, 80.dp)
+                    .padding(16.dp, 16.dp, 16.dp, 0.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start

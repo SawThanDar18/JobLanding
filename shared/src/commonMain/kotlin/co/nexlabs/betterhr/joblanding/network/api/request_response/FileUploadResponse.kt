@@ -9,7 +9,8 @@ data class FileUploadResponse(
     @SerialName("name") val name: String,
     @SerialName("path") val path: String,
     @SerialName("folder") val folder: String,
+    @SerialName("extension") val extension: String,
     @SerialName("full_path") val fullPath: String,
-    @SerialName("size") val size: String,
+    @SerialName("size") val size: Int,
 
 )

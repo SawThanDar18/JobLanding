@@ -37,6 +37,7 @@ import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewMod
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxViewModel
+import co.nexlabs.betterhr.joblanding.network.api.interview.InterviewViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
 import kotlinx.coroutines.launch
@@ -147,7 +148,10 @@ fun BottomNavigation(
                 val viewModel: InboxViewModel = getKoin().get()
                 NotificationScreen(viewModel, nav)
             }
-            composable("interviews") { InterviewsScreen() }
+            composable("interviews") {
+                val viewModel: InterviewViewModel = getKoin().get()
+                InterviewsScreen(viewModel, nav)
+            }
             composable("profile") {
                 if (viewModel.getBearerToken() != "") {
                     val viewModel: CompleteProfileViewModel = getKoin().get()
@@ -171,7 +175,10 @@ fun BottomNavigation(
                     val viewModel: InboxViewModel = getKoin().get()
                     NotificationScreen(viewModel, nav)
                 }
-                "interviews" -> composable("interviews") { InterviewsScreen() }
+                "interviews" -> composable("interviews") {
+                    val viewModel: InterviewViewModel = getKoin().get()
+                    InterviewsScreen(viewModel, nav)
+                }
                 "profile" -> composable("profile") {
                     if (viewModel.getBearerToken() != "") {
                         val viewModel: CompleteProfileViewModel = getKoin().get()

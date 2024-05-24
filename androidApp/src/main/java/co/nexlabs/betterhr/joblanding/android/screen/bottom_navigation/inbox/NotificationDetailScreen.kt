@@ -1,6 +1,8 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox
 
+import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -18,12 +20,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -68,9 +72,9 @@ fun NotificationDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     var loading by remember { mutableStateOf(false) }
 
-    scope.launch {
-        if (notificationId != "") {
-            viewModel.fetchNotificationDetail(notificationId)
+    if (notificationId != "") {
+        scope.launch {
+            viewModel.fetchNotificationDetail(notificationId, context)
         }
     }
 
@@ -98,8 +102,12 @@ fun NotificationDetailScreen(
             enter = fadeIn(),
             exit = fadeOut()
         ) {
+            var renderView = uiState.notificationDetail.renderView
+
             Column(
-                modifier = Modifier.padding(16.dp, 16.dp, 0.dp, 0.dp),
+                modifier = Modifier
+                    .padding(16.dp, 16.dp, 16.dp, 0.dp)
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -112,7 +120,8 @@ fun NotificationDetailScreen(
                         painter = painterResource(id = R.drawable.arrow_left),
                         contentDescription = "Back Icon",
                         modifier = Modifier
-                            .size(24.dp),
+                            .size(24.dp)
+                            .clickable { navController.popBackStack() },
                         alignment = Alignment.Center
                     )
 
@@ -126,75 +135,94 @@ fun NotificationDetailScreen(
                         alignment = Alignment.Center
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
-                AndroidView(factory = { context ->
-                    WebView(context).apply {
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                        settings.useWideViewPort = true
-                        settings.loadWithOverviewMode = true
-                        settings.cacheMode = WebSettings.LOAD_NO_CACHE
 
-                        webViewClient = object : WebViewClient() {
-                            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                                return handleForDownloadableUrl(request?.url)
+                if (renderView != "") {
+                    AndroidView(
+                        modifier = Modifier
+                            .padding(bottom = 60.dp)
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        factory = { context ->
+                            WebView(context).apply {
+                                settings.javaScriptEnabled = true
+                                settings.domStorageEnabled = true
+                                settings.useWideViewPort = true
+                                settings.loadWithOverviewMode = true
+                                settings.cacheMode = WebSettings.LOAD_NO_CACHE
+
+                                webViewClient = object : WebViewClient() {
+                                    override fun shouldOverrideUrlLoading(
+                                        view: WebView?,
+                                        request: WebResourceRequest?
+                                    ): Boolean {
+                                        return handleForDownloadableUrl(request?.url)
+                                    }
+
+                                    override fun onPageFinished(view: WebView?, url: String?) {
+                                        if (title == "about:blank" && url?.startsWith("file:///android_asset/") == false) {
+                                            loadPdfView(url)
+                                            return
+                                        }
+                                        super.onPageFinished(view, url)
+                                        loading = false
+                                    }
+
+                                    private fun loadPdfView(url: String) {
+                                        loadUrl(url)
+                                        loading = true
+                                    }
+
+                                    private fun handleForDownloadableUrl(uri: Uri?): Boolean {
+                                        val url = urlEncodeMe(uri)
+                                        var html = ""
+
+                                        if (isBlockedUrl(url)) {
+                                            return true
+                                        }
+
+                                        if (isDocPreviewLink(url) || isExcelPreviewLink(url) || isPptPreviewLink(
+                                                url
+                                            )
+                                        ) {
+                                            settings.useWideViewPort = false
+                                            settings.loadWithOverviewMode = false
+                                            loadPdfView(
+                                                "${Companion.BASE_URL_FOR_PDF_PREVIEW}" + URLEncoder.encode(
+                                                    url,
+                                                    "ISO-8859-1"
+                                                )
+                                            )
+                                            return true
+                                        }
+
+                                        if (isMovPreviewLink(url)) {
+                                            settings.useWideViewPort = false
+                                            settings.loadWithOverviewMode = false
+                                            html =
+                                                "<video controls='controls' width='100%' height='200' name=''>\n" +
+                                                        "<source src='$url'>\n" +
+                                                        "</video>"
+                                        }
+
+                                        if (html.isNotBlank()) {
+                                            html =
+                                                "<!DOCTYPE><html><body style='width: 100%; height: 100vh; background: black; display: flex; justify-content: center; align-items: center;'>$html</body></html>"
+                                            loading = true
+                                            loadHtml(html)
+                                            return true
+                                        }
+
+                                        return false
+                                    }
+                                }
+
+                                loadDataWithBaseURL(null, renderView, "text/html", "UTF-8", null)
                             }
-
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                if (title == "about:blank" && url?.startsWith("file:///android_asset/") == false) {
-                                    loadPdfView(url)
-                                    return
-                                }
-                                super.onPageFinished(view, url)
-                                loading = false
-                            }
-                            private fun loadPdfView(url: String) {
-                                loadUrl(url)
-                                loading = true
-                            }
-
-                            private fun handleForDownloadableUrl(uri: Uri?): Boolean {
-                                val url = urlEncodeMe(uri)
-                                var html = ""
-
-                                if (isBlockedUrl(url)) {
-                                    return true
-                                }
-
-                                if (isDocPreviewLink(url) || isExcelPreviewLink(url) || isPptPreviewLink(url)) {
-                                    settings.useWideViewPort = false
-                                    settings.loadWithOverviewMode = false
-                                    loadPdfView("${Companion.BASE_URL_FOR_PDF_PREVIEW}" + URLEncoder.encode(url, "ISO-8859-1"))
-                                    return true
-                                }
-
-                                if (isMovPreviewLink(url)) {
-                                    settings.useWideViewPort = false
-                                    settings.loadWithOverviewMode = false
-                                    html = "<video controls='controls' width='100%' height='200' name=''>\n" +
-                                            "<source src='$url'>\n" +
-                                            "</video>"
-                                }
-
-                                if (html.isNotBlank()) {
-                                    html = "<!DOCTYPE><html><body style='width: 100%; height: 100vh; background: black; display: flex; justify-content: center; align-items: center;'>$html</body></html>"
-                                    loading = true
-                                    loadHtml(html)
-                                    return true
-                                }
-
-                                return false
-                            }
-                        }
-
-                        loadUrl(uiState.notificationDetail.renderView)
-                    }
-                })
-
-                if (loading) {
-                    CircularProgressIndicator()
+                        })
+                } else {
+                    Log.d("web>>", "renderview null")
                 }
 
             }
@@ -203,49 +231,7 @@ fun NotificationDetailScreen(
 
     if (notiType != "") {
         when (notiType) {
-            "interview" -> {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp)
-                            .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                            .background(
-                                color = Color(0xFF1ED292),
-                                shape = MaterialTheme.shapes.medium
-                            ),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (uiState.notificationDetail != null) {
-                            if (uiState.notificationDetail.interviewType == "in_person") {
-                                Text(
-                                    text = "View on google map",
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W600,
-                                    color = Color(0xFFFFFFFF),
-                                    fontSize = 14.sp,
-                                )
-                            } else {
-                                Text(
-                                    text = "Join the meeting",
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W600,
-                                    color = Color(0xFFFFFFFF),
-                                    fontSize = 14.sp,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            "offer" -> {
+            "in_person" -> {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.Bottom,
@@ -263,15 +249,24 @@ fun NotificationDetailScreen(
                                 shape = MaterialTheme.shapes.medium
                             )
                             .clickable {
-                                if (uiState.notificationDetail != null) {
-                                    var item = uiState.notificationDetail
-                                    navController.navigate("submit-offer/${item.id}/${item.offerAndInterviewLink}")
+
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    var url = ""
+                                    url =
+                                        if (uiState.notificationDetail.interviewLink == "") {
+                                            "https://jobdev.better.hr/collections/9c1e3932-9d9c-4e72-baff-283275849a3e/jobs"
+                                        } else {
+                                            uiState.notificationDetail.interviewLink
+                                        }
+                                    data = Uri.parse(url)
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                 }
+                                context.startActivity(intent)
                             },
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "View attachment",
+                            text = "View on google map",
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                             fontWeight = FontWeight.W600,
                             color = Color(0xFFFFFFFF),
@@ -281,19 +276,13 @@ fun NotificationDetailScreen(
                 }
             }
 
-            "assignment" -> {
+            "virtual" -> {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.Bottom,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                        .clickable {
-                            if (uiState.notificationDetail != null) {
-                                var item = uiState.notificationDetail
-                                navController.navigate("submit-assignment/${uiState.notificationDetail.id}/${item.jobId}/${item.referenceId}${item.title}/${item.status}/${item.subDomain}/${item.referenceApplicationId}")
-                            }
-                        },
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 ) {
                     Box(
                         modifier = Modifier
@@ -303,16 +292,107 @@ fun NotificationDetailScreen(
                             .background(
                                 color = Color(0xFF1ED292),
                                 shape = MaterialTheme.shapes.medium
-                            ),
+                            )
+                            .clickable {
+
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    var url = ""
+                                    url =
+                                        if (uiState.notificationDetail.interviewLink == "") {
+                                            "https://jobdev.better.hr/collections/9c1e3932-9d9c-4e72-baff-283275849a3e/jobs"
+                                        } else {
+                                            uiState.notificationDetail.interviewLink
+                                        }
+                                    data = Uri.parse(url)
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                context.startActivity(intent)
+                            },
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "Submit Assignment",
+                            text = "Join the meeting",
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                             fontWeight = FontWeight.W600,
                             color = Color(0xFFFFFFFF),
                             fontSize = 14.sp,
                         )
+                    }
+                }
+            }
+
+            "offer" -> {
+                if (uiState.notificationDetail.status != "complete") {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                                .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                                .background(
+                                    color = Color(0xFF1ED292),
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .clickable {
+                                    if (uiState.notificationDetail != null) {
+                                        var item = uiState.notificationDetail
+                                        navController.navigate("submit-offer/${item.id}/${item.referenceId}/${item.offerLink}")
+                                    }
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "View attachment",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFFFFFFFF),
+                                fontSize = 14.sp,
+                            )
+                        }
+                    }
+                }
+            }
+
+            "assignment" -> {
+                if (uiState.notificationDetail.status != "complete") {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                                .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                                .background(
+                                    color = Color(0xFF1ED292),
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .clickable {
+                                    if (uiState.notificationDetail != null) {
+                                        var item = uiState.notificationDetail
+                                        navController.navigate("submit-assignment/${uiState.notificationDetail.id}/${item.jobId}/${item.referenceId}/${item.title}/${item.status}/${item.subDomain}/${item.referenceApplicationId}")
+                                    }
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "Submit Assignment",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFFFFFFFF),
+                                fontSize = 14.sp,
+                            )
+                        }
                     }
                 }
             }

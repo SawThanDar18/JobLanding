@@ -6,6 +6,6 @@ data class InboxDetailUIState(
     val isLoading: Boolean = true,
     val error: UIErrorType = UIErrorType.Nothing,
     val notificationDetail: InboxDetailUIModel = InboxDetailUIModel(
-        "", "", "", "", "", "", "", "", "", "", "", "", "", ""
+        "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
     ),
 )

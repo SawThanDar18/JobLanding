@@ -485,6 +485,31 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         }
     }
 
+
+    /*var fileIds: MutableList<String> = ArrayList()
+    if (uiState.isSuccessUploadMultipleFile) {
+        if (uiState.multiFileList.isNotEmpty()) {
+            uiState.multiFileList.map {
+                fileIds.add(it.id)
+            }
+        }
+    }
+
+    if (fileIds.isNotEmpty()) {
+        scope.launch {
+            viewModel.createApplication(
+                uiState.jobDetail.id,
+                uiState.jobDetail.company.subDomain,
+                uiState.jobDetail.position,
+                formattedDateTime,
+                jobTitle,
+                companyName,
+                convertDate("$selectedItemMonth $startYear"),
+                fileIds
+            )
+        }
+    }*/
+
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
         AnimatedVisibility(
@@ -2417,9 +2442,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     var files: MutableList<Uri?> = ArrayList()
                                                     var fileNames: MutableList<String?> =
                                                         ArrayList()
-                                                    var fileTypes: MutableList<String> = ArrayList()
                                                     var fileIds: MutableList<String> =
                                                         ArrayList()
+                                                    var fileTypes: MutableList<String> = ArrayList()
                                                     var existingFileIds: MutableList<String> =
                                                         ArrayList()
 
@@ -2517,43 +2542,48 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                     jobTitle,
                                                                     companyName,
                                                                     convertDate("$selectedItemMonth $startYear"),
-                                                                    fileNames,
-                                                                    files,
-                                                                    fileTypes,
+//                                                                    fileNames,
+//                                                                    files,
+//                                                                    fileTypes,
                                                                     existingFileIds
                                                                 )
                                                             }
                                                         } else {
+                                                            fileIds.clear()
+
                                                             scope.launch {
                                                                 viewModel.uploadMultipleFiles(
                                                                     files, fileNames, fileTypes
                                                                 )
-                                                            }
 
-                                                            if (uiState.isSuccessUploadMultipleFile) {
-                                                                if (uiState.multiFileList.isNotEmpty()) {
-                                                                    uiState.multiFileList.map {
-                                                                        fileIds.add(it.id)
+                                                                if (uiState.isSuccessUploadMultipleFile) {
+                                                                    Log.d("toast>>", "isSuccessUploadMultipleFile")
+                                                                    if (uiState.multiFileList.isNotEmpty()) {
+                                                                        uiState.multiFileList.map {
+                                                                            fileIds.add(it.id)
+                                                                        }
                                                                     }
                                                                 }
-                                                            }
 
-                                                            if (fileIds.isNotEmpty()) {
-                                                                scope.launch {
-                                                                    viewModel.createApplication(
-                                                                        uiState.jobDetail.id,
-                                                                        uiState.jobDetail.company.subDomain,
-                                                                        uiState.jobDetail.position,
-                                                                        formattedDateTime,
-                                                                        jobTitle,
-                                                                        companyName,
-                                                                        convertDate("$selectedItemMonth $startYear"),
-                                                                        fileNames,
-                                                                        files,
-                                                                        fileTypes,
-                                                                        fileIds
-                                                                    )
+                                                                if (fileIds.isNotEmpty()) {
+                                                                    Log.d("toast>>", "file ids not empty")
+                                                                    scope.launch {
+                                                                        viewModel.createApplication(
+                                                                            uiState.jobDetail.id,
+                                                                            uiState.jobDetail.company.subDomain,
+                                                                            uiState.jobDetail.position,
+                                                                            formattedDateTime,
+                                                                            jobTitle,
+                                                                            companyName,
+                                                                            convertDate("$selectedItemMonth $startYear"),
+//                                                                        fileNames,
+//                                                                        files,
+//                                                                        fileTypes,
+                                                                            fileIds
+                                                                        )
+                                                                    }
                                                                 }
+
                                                             }
                                                         }
                                                     }
@@ -4208,29 +4238,34 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                         viewModel.uploadMultipleFiles(
                                                             files, fileNames, fileTypes
                                                         )
-                                                    }
 
-                                                    if (uiState.isSuccessUploadMultipleFile) {
-                                                        if (uiState.multiFileList.isNotEmpty()) {
-                                                            uiState.multiFileList.map {
-                                                                fileIds.add(it.id)
+                                                        if (uiState.isSuccessUploadMultipleFile) {
+                                                            Log.d("toast>>", "isSuccessUploadMultipleFile")
+                                                            if (uiState.multiFileList.isNotEmpty()) {
+                                                                uiState.multiFileList.map {
+                                                                    fileIds.add(it.id)
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                    scope.launch {
-                                                        viewModel.createApplication(
-                                                            uiState.jobDetail.id,
-                                                            uiState.jobDetail.company.subDomain,
-                                                            uiState.jobDetail.position,
-                                                            formattedDateTime,
-                                                            jobTitle,
-                                                            companyName,
-                                                            convertDate("$selectedItemMonth $startYear"),
-                                                            fileNames,
-                                                            files,
-                                                            fileTypes,
-                                                            fileIds
-                                                        )
+
+                                                        if (fileIds.isNotEmpty()) {
+                                                            Log.d("toast>>", "multi file list not null")
+                                                            scope.launch {
+                                                                viewModel.createApplication(
+                                                                    uiState.jobDetail.id,
+                                                                    uiState.jobDetail.company.subDomain,
+                                                                    uiState.jobDetail.position,
+                                                                    formattedDateTime,
+                                                                    jobTitle,
+                                                                    companyName,
+                                                                    convertDate("$selectedItemMonth $startYear"),
+//                                                            fileNames,
+//                                                            files,
+//                                                            fileTypes,
+                                                                    fileIds
+                                                                )
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }

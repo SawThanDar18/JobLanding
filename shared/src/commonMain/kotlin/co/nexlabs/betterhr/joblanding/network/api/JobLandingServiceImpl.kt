@@ -15,6 +15,7 @@ import co.nexlabs.betterhr.job.with_auth.CreateLanguageMutation
 import co.nexlabs.betterhr.job.with_auth.CreateSkillMutation
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
+import co.nexlabs.betterhr.job.with_auth.FetchInterviewQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationsQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
@@ -358,7 +359,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
                 inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
                 byteArray = inputStream.readBytes()
 
-                append("files$index", byteArray, Headers.build {
+                append("files[]", byteArray, Headers.build {
                     append(HttpHeaders.ContentDisposition, "filename=${fileNames[index]}")
                 })
             }
@@ -396,48 +397,39 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         currentJobTitle: String,
         currentCompany: String,
         workingSince: String,
-        fileName: MutableList<String?>,
-        files: MutableList<Uri?>,
-        types: List<String>,
+//        fileName: MutableList<String?>,
+//        files: MutableList<Uri?>,
+//        types: List<String>,
         fileIds: List<String>
     ): UploadResponseId {
-        Log.d("v>>", referenceJobId)
-        Log.d("v>>", subdomain)
-        Log.d("v>>", jobTitle)
-        Log.d("v>>", status)
-        Log.d("v>>", appliedDate)
-        Log.d("v>>", candidateId)
-        Log.d("v>>", currentJobTitle)
-        Log.d("v>>", currentCompany)
-        Log.d("v>>", workingSince)
 
         val fileIdsTypeObject = ExistingFileIdTypeObject(fileIds)
-        val fileTypeObject = FileTypeObject(types)
+//        val fileTypeObject = FileTypeObject(types)
+//
+//        Log.d("file>>>Object", fileTypeObject.toString())
 
-        Log.d("file>>>Object", fileTypeObject.toString())
-
-        var parcelFileDescriptor: ParcelFileDescriptor
-        var inputStream: FileInputStream
-        var byteArray: ByteArray
+//        var parcelFileDescriptor: ParcelFileDescriptor
+//        var inputStream: FileInputStream
+//        var byteArray: ByteArray
 
         val formData = formData {
 
-            files.forEachIndexed { index, file ->
-                parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
-                inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
-                byteArray = inputStream.readBytes()
-
-                append("file$index", byteArray, Headers.build {
-                    append(HttpHeaders.ContentDisposition, "filename=${fileName[index]}")
-                })
-            }
-            append(
-                "file_types",
-                Json.encodeToString(fileTypeObject),
-                Headers.build {
-                    append(HttpHeaders.ContentType, "application/json")
-                }
-            )
+//            files.forEachIndexed { index, file ->
+//                parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
+//                inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
+//                byteArray = inputStream.readBytes()
+//
+//                append("file$index", byteArray, Headers.build {
+//                    append(HttpHeaders.ContentDisposition, "filename=${fileName[index]}")
+//                })
+//            }
+//            append(
+//                "file_types",
+//                Json.encodeToString(fileTypeObject),
+//                Headers.build {
+//                    append(HttpHeaders.ContentType, "application/json")
+//                }
+//            )
             append(
                 "file_ids",
                 Json.encodeToString(fileIdsTypeObject),
@@ -694,13 +686,12 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         var byteArray: ByteArray
 
         val formData = formData {
-
             files.forEachIndexed { index, file ->
                 parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
                 inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
                 byteArray = inputStream.readBytes()
 
-                append("files$index", byteArray, Headers.build {
+                append("files[]", byteArray, Headers.build {
                     append(HttpHeaders.ContentDisposition, "filename=${fileNames[index]}")
                 })
             }
@@ -785,13 +776,10 @@ class JobLandingServiceImpl(private val application: Application, private val cl
             Optional.present(referenceId),
             Optional.present(title),
             Optional.present(description),
-            Optional.present(""),
             Optional.present(status),
             Optional.present(summitedDate),
             Optional.present(candidateDescription),
-            Optional.present(""),
             Optional.present(endTime),
-            Optional.present(""),
             Optional.present(attachments),
             subDomain,
             Optional.present(referenceApplicationId)
@@ -1017,5 +1005,12 @@ class JobLandingServiceImpl(private val application: Application, private val cl
             Optional.present(isExpire),
             Optional.present(credentialUrl),
         ))
+    }
+
+    override suspend fun fetchInterview(
+        limit: Int,
+        page: Int
+    ): ApolloCall<FetchInterviewQuery.Data> {
+        return apolloClientWithAuth.query(FetchInterviewQuery(limit, page))
     }
 }

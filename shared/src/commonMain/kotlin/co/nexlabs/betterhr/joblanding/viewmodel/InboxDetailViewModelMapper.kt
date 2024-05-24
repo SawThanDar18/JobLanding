@@ -20,23 +20,27 @@ object InboxDetailViewModelMapper {
         this.context = context
     }
 
-    fun mapDataToInboxDetail(data: FetchNotificationByIdQuery.Notification): InboxDetailUIModel {
-        return InboxDetailUIModel(
-            data.id ?: "",
-            data.candidate_id ?: "",
-            data.job_id ?: "",
-            data.reference_id ?: "",
-            data.reference_application_id ?: "",
-            data.title ?: "",
-            data.status ?: "",
-            data.sub_domain ?: "",
-            data.sender_name ?: "",
-            data.sender_position ?: "",
-            data.updated_at ?: "",
-            generateHTML(data.render_view ?: ""),
-            data.interview_type ?: "",
-            data.offer_link ?: ""
-        )
+    fun mapDataToInboxDetail(data: FetchNotificationByIdQuery.Data): InboxDetailUIModel {
+        return data.notification.let { data ->
+            InboxDetailUIModel(
+                data!!.id ?: "",
+                data.candidate_id ?: "",
+                data.job_id ?: "",
+                data.reference_id ?: "",
+                data.reference_application_id ?: "",
+                data.title ?: "",
+                data.status ?: "",
+                data.sub_domain ?: "",
+                data.sender_name ?: "",
+                data.sender_position ?: "",
+                data.updated_at ?: "",
+                //data.render_view ?: "",
+                generateHTML(data.render_view ?: ""),
+                data.interview_type ?: "",
+                data.offer_link ?: "",
+                data.interview_link ?: ""
+            )
+        }
     }
 
     private fun generateHTML(rawHTMLFromServer: String): String {
@@ -81,5 +85,6 @@ object InboxDetailViewModelMapper {
             }
         }
         return rawHTMLFromServer
+        Log.d("web>>>", rawHTMLFromServer)
     }
 }

@@ -14,5 +14,6 @@ query FetchNotificationById($id: String!) {
         sub_domain
         interview_type
         offer_link
+        interview_link
     }
 }

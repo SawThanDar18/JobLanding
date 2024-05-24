@@ -100,15 +100,6 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
     }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        AnimatedVisibility(
-            uiState.isLoading,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            CircularProgressIndicator(
-                color = Color(0xFF1ED292)
-            )
-        }
 
         AnimatedVisibility(
             uiState.error != UIErrorType.Nothing,

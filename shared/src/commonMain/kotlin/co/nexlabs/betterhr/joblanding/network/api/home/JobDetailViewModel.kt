@@ -494,9 +494,9 @@ class JobDetailViewModel(
         currentJobTitle: String,
         currentCompany: String,
         workingSince: String,
-        fileName: MutableList<String?>,
-        files: MutableList<Uri?>,
-        types: MutableList<String>,
+//        fileName: MutableList<String?>,
+//        files: MutableList<Uri?>,
+//        types: MutableList<String>,
         fileIds: MutableList<String>
     ) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -519,9 +519,6 @@ class JobDetailViewModel(
                     currentJobTitle,
                     currentCompany,
                     workingSince,
-                    fileName,
-                    files,
-                    types,
                     fileIds
                 )
                 _uiState.update {

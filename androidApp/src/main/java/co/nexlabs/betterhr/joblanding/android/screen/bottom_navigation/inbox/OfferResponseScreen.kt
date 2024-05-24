@@ -1,5 +1,7 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import android.webkit.WebView
@@ -52,6 +54,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -77,10 +84,16 @@ import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
+import com.joelkanyi.composesignature.ComposeSignature
+import io.github.joelkanyi.sain.Sain
+import io.github.joelkanyi.sain.SignatureAction
+import io.github.joelkanyi.sain.SignatureState
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.internal.notify
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -313,7 +326,17 @@ fun OfferResponseScreen(viewModel: SubmitOfferViewModel, navController: NavContr
 
 @Composable
 fun DrawScreen(viewModel: SubmitOfferViewModel, notiId: String, referenceId: String, status: String, subDomain: String) {
-    val applicationContext = LocalContext.current
+    var applicationContext = LocalContext.current.applicationContext
+    var uri: Uri? by remember { mutableStateOf(null) }
+    var imageBitmap: ImageBitmap? by remember {
+        mutableStateOf(null)
+    }
+
+    val state = remember {
+        SignatureState()
+    }
+
+    var showSignatureDraw by remember { mutableStateOf(false) }
 
     val dateFormatWithHour = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     val currentDateWithHour = dateFormatWithHour.format(Date())
@@ -358,90 +381,225 @@ fun DrawScreen(viewModel: SubmitOfferViewModel, notiId: String, referenceId: Str
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(502.dp)
-                .padding(bottom = 22.dp)
-                .background(
-                    color = Color(0xFFF0F8FE),
-                    shape = MaterialTheme.shapes.medium
-                )
-                .border(
-                    1.dp,
-                    Color(0xFFF0F8FE),
-                    RoundedCornerShape(4.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(applicationContext)
-                    .data(R.drawable.apply_job_success)
-                    .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
-                    .size(Size.ORIGINAL)
-                    .build(),
-                contentDescription = "GIF",
+        if (!showSignatureDraw) {
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box(modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .clickable {
-                    bottomBarVisible.postValue(false)
-                }) {
-                Text(
+                    .height(502.dp)
+                    .background(
+                        color = Color(0xFFF0F8FE),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .border(
+                        1.dp,
+                        Color(0xFFF0F8FE),
+                        RoundedCornerShape(4.dp)
+                    )
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                when (event.type) {
+                                    PointerEventType.Press -> {
+                                        showSignatureDraw = true
+                                    }
+                                    /*PointerEventType.Release -> {
+                                        println("Touch up at: ${event.changes.first().position}")
+                                    }
+                                    PointerEventType.Move -> {
+                                        println("Touch move at: ${event.changes.first().position}")
+                                    }*/
+                                }
+                            }
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(applicationContext)
+                        .data(R.drawable.signature)
+                        .decoderFactory { result, options, _ ->
+                            ImageDecoderDecoder(
+                                result.source,
+                                options
+                            )
+                        }
+                        .size(Size.ORIGINAL)
+                        .build(),
+                    contentDescription = "GIF",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(35.dp),
-                    text = "Cancel",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 14.sp,
+                        .height(200.dp),
                 )
             }
 
-            Box(modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .border(
-                    1.dp,
-                    color = Color(0xFF1ED292),
-                    RoundedCornerShape(8.dp)
-                )
-                .clickable {
-                    //upload draw sign & response offer
-                    //check file empty or not
-                    scope.launch {
-                       /* viewModel.uploadSingleFile(
-
-                        )*/
+            Row(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box(modifier = Modifier
+                    .weight(1f)
+                    .height(40.dp)
+                    .clickable {
+                        bottomBarVisible.postValue(false)
                     }
+                    .background(color = Color.Transparent)
+                    .border(
+                        1.dp,
+                        color = Color(0xFF1ED292),
+                        RoundedCornerShape(8.dp)
+                    ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Cancel",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W600,
+                        color = Color(0xFFAAAAAA),
+                        fontSize = 14.sp,
+                    )
+                }
 
-                }) {
-                Text(
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp),
-                    text = "Next",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFFFFFFFF),
-                    fontSize = 14.sp,
+                        .weight(1f)
+                        .height(40.dp)
+                        .background(
+                            color = Color(0xFF1ED292),
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .border(
+                            1.dp,
+                            color = Color(0xFF1ED292),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .clickable {
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Next",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W600,
+                        color = Color(0xFFFFFFFF),
+                        fontSize = 14.sp,
+                    )
+                }
+            }
+        } else {
+            Sain(
+                state = state,
+                signatureThickness = 1.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(502.dp)
+                    .background(
+                        color = Color(0xFFF0F8FE),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .border(
+                        1.dp,
+                        Color(0xFFF0F8FE),
+                        RoundedCornerShape(4.dp)
+                    ),
+                onComplete = { signatureBitmap ->
+                    if (signatureBitmap != null) {
+                        imageBitmap = signatureBitmap
+                    } else {
+                        println("Signature is empty")
+                    }
+                },
+            ) { action ->
+
+                Image(
+                    painter = painterResource(id = R.drawable.sign_undo),
+                    contentDescription = "Undo Image",
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .size(32.dp).align(Alignment.End)
+                        .clickable {
+                            action(SignatureAction.CLEAR)
+                            uri = null
+                        }
                 )
+
+                Row(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Box(modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp)
+                        .clickable {
+                            bottomBarVisible.postValue(false)
+                        }
+                        .background(color = Color.Transparent)
+                        .border(
+                            1.dp,
+                            color = Color(0xFF1ED292),
+                            RoundedCornerShape(8.dp)
+                        ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFFAAAAAA),
+                            fontSize = 14.sp,
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp)
+                            .background(
+                                color = Color(0xFF1ED292),
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            .border(
+                                1.dp,
+                                color = Color(0xFF1ED292),
+                                RoundedCornerShape(8.dp)
+                            )
+                            .clickable {
+                                action(SignatureAction.COMPLETE)
+                                uri = saveBitmapAsFile(
+                                    applicationContext,
+                                    imageBitmap!!.asAndroidBitmap(),
+                                    "signature.png"
+                                )
+                                Log.d("nit>>", uri.toString())
+
+                                if (uri != null) {
+                                    scope.launch {
+                                        viewModel.uploadSingleFile(uri!!, "signature.png", "offer", referenceId)
+                                    }
+                                } else {
+                                    Toast.makeText(applicationContext, "Please add Signature!", Toast.LENGTH_LONG).show()
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Next",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFFFFFFFF),
+                            fontSize = 14.sp,
+                        )
+                    }
+                }
             }
         }
     }
@@ -939,3 +1097,16 @@ fun ReasonDialog(viewModel: SubmitOfferViewModel, id: String, status: String, su
     }
 }
 
+private fun saveBitmapAsFile(context: Context, bitmap: Bitmap, fileName: String): Uri? {
+    val file = File(context.cacheDir, fileName)
+    return try {
+        val stream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        stream.flush()
+        stream.close()
+        Uri.fromFile(file)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}

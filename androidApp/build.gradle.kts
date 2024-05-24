@@ -91,5 +91,8 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.20.0")
 
+    implementation("com.github.JoelKanyi:ComposeSignature:1.0.3")
+    implementation("io.github.joelkanyi:sain:2.0.3")
+
 
 }

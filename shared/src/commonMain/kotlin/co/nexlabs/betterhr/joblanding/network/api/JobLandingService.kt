@@ -11,6 +11,7 @@ import co.nexlabs.betterhr.job.with_auth.CreateLanguageMutation
 import co.nexlabs.betterhr.job.with_auth.CreateSkillMutation
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
+import co.nexlabs.betterhr.job.with_auth.FetchInterviewQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationsQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
@@ -106,9 +107,9 @@ interface JobLandingService {
         currentJobTitle: String,
         currentCompany: String,
         workingSince: String,
-        fileName: MutableList<String?>,
-        files: MutableList<Uri?>,
-        types: List<String>,
+//        fileName: MutableList<String?>,
+//        files: MutableList<Uri?>,
+//        types: List<String>,
         fileIds: List<String>
     ): UploadResponseId
 
@@ -313,5 +314,9 @@ interface JobLandingService {
         isExpire: Boolean,
         credentialUrl: String
     ): ApolloCall<UpdateCertificateMutation.Data>
+
+    suspend fun fetchInterview(
+        limit: Int, page: Int
+    ): ApolloCall<FetchInterviewQuery.Data>
 
 }

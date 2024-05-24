@@ -8,7 +8,7 @@ data class SubmitOfferUIState(
     val error: UIErrorType = UIErrorType.Nothing,
     val isSuccessUploadFile: Boolean = false,
     val fileList: FileUploadResponse = FileUploadResponse(
-        "", "", "", "", "", ""
+        "", "", "", "", "", "", 0
     ),
     val isOfferResponseSuccess: Boolean = false,
     val isSuccess: Boolean = false

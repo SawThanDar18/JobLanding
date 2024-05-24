@@ -85,6 +85,18 @@ class SubmitAssignmentViewModel(application: Application, private val inboxRepos
         subDomain: String,
         referenceApplicationId: String
     ) {
+        Log.d("candi>>", localStorage.candidateId)
+        Log.d("jobId>>", jobId)
+        Log.d("referenceId>>", referenceId)
+        Log.d("title>>", title)
+        Log.d("description>>", description)
+        Log.d("status>>", status)
+        Log.d("summitedDate>>", summitedDate)
+        Log.d("candidateDescription>>", candidateDescription)
+        Log.d("endTime>>", endTime)
+        Log.d("attachments>>", attachments)
+        Log.d("subDomain>>", subDomain)
+        Log.d("ApplicationId>>", referenceApplicationId)
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
                 it.copy(
@@ -95,7 +107,7 @@ class SubmitAssignmentViewModel(application: Application, private val inboxRepos
             }
 
             inboxRepository.responseAssignment(
-                localStorage.candidateId, jobId, referenceId, title, description, status, summitedDate, candidateDescription, endTime, attachments, subDomain, referenceApplicationId
+                localStorage.candidateId, jobId, referenceId, title, description, status, summitedDate, candidateDescription, endTime, attachments, "tenantrickshaw", referenceApplicationId
             ).toFlow()
                 .catch { e ->
                     _uiState.update {

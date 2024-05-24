@@ -1,16 +1,9 @@
-package co.nexlabs.betterhr.joblanding.network.api.inbox
+package co.nexlabs.betterhr.joblanding.network.api.interview
 
-import android.app.Application
-import android.content.Context
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
-import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
-import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIModel
-import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIState
-import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
+import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewUIState
+import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewsRepository
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
-import co.nexlabs.betterhr.joblanding.viewmodel.InboxDetailViewModelMapper
+import co.nexlabs.betterhr.joblanding.viewmodel.InterviewViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
@@ -25,23 +18,12 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class InboxDetailViewModel(application: Application, private val inboxRepository: InboxRepository): ViewModel() {
+class InterviewViewModel(private val interviewRepository: InterviewsRepository): ViewModel() {
 
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
-
-    private val _uiState = MutableStateFlow(InboxDetailUIState())
+    private val _uiState = MutableStateFlow(InterviewUIState())
     val uiState = _uiState.asStateFlow()
 
-    fun fetchNotificationDetail(
-        id: String, context: Context
-    ) {
-
-        InboxDetailViewModelMapper.setContext(context)
-
+    fun fetchInterviews() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
                 it.copy(
@@ -50,7 +32,7 @@ class InboxDetailViewModel(application: Application, private val inboxRepository
                 )
             }
 
-            inboxRepository.fetchInboxById(id).toFlow()
+            interviewRepository.fetchInterviews(20, 1).toFlow()
                 .catch { e ->
                     _uiState.update {
                         it.copy(
@@ -87,13 +69,13 @@ class InboxDetailViewModel(application: Application, private val inboxRepository
                         )
                     }
                     if(!data.hasErrors()) {
-                            _uiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
-                                    notificationDetail = InboxDetailViewModelMapper.mapDataToInboxDetail(data.data!!)
-                                )
-                            }
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                interviewList = InterviewViewModelMapper.mapResponseToViewModel(data.data!!)
+                            )
+                        }
                     } else {
                         _uiState.update {
                             it.copy(
