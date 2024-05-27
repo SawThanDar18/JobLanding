@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
+import androidx.navigation.compose.composable
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
@@ -342,7 +343,7 @@ fun NotificationDetailScreen(
                                 .clickable {
                                     if (uiState.notificationDetail != null) {
                                         var item = uiState.notificationDetail
-                                        navController.navigate("submit-offer/${item.id}/${item.referenceId}/${item.offerLink}")
+                                        navController.navigate("submit-offer/${uiState.notificationDetail.id}/${item.referenceId}/${item.status}/${item.subDomain}/${item.offerLink}")
                                     }
                                 },
                             contentAlignment = Alignment.Center,

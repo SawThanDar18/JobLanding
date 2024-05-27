@@ -89,7 +89,7 @@ class SubmitOfferViewModel(application: Application, private val inboxRepository
             }
 
             inboxRepository.responseOffer(
-                id, note, status, responseDate, attachments, subDomain
+                id, note, status, responseDate, attachments, "tenantrickshaw"
             ).toFlow()
                 .catch { e ->
                     _uiState.update {

@@ -158,7 +158,7 @@ fun OfferResponseScreen(viewModel: SubmitOfferViewModel, navController: NavContr
                 ),
             contentAlignment = Alignment.Center
         ) {
-            AndroidView(
+            /*AndroidView(
                 factory = { context ->
                     WebView(context).apply {
                         webViewClient = WebViewClient()
@@ -167,7 +167,7 @@ fun OfferResponseScreen(viewModel: SubmitOfferViewModel, navController: NavContr
                     }
                 },
                 modifier = Modifier.fillMaxSize()
-            )
+            )*/
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -1072,7 +1072,7 @@ fun ReasonDialog(viewModel: SubmitOfferViewModel, id: String, status: String, su
                                     viewModel.responseOffer(
                                         id,
                                         reason,
-                                        status,
+                                        "reject",
                                         currentDateWithHour,
                                         "",
                                         subDomain

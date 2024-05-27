@@ -56,9 +56,6 @@ fun MyApp() {
             .background(color = Color.White)
     ) {
         NavHost(navController, startDestination = "screen-portal") {
-            composable("signature") {
-                //SignaturePad()
-            }
             composable("screen-portal") {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
@@ -149,11 +146,16 @@ fun MyApp() {
                 }
             }
 
-            composable("submit-offer/{id}/{referenceId}/{link}") {
+            composable("submit-offer/{notiId}/{referenceId}/{status}/{subDomain}/{link}") {
                 val viewModel: SubmitOfferViewModel = getKoin().get()
-                if (it.arguments?.getString("referenceId") != "" && it.arguments?.getString("id") != "" &&
-                    it.arguments?.getString("link") != "") {
-                    OfferResponseScreen(viewModel, navController, it.arguments?.getString("id") ?: "", it.arguments?.getString("referenceId") ?: "", it.arguments?.getString("status") ?: "", it.arguments?.getString("subDomain") ?: "", it.arguments?.getString("link") ?: "")
+                if (it.arguments?.getString("notiId") != "" && it.arguments?.getString("referenceId") != "" &&
+                    it.arguments?.getString("status") != "" && it.arguments?.getString("subDomain") != "" && it.arguments?.getString("link") != "") {
+                    OfferResponseScreen(viewModel, navController,
+                        it.arguments?.getString("notiId") ?: "",
+                        it.arguments?.getString("referenceId") ?: "",
+                        it.arguments?.getString("status") ?: "",
+                        it.arguments?.getString("subDomain") ?: "",
+                        it.arguments?.getString("link") ?: "")
                 }
             }
         }
