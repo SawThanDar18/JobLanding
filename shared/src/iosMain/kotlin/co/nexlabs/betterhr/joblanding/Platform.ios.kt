@@ -1,6 +1,5 @@
 package co.nexlabs.betterhr.joblanding
 
-
 import platform.UIKit.UIDevice
 
 class IOSPlatform: Platform {
