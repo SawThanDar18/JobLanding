@@ -1,0 +1,15 @@
+mutation UpdateSkill(
+    $id: String!
+    $name: String!
+) {
+    updateSkill (
+        id: $id
+        name: $name
+    ) {
+        id
+        name
+        candidate {
+            name
+        }
+    }
+}

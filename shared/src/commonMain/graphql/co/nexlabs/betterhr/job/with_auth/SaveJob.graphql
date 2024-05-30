@@ -1,0 +1,7 @@
+mutation SaveJob($candidate_id: String!, $job_id: String!) {
+    saveJob(candidate_id: $candidate_id, job_id: $job_id) {
+        id
+        candidate_id
+        job_id
+    }
+}

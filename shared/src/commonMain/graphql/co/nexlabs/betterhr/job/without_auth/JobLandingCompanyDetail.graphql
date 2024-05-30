@@ -1,0 +1,13 @@
+query JobLandingCompanyDetail($company_id: String!){
+    jobLandingCompany(company_id: $company_id)
+    {
+        id
+        subdomain
+#        country
+        name
+        description
+        company_mail
+        company_link
+        jobs_count
+    }
+}

@@ -1,0 +1,28 @@
+mutation CreateCertificate (
+    $candidate_id: String,
+    $course_name: String,
+    $issuing_organization: String,
+    $issue_date: String,
+    $expire_date: String,
+    $is_expire: Boolean,
+    $credential_url: String
+) {
+    createCertificate (
+        candidate_id: $candidate_id,
+        course_name: $course_name,
+        issuing_organization: $issuing_organization,
+        issue_date: $issue_date,
+        expire_date: $expire_date,
+        is_expire: $is_expire,
+        credential_url: $credential_url
+    ) {
+        id
+        candidate_id
+        course_name
+        issuing_organization
+        issue_date
+        expire_date
+        is_expire
+        credential_url
+    }
+}

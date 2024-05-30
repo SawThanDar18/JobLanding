@@ -1,0 +1,7 @@
+query DynamicPages($country_id: String!, $platform: String!){
+    dynamicPages(country_id: $country_id, platform: $platform)
+    {
+        id
+        name
+    }
+}

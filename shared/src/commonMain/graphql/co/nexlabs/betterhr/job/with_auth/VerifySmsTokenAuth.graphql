@@ -1,0 +1,5 @@
+mutation verifySmsTokenAndAuth($token: String!) {
+    verifySmsTokenAndAuth (token: $token) {
+        token
+    }
+}

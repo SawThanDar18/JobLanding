@@ -1,0 +1,40 @@
+query JobLandingJobDetail($job_id: String!){
+    jobLandingJob(job_id: $job_id)
+    {
+        id
+        company_id
+        title
+        department_id
+        location_id
+        country_id
+        created_by
+        state_id
+        city_name
+        city_id
+        state_name
+        hiring_date
+        seniority_level
+#        employment_type
+        workplace_type
+        office_address
+        currency_code
+        min_salary
+        max_salary
+        description
+        requirement
+        benefits_and_perks
+        overview
+        status
+        last3_view_count
+        last3_conversation_rate
+        last3_cv_count
+        last1_view_count
+        last1_conversation_rate
+        last1_cv_count
+        company {
+            id
+            name
+            subdomain
+        }
+    }
+}

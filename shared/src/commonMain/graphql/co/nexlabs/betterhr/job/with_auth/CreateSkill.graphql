@@ -1,0 +1,12 @@
+mutation CreateSkill(
+    $name: String!
+    $candidate_id: String!
+) {
+    createSkill (
+        name: $name
+        candidate_id: $candidate_id
+    ) {
+        id
+        name
+    }
+}

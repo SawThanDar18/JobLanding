@@ -1,0 +1,39 @@
+mutation UpdateEducation(
+    $id: String!
+    $country_name: String
+    $institution: String
+    $education_level: String
+    $degree: String
+    $field_of_study: String
+    $start_date: String
+    $end_date: String
+    $is_current_study: Boolean
+    $description: String
+) {
+    updateEducation (
+        id: $id
+        country_name: $country_name
+        institution: $institution
+        education_level: $education_level
+        degree: $degree
+        field_of_study: $field_of_study
+        start_date: $start_date
+        end_date: $end_date
+        is_current_study: $is_current_study
+        description: $description
+    ) {
+        id
+        country_name
+        institution
+        education_level
+        degree
+        field_of_study
+        start_date
+        end_date
+        is_current_study
+        description
+        candidate {
+            name
+        }
+    }
+}

@@ -1,0 +1,21 @@
+mutation ResponseOffer(
+    $id: String
+    $note: String
+    $status: String
+    $response_date: String,
+    $attachment: String,
+    $subdomain: String!
+) {
+    candidateResponseOffer(
+        id: $id
+        note: $note
+        status: $status
+        response_date: $response_date
+        attachment: $attachment
+        subdomain: $subdomain
+    ) {
+        id
+        title
+    }
+}
+

@@ -1,0 +1,8 @@
+mutation UnSaveJob($id: String!) {
+    unsaveJob (
+        id: $id
+    ) {
+        job_id
+        candidate_id
+    }
+}

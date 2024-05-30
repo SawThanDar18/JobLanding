@@ -1,0 +1,28 @@
+query FetchApplicationById($id: String!) {
+    application(id: $id) {
+        id
+        subdomain
+        reference_job_id
+        job_title
+        status
+        applied_date
+        current_job_title
+        current_company
+        working_since
+        files {
+            name
+            path
+            folder
+            extension
+            full_path
+            created_at
+        }
+        applicationHistories {
+            id
+            application_status
+            application_date
+            have_assignment
+            assignment_submitted
+        }
+    }
+}

@@ -1,0 +1,12 @@
+mutation UpdateSummary(
+    $id: String!,
+    $summary: String,
+    $country_id: String) {
+    updateCandidate (
+        id: $id
+        summary: $summary
+        country_id: $country_id
+    ) {
+        id
+    }
+}
