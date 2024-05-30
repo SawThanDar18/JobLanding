@@ -302,15 +302,15 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         viewModel.getJobDetail(jobId)
     }
 
-     if (uiState.isSuccessGetJobDetail) {
-         LaunchedEffect(Unit) {
-             scope.launch {
-                 if (viewModel.getBearerToken() != "") {
-                     viewModel.fetchSaveJobsById(jobId)
-                 }
-             }
-         }
-     }
+    if (uiState.isSuccessGetJobDetail) {
+        LaunchedEffect(Unit) {
+            scope.launch {
+                if (viewModel.getBearerToken() != "") {
+                    viewModel.fetchSaveJobsById(jobId)
+                }
+            }
+        }
+    }
 
     if (uiState.fetchSaveJobs.data!!.id != "") {
         isSaveItem = true
@@ -362,7 +362,12 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
     if (uiState.isSuccessCreateApplication) {
         LaunchedEffect(Unit) {
-            if (uiState.idFromCreateApplication != "" && uiState.jobDetail.id != "" && uiState.jobDetail.company.subDomain != "") {
+            step = if (bottomBarVisibleAfterSignUp) {
+                "stepThree"
+            } else {
+                "stepFour"
+            }
+            /*if (uiState.idFromCreateApplication != "" && uiState.jobDetail.id != "" && uiState.jobDetail.company.subDomain != "") {
                 scope.launch {
                     viewModel.applyJob(
                         uiState.idFromCreateApplication,
@@ -370,30 +375,30 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                         uiState.jobDetail.company.subDomain
                     )
                 }
-            }
+            }*/
         }
-       /* LaunchedEffect(Unit) {
-            if (uiState.idFromCreateApplication != "") {
-                scope.launch {
-                    viewModel.updateApplication(uiState.idFromCreateApplication)
-                }
-            }
-        }*/
+        /* LaunchedEffect(Unit) {
+             if (uiState.idFromCreateApplication != "") {
+                 scope.launch {
+                     viewModel.updateApplication(uiState.idFromCreateApplication)
+                 }
+             }
+         }*/
     }
 
-   /* if (uiState.isSuccessUpdateApplication) {
-        LaunchedEffect(Unit) {
-            if (uiState.idFromCreateApplication != "" && uiState.jobDetail.id != "" && uiState.jobDetail.company.subDomain != "") {
-                scope.launch {
-                    viewModel.applyJob(
-                        uiState.idFromCreateApplication,
-                        uiState.jobDetail.id,
-                        uiState.jobDetail.company.subDomain
-                    )
-                }
-            }
-        }
-    }*/
+    /* if (uiState.isSuccessUpdateApplication) {
+         LaunchedEffect(Unit) {
+             if (uiState.idFromCreateApplication != "" && uiState.jobDetail.id != "" && uiState.jobDetail.company.subDomain != "") {
+                 scope.launch {
+                     viewModel.applyJob(
+                         uiState.idFromCreateApplication,
+                         uiState.jobDetail.id,
+                         uiState.jobDetail.company.subDomain
+                     )
+                 }
+             }
+         }
+     }*/
 
     if (uiState.isApplyJobSuccess) {
         LaunchedEffect(Unit) {

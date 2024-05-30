@@ -133,24 +133,43 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.better_icon),
-                            contentDescription = "Home Screen Header Logo",
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .width(26.dp)
-                                .height(32.dp),
-                        )
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.better_icon),
+                                contentDescription = "Home Screen Header Logo",
+                                modifier = Modifier
+                                    .width(26.dp)
+                                    .height(32.dp),
+                            )
 
-                        Text(
-                            text = "Better Job",
-                            modifier = Modifier.padding(start = 8.dp),
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W600,
-                            color = Color(0xFF757575),
-                            fontSize = 24.sp,
-                        )
+                            Text(
+                                text = "Better Job",
+                                modifier = Modifier.padding(start = 8.dp),
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF757575),
+                                fontSize = 24.sp,
+                            )
+                        }
+
+                        if (viewModel.getBearerToken() != "") {
+                            Image(
+                                painter = painterResource(id = R.drawable.qr),
+                                contentDescription = "QR Logo",
+                                modifier = Modifier
+                                    .width(30.dp)
+                                    .clickable {
+
+                                    },
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
