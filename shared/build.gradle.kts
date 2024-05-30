@@ -1,29 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
-tasks.register<Sync>("packForXcode") {
-    group = "build"
-    description = "Packs the iOS framework for Xcode"
-
-    val mode = project.findProperty("XCODE_CONFIGURATION") as? String ?: "DEBUG"
-    val targetDir = buildDir.resolve("xcode-frameworks")
-
-    val iosTargets = listOf("iosX64", "iosArm64")
-
-    iosTargets.forEach { targetName ->
-        val target = kotlin.targets.getByName<KotlinNativeTarget>(targetName)
-        val framework = target.binaries.getFramework(mode)
-        dependsOn(framework.linkTask)
-        from(framework.outputDirectory)
-    }
-
-    into(targetDir)
-
-    doLast {
-        println("Framework is packed for Xcode in: $targetDir")
-    }
-}
-
-
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -43,11 +17,13 @@ kotlin {
         }
     }
 
-    ios {
-        binaries {
-            framework {
-                baseName = "shared"
-            }
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.binaries.framework {
+            baseName = "shared"
         }
     }
 
