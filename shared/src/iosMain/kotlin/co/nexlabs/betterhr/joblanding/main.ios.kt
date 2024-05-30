@@ -1,20 +1,10 @@
 package co.nexlabs.betterhr.joblanding
 
-import App
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.platform.Typeface
-import moe.tlaster.precompose.PreComposeApplication
-import org.jetbrains.skia.FontStyle
-import org.jetbrains.skia.Typeface
 
-actual fun getPlatformName(): String = "iOS"
+import platform.UIKit.UIDevice
 
-fun MainViewController() = PreComposeApplication { App() }
-
-private fun loadCustomFont(name: String): Typeface {
-    return Typeface.makeFromName(name, FontStyle.NORMAL)
+class IOSPlatform: Platform {
+    override val name: String = UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
 }
 
-actual val sailecFontFamily: FontFamily = FontFamily(
-    Typeface(loadCustomFont("sailec_regular"))
-)
+actual fun getPlatform(): Platform = IOSPlatform()
