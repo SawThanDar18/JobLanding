@@ -1,7 +1,6 @@
 package co.nexlabs.betterhr.joblanding
+class AndroidPlatform : Platform {
+    override val name: String = "Android ${android.os.Build.VERSION.SDK_INT}"
+}
 
-import App
-import androidx.compose.runtime.Composable
-
-@Composable
-fun MainView() = App()
+actual fun getPlatform(): Platform = AndroidPlatform()

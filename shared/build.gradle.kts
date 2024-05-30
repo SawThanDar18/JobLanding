@@ -12,7 +12,7 @@ kotlin {
     android {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "17"
+                jvmTarget = "1.8"
             }
         }
     }
@@ -44,9 +44,9 @@ kotlin {
                 api("io.insert-koin:koin-core:3.4.3")
                 api("io.insert-koin:koin-compose:1.0.4")
 
-                api("moe.tlaster:precompose:1.5.0")
-                api("moe.tlaster:precompose-viewmodel:1.5.0")
-                api("moe.tlaster:precompose-koin:1.5.0")
+//                api("moe.tlaster:precompose:1.5.0")
+//                api("moe.tlaster:precompose-viewmodel:1.5.0")
+//                api("moe.tlaster:precompose-koin:1.5.0")
             }
         }
         val androidMain by getting {
@@ -72,11 +72,8 @@ android {
         minSdk = BuildConfig.minSdk
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        jvmToolchain(17)
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 
