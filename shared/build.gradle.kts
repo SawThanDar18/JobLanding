@@ -44,9 +44,32 @@ kotlin {
                 api("io.insert-koin:koin-core:3.4.3")
                 api("io.insert-koin:koin-compose:1.0.4")
 
-//                api("moe.tlaster:precompose:1.5.0")
-//                api("moe.tlaster:precompose-viewmodel:1.5.0")
-//                api("moe.tlaster:precompose-koin:1.5.0")
+                api("moe.tlaster:precompose:1.5.0")
+                api("moe.tlaster:precompose-viewmodel:1.5.0")
+                api("moe.tlaster:precompose-koin:1.5.0")
+
+                implementation(KTOR.clientCore)
+                implementation(KTOR.clientLogging)
+                implementation(KTOR.clientSerilization)
+                implementation(KTOR.serilization)
+                implementation(KTOR.clientNegotiation)
+                implementation(KTOR.clientEncoding)
+                implementation(KTOR.ktorSerialization)
+                implementation(KTOR.kotlinXSerialization)
+                implementation(KTOR.ktorJson)
+                implementation(KTOR.ktorAuth)
+
+                implementation(ReactiveX.rxjava)
+                implementation(ReactiveX.rxandroid)
+                implementation(ReactiveX.rxKotlin)
+
+                implementation(AndroidArchLifeCycle.livedata)
+
+                implementation("com.squareup.okhttp3:okhttp:4.9.1")
+                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
+                implementation("io.github.joelkanyi:sain:2.0.3")
+
             }
         }
         val androidMain by getting {
@@ -54,14 +77,61 @@ kotlin {
                 api("androidx.activity:activity-compose:1.7.2")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.10.1")
+
+                implementation(KTOR.clientCore)
+                implementation(KTOR.clientAndroid)
+                implementation(KTOR.clientOKHttp)
+                implementation(KTOR.kotlinXSerialization)
+                implementation(KTOR.ktorJson)
+                implementation(KTOR.clientLogging)
+                implementation(KTOR.clientSerilization)
+                implementation(KTOR.clientNegotiation)
+                implementation(KTOR.ktorSerialization)
+
+                implementation(ReactiveX.rxjava)
+                implementation(ReactiveX.rxandroid)
+                implementation(ReactiveX.rxKotlin)
+
+                implementation(AndroidArchLifeCycle.livedata)
+
+                implementation("com.squareup.okhttp3:okhttp:4.9.1")
+                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
+                //implementation("com.russhwolf:multiplatform-settings:0.7.4")
             }
         }
 
-        val iosMain by getting{
+        val iosX64Main by getting {
             dependencies {
-                
+                //implementation(KTOR.clientOKHttp)
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
             }
         }
+        val iosArm64Main by getting {
+            dependencies {
+                //implementation(KTOR.clientOKHttp)
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
+            }
+        }
+        val iosSimulatorArm64Main by getting {
+            dependencies {
+                //implementation(KTOR.clientOKHttp)
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
+            }
+        }
+        /*val iosMain by creating {
+            dependencies {
+                implementation(KTOR.clientOKHttp)
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
+            }
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+        }*/
     }
 }
 
@@ -77,9 +147,18 @@ android {
     }
 }
 
+dependencies {
+    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0")
+}
+
 apollo {
-    service("service") {
-        packageName.set("co.nexlabs.betterhr.joblanding")
+    service("with_auth") {
+        sourceFolder.set("co/nexlabs/betterhr/job/with_auth")
+        packageName.set("co.nexlabs.betterhr.job.with_auth")
+    }
+    service("without_auth") {
+        sourceFolder.set("co/nexlabs/betterhr/job/without_auth")
+        packageName.set("co.nexlabs.betterhr.job.without_auth")
     }
 }
 
