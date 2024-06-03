@@ -16,7 +16,6 @@ kotlin {
             }
         }
     }
-
     listOf(
         iosX64(),
         iosArm64(),
@@ -59,7 +58,6 @@ kotlin {
 
         val iosMain by getting{
             dependencies {
-                
             }
         }
     }
