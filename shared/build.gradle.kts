@@ -40,6 +40,8 @@ kotlin {
 
                 api("com.apollographql.apollo3:apollo-runtime:3.8.2")
                 api("com.apollographql.apollo3:apollo-normalized-cache:3.8.2")
+                //implementation("com.apollographql.apollo3:apollo-runtime-kotlin:3.8.2")
+
 
                 api("io.insert-koin:koin-core:3.4.3")
                 api("io.insert-koin:koin-compose:1.0.4")
@@ -48,7 +50,7 @@ kotlin {
                 api("moe.tlaster:precompose-viewmodel:1.5.0")
                 api("moe.tlaster:precompose-koin:1.5.0")
 
-                implementation(KTOR.clientCore)
+                /*implementation(KTOR.clientCore)
                 implementation(KTOR.clientLogging)
                 implementation(KTOR.clientSerilization)
                 implementation(KTOR.serilization)
@@ -57,7 +59,14 @@ kotlin {
                 implementation(KTOR.ktorSerialization)
                 implementation(KTOR.kotlinXSerialization)
                 implementation(KTOR.ktorJson)
-                implementation(KTOR.ktorAuth)
+                implementation(KTOR.ktorAuth)*/
+
+                    implementation("io.ktor:ktor-client-core:2.3.11")
+                    implementation("io.ktor:ktor-client-cio:2.3.11") // or another Ktor engine of your choice
+                    implementation("io.ktor:ktor-client-logging:2.3.11")
+                    implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
+                    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.11")
+
 
                 implementation(ReactiveX.rxjava)
                 implementation(ReactiveX.rxandroid)
@@ -65,10 +74,8 @@ kotlin {
 
                 implementation(AndroidArchLifeCycle.livedata)
 
-                implementation("com.squareup.okhttp3:okhttp:4.9.1")
-                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
-                implementation("io.github.joelkanyi:sain:2.0.3")
+//                implementation("com.squareup.okhttp3:okhttp:4.9.1")
+//                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
 
             }
         }
@@ -96,8 +103,6 @@ kotlin {
 
                 implementation("com.squareup.okhttp3:okhttp:4.9.1")
                 implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
-                //implementation("com.russhwolf:multiplatform-settings:0.7.4")
             }
         }
 

@@ -4,7 +4,6 @@ import android.app.Application
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import androidx.core.net.toFile
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
@@ -65,6 +64,7 @@ import co.nexlabs.betterhr.joblanding.util.baseUrlForMultipleUploadFileForCreate
 import co.nexlabs.betterhr.joblanding.util.baseUrlForUploadFile
 import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
+import com.apollographql.apollo3.network.http.HttpEngine
 import com.apollographql.apollo3.ApolloCall
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
@@ -80,7 +80,6 @@ import io.ktor.http.*
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import com.apollographql.apollo3.network.okHttpClient
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.forms.formData
@@ -88,11 +87,17 @@ import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.header
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import java.io.File
-import java.io.FileInputStream
+import io.ktor.client.*
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
 
 class JobLandingServiceImpl(private val application: Application, private val client: HttpClient) :
     JobLandingService {
@@ -102,6 +107,31 @@ class JobLandingServiceImpl(private val application: Application, private val cl
     init {
         localStorage = AndroidLocalStorageImpl(application)
     }
+
+    val clientt = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+                encodeDefaults = true
+            })
+        }
+
+        install(Logging) {
+            logger = Logger.DEFAULT
+            level = LogLevel.HEADERS
+        }
+
+        defaultRequest {
+            header(API_KEY, API_VALUE_JOB)
+        }
+    }
+
+    val apolloClient = ApolloClient.Builder()
+        .httpEngine(HttpEngine(clientt))
+        .serverUrl(baseUrlForJob)
+        .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
+        .build()
 
     val headerInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
@@ -133,11 +163,11 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         .addInterceptor(headerInterceptorWithAuth)
         .build()
 
-    val apolloClient = ApolloClient.Builder()
+    /*val apolloClient = ApolloClient.Builder()
         .okHttpClient(okHttpClient)
         .serverUrl(baseUrlForJob)
         .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
-        .build()
+        .build()*/
 
     val apolloClientWithAuth = ApolloClient.Builder()
         .okHttpClient(okHttpClientWithAuth)
