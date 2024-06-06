@@ -84,6 +84,9 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings:0.7.4")
                 implementation("io.github.joelkanyi:sain:2.0.3")
 
+                api("io.jsonwebtoken:jjwt-api:0.10.5")
+                implementation("io.jsonwebtoken:jjwt-impl:0.10.5")
+
             }
         }
         val androidMain by getting {

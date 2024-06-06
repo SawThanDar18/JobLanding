@@ -137,8 +137,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            //modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Start,
                         ) {
                             Image(
@@ -166,7 +165,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
                                 modifier = Modifier
                                     .width(30.dp)
                                     .clickable {
-
+                                               navController.navigate("qr-scan-login-screen")
                                     },
                             )
                         }

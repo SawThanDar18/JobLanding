@@ -18,6 +18,7 @@ import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.job.with_auth.ResponseAssignmentMutation
 import co.nexlabs.betterhr.job.with_auth.ResponseOfferMutation
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
+import co.nexlabs.betterhr.job.with_auth.ScanWebLogInMutation
 import co.nexlabs.betterhr.job.with_auth.UnSaveJobMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateApplicationMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateCandidateMutation
@@ -318,5 +319,7 @@ interface JobLandingService {
     suspend fun fetchInterview(
         limit: Int, page: Int
     ): ApolloCall<FetchInterviewQuery.Data>
+
+    suspend fun scanWebLogIn(qrToken: String): ApolloCall<ScanWebLogInMutation.Data>
 
 }

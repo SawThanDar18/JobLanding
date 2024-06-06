@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen
 
+import QRScannerScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +39,7 @@ import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewMod
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
+import co.nexlabs.betterhr.joblanding.network.api.login.QRLogInViewModel
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -157,6 +159,11 @@ fun MyApp() {
                         it.arguments?.getString("subDomain") ?: "",
                         it.arguments?.getString("link") ?: "")
                 }
+            }
+
+            composable("qr-scan-login-screen") {
+                val viewModel: QRLogInViewModel = getKoin().get()
+                QRScannerScreen(viewModel, navController)
             }
         }
     }

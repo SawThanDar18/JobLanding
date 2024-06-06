@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -66,8 +67,12 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
     var todayInterviewList: MutableList<InterviewUIModel> = ArrayList()
     var upComingInterviewList: MutableList<InterviewUIModel> = ArrayList()
 
-    scope.launch {
-        viewModel.fetchInterviews()
+    LaunchedEffect(Unit) {
+        scope.launch {
+            if (!viewModel.getBearerToken().isNullOrBlank()) {
+                viewModel.fetchInterviews()
+            }
+        }
     }
 
     if (uiState.interviewList.isNotEmpty()) {
