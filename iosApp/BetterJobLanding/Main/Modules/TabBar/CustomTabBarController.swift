@@ -33,25 +33,25 @@ class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
                 selectedImage: UIImage(named: "home_fill")
             ),
             generateVC(
-                viewController: HomeScene.create(),
+                viewController: ApplicationsScene.create(),
                 title: "Applications",
                 image: UIImage(named: "applications"),
                 selectedImage: UIImage(named: "applications_fill")
             ),
             generateVC(
-                viewController: HomeScene.create(),
+                viewController: InboxScene.create(),
                 title: "Inbox",
                 image: UIImage(named: "inbox"),
                 selectedImage: UIImage(named: "inbox_fill")
             ),
             generateVC(
-                viewController: HomeScene.create(),
+                viewController: InterviewsScene.create(),
                 title: "Interviews",
                 image: UIImage(named: "interviews"),
                 selectedImage: UIImage(named: "interviews_fill")
             ),
             generateVC(
-                viewController: HomeScene.create(),
+                viewController: ProfileScene.create(),
                 title: "Profile",
                 image: UIImage(named: "profile"),
                 selectedImage: UIImage(named: "profile_fill")
