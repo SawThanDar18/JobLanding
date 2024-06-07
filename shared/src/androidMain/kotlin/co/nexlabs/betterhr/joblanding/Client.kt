@@ -1,5 +1,8 @@
 package co.nexlabs.betterhr.joblanding
 
+import android.app.Application
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import co.nexlabs.betterhr.joblanding.util.API_KEY
 import co.nexlabs.betterhr.joblanding.util.API_VALUE_JOB
 import io.ktor.client.HttpClient

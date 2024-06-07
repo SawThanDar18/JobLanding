@@ -3,8 +3,6 @@ package co.nexlabs.betterhr.joblanding.network.api.home
 import android.app.Application
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage

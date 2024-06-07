@@ -31,7 +31,6 @@ import co.nexlabs.betterhr.job.with_auth.UpdateExperienceMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateLanguageMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateNotificationMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateSkillMutation
-import co.nexlabs.betterhr.job.with_auth.UpdateSummaryMutation
 import co.nexlabs.betterhr.job.with_auth.VerifySmsTokenAndAuthMutation
 import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
@@ -43,11 +42,9 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.createApolloClient
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuth
-import co.nexlabs.betterhr.joblanding.createHttpClientWithAuthWithoutToken
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
+import co.nexlabs.betterhr.joblanding.createApolloClientWithAuthWithoutToken
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.request_response.ExistingFileIdTypeObject
-import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileUploadResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
@@ -58,22 +55,15 @@ import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyOTPRequ
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyPhoneNumResponse
 import co.nexlabs.betterhr.joblanding.util.API_KEY
 import co.nexlabs.betterhr.joblanding.util.API_VALUE
-import co.nexlabs.betterhr.joblanding.util.API_VALUE_JOB
 import co.nexlabs.betterhr.joblanding.util.baseUrl
-import co.nexlabs.betterhr.joblanding.util.baseUrlForAuth
 import co.nexlabs.betterhr.joblanding.util.baseUrlForCreateApplication
-import co.nexlabs.betterhr.joblanding.util.baseUrlForJob
 import co.nexlabs.betterhr.joblanding.util.baseUrlForMultipleUploadFile
 import co.nexlabs.betterhr.joblanding.util.baseUrlForMultipleUploadFileForCreateApplication
 import co.nexlabs.betterhr.joblanding.util.baseUrlForUploadFile
 import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
-import com.apollographql.apollo3.network.http.HttpEngine
 import com.apollographql.apollo3.ApolloCall
-import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
-import com.apollographql.apollo3.cache.normalized.api.MemoryCacheFactory
-import com.apollographql.apollo3.cache.normalized.normalizedCache
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -87,80 +77,21 @@ import kotlinx.serialization.json.put
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
-import io.ktor.client.request.header
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import io.ktor.client.*
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.DEFAULT
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
-import com.apollographql.apollo3.network.http.HttpNetworkTransport
+import java.io.FileInputStream
 
-class JobLandingServiceImpl(private val application: Application, private val client: HttpClient) :
+class JobLandingServiceImpl(private val localStorage: LocalStorage, private val client: HttpClient) :
     JobLandingService {
-
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
 
     val apolloClient = createApolloClient()
 
     val apolloClientWithAuth = createApolloClientWithAuth(localStorage.bearerToken)
 
-    val apolloClientWithAuthWithoutToken = createHttpClientWithAuthWithoutToken()
-
-    /*val headerInterceptor = Interceptor { chain ->
-        val request = chain.request().newBuilder()
-            .addHeader(API_KEY, API_VALUE_JOB)
-            .build()
-        chain.proceed(request)
-    }
-
-    val headerInterceptorWithAuth = Interceptor { chain ->
-        val request = chain.request().newBuilder()
-            .addHeader("Authorization", "bearer ${localStorage.bearerToken}")
-            .build()
-        chain.proceed(request)
-    }
-
-    val loggingInterceptor = HttpLoggingInterceptor().apply {
-        val logger = HttpLoggingInterceptor.Logger.DEFAULT
-        level = HttpLoggingInterceptor.Level.HEADERS
-        HttpLoggingInterceptor.Logger { message -> println("message>>$logger") }
-    }
-
-    val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
-        .addInterceptor(headerInterceptor)
-        .build()
-
-    val okHttpClientWithAuth = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
-        .addInterceptor(headerInterceptorWithAuth)
-        .build()
-
-    val apolloClient = ApolloClient.Builder()
-        .okHttpClient(okHttpClient)
-        .serverUrl(baseUrlForJob)
-        .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
-        .build()
-
-    val apolloClientWithAuth = ApolloClient.Builder()
-        .okHttpClient(okHttpClientWithAuth)
-        .serverUrl(baseUrlForAuth)
-        .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
-        .build()
-
-    val apolloClientWithAuthWithoutToken = ApolloClient.Builder()
-        .serverUrl(baseUrlForAuth)
-        .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
-        .build()*/
+    val apolloClientWithAuthWithoutToken = createApolloClientWithAuthWithoutToken()
 
     override suspend fun sendVerification(body: SendVerificationCodeRequest): SendVerificationResponse {
 
@@ -1032,3 +963,53 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         return apolloClientWithAuth.mutation(ScanWebLogInMutation(qrToken))
     }
 }
+
+
+
+
+/*val headerInterceptor = Interceptor { chain ->
+    val request = chain.request().newBuilder()
+        .addHeader(API_KEY, API_VALUE_JOB)
+        .build()
+    chain.proceed(request)
+}
+
+val headerInterceptorWithAuth = Interceptor { chain ->
+    val request = chain.request().newBuilder()
+        .addHeader("Authorization", "bearer ${localStorage.bearerToken}")
+        .build()
+    chain.proceed(request)
+}
+
+val loggingInterceptor = HttpLoggingInterceptor().apply {
+    val logger = HttpLoggingInterceptor.Logger.DEFAULT
+    level = HttpLoggingInterceptor.Level.HEADERS
+    HttpLoggingInterceptor.Logger { message -> println("message>>$logger") }
+}
+
+val okHttpClient = OkHttpClient.Builder()
+    .addInterceptor(loggingInterceptor)
+    .addInterceptor(headerInterceptor)
+    .build()
+
+val okHttpClientWithAuth = OkHttpClient.Builder()
+    .addInterceptor(loggingInterceptor)
+    .addInterceptor(headerInterceptorWithAuth)
+    .build()
+
+val apolloClient = ApolloClient.Builder()
+    .okHttpClient(okHttpClient)
+    .serverUrl(baseUrlForJob)
+    .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
+    .build()
+
+val apolloClientWithAuth = ApolloClient.Builder()
+    .okHttpClient(okHttpClientWithAuth)
+    .serverUrl(baseUrlForAuth)
+    .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
+    .build()
+
+val apolloClientWithAuthWithoutToken = ApolloClient.Builder()
+    .serverUrl(baseUrlForAuth)
+    .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
+    .build()*/
