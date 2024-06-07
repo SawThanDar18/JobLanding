@@ -31,6 +31,10 @@ class ApplicationViewModel(application: Application, private val applicationRepo
         localStorage = AndroidLocalStorageImpl(application)
     }
 
+    fun getBearerToken(): String {
+        return localStorage.bearerToken
+    }
+
     private val _uiState = MutableStateFlow(ApplicationUIState())
     val uiState = _uiState.asStateFlow()
 

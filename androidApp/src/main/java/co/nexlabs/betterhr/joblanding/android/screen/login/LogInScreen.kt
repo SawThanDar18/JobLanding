@@ -1,4 +1,4 @@
-package co.nexlabs.betterhr.joblanding.android.screen.register
+package co.nexlabs.betterhr.joblanding.android.screen.login
 
 import android.opengl.Visibility
 import android.util.Log
@@ -72,7 +72,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
+fun LogInScreen(navController: NavController, viewModel: RegisterViewModel) {
 
     var timer by remember { mutableStateOf(60) }
     var isTimerRunning by remember { mutableStateOf(false) }
@@ -80,6 +80,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
     val scope = rememberCoroutineScope()
     val uiState = viewModel.uiState.collectAsState(initial = UiState.Loading)
     val uiStateForVerify = viewModel.uiStateForVerify.collectAsState(initial = UiState.Loading)
+    val registerUiState by viewModel.registerUiState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
     val applicationContext = LocalContext.current.applicationContext
     var text by remember { mutableStateOf("") }
@@ -128,13 +129,25 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
             LaunchedEffect(Unit) {
                 scope.launch {
                     viewModel.updateToken(currentState.data)
+                    viewModel.getBearerToken(currentState.data)
                 }
-                navController.navigate("profile-register-screen")
             }
         }
 
         is UiState.Error -> {
             MyToast(currentState.errorMessage)
+        }
+    }
+
+    LaunchedEffect(registerUiState.isSuccessForBearerToken) {
+        if (registerUiState.bearerToken != "") {
+            scope.launch {
+                viewModel.updateBearerToken(registerUiState.bearerToken)
+
+                if (viewModel.getPageId().isNotBlank()) {
+                    navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"profile"}")
+                }
+            }
         }
     }
 
@@ -170,7 +183,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Register",
+                text = "Login",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W600,
                 color = Color(0xFF6A6A6A),
@@ -475,7 +488,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Already have an account?",
+                    text = "Don't have an account?",
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W400,
                     color = Color(0xFF6A6A6A),
@@ -487,13 +500,13 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "log in",
+                    text = "Register now",
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W600,
                     color = Color(0xFF1ED292),
                     fontSize = 14.sp,
                     modifier = Modifier.clickable {
-                        navController.navigate("login-screen")
+                        navController.navigate("register-screen")
                     }
                 )
             }

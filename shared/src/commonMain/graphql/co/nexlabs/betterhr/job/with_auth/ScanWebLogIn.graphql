@@ -1,0 +1,5 @@
+mutation ScanWebLogIn($qr_token: String!) {
+    validateQRAndAuth(qr_token: $qr_token) {
+        token
+    }
+}

@@ -1,16 +1,23 @@
-package co.nexlabs.betterhr.joblanding.network.api.inbox
+package co.nexlabs.betterhr.joblanding.network.api.login
 
 import android.app.Application
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
-import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
-import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxUIState
+import co.nexlabs.betterhr.joblanding.network.api.login.data.InvalidQRCodeException
+import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInRepository
+import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInUIState
+import co.nexlabs.betterhr.joblanding.network.api.login.data.WebLoginException
+import co.nexlabs.betterhr.joblanding.network.api.login.data.WebLoginQRCodeDecrypter
+import co.nexlabs.betterhr.joblanding.network.api.login.data.WebLoginQRData
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
-import co.nexlabs.betterhr.joblanding.viewmodel.InboxViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
+import io.jsonwebtoken.UnsupportedJwtException
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +28,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class InboxViewModel(application: Application, private val inboxRepository: InboxRepository): ViewModel() {
+class QRLogInViewModel(application: Application, private val qrLogInRepository: QRLogInRepository): ViewModel() {
 
     private val localStorage: LocalStorage
 
@@ -33,28 +40,47 @@ class InboxViewModel(application: Application, private val inboxRepository: Inbo
         return localStorage.bearerToken
     }
 
-    private val _uiState = MutableStateFlow(InboxUIState())
+    private val _uiState = MutableStateFlow(QRLogInUIState())
     val uiState = _uiState.asStateFlow()
 
-    fun fetchNotification(
-        status: List<String>
-    ) {
+    fun validateQRToken(qrToken: String): Observable<WebLoginQRData> {
+        return Observable.create<WebLoginQRData> { emitter ->
+            try {
+                val qrData = WebLoginQRCodeDecrypter()(qrToken)
+                qrData?.let {
+                    emitter.onNext(it)
+                    emitter.onComplete()
+                } ?: emitter.onError(InvalidQRCodeException())
+            } catch (e: WebLoginException) {
+                emitter.onError(e)
+            } catch (e: UnsupportedJwtException) {
+                emitter.onError(InvalidQRCodeException())
+            } catch (e: Exception) {
+                emitter.onError(e)
+            }
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun qrScanLogIn(qrToken: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
-                    error = UIErrorType.Nothing
+                    error = UIErrorType.Nothing,
+                    isSuccessQRLogIn = false
                 )
             }
 
-            inboxRepository.fetchInbox(status, "", 20).toFlow()
+            qrLogInRepository.qrScanLogIn(qrToken).toFlow()
                 .catch { e ->
                     _uiState.update {
                         it.copy(
                             isLoading = true,
                             error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
                                     .any { it is ApolloNetworkException || it is ApolloParseException })
-                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!")
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                            isSuccessQRLogIn = false
                         )
                     }
 
@@ -80,7 +106,8 @@ class InboxViewModel(application: Application, private val inboxRepository: Inbo
                     _uiState.update {
                         it.copy(
                             isLoading = true,
-                            error = UIErrorType.Nothing
+                            error = UIErrorType.Nothing,
+                            isSuccessQRLogIn = false
                         )
                     }
                     if(!data.hasErrors()) {
@@ -88,18 +115,20 @@ class InboxViewModel(application: Application, private val inboxRepository: Inbo
                             it.copy(
                                 isLoading = false,
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
-                                notificationList = InboxViewModelMapper.mapResponseToViewModel(data.data!!)
+                                isSuccessQRLogIn = true
                             )
                         }
                     } else {
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isSuccessQRLogIn = false
                             )
                         }
                     }
                 }
         }
     }
+
 }

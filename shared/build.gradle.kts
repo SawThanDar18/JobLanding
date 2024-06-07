@@ -77,6 +77,9 @@ kotlin {
 //                implementation("com.squareup.okhttp3:okhttp:4.9.1")
 //                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
 
+                api("io.jsonwebtoken:jjwt-api:0.10.5")
+                implementation("io.jsonwebtoken:jjwt-impl:0.10.5")
+
             }
         }
         val androidMain by getting {
