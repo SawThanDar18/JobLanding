@@ -306,7 +306,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
     }
 
     override suspend fun getCompanyDetailJob(companyId: String): ApolloCall<JobLandingCompanyJobsQuery.Data> {
-        return apolloClient.query(JobLandingCompanyJobsQuery(companyId))
+        return apolloClient.query(JobLandingCompanyJobsQuery(companyId, false))
     }
 
     override suspend fun saveJob(
