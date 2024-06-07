@@ -1,8 +1,5 @@
 package co.nexlabs.betterhr.joblanding.network.api.application
 
-import android.app.Application
-import android.util.Log
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationRepository
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationUIState
@@ -15,7 +12,6 @@ import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -25,11 +21,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class ApplicationViewModel(application: Application, private val applicationRepository: ApplicationRepository): ViewModel() {
-    private val localStorage: LocalStorage
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
+class ApplicationViewModel(private val localStorage: LocalStorage, private val applicationRepository: ApplicationRepository): ViewModel() {
 
     fun getBearerToken(): String {
         return localStorage.bearerToken

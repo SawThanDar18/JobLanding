@@ -1,12 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api.inbox
 
-import android.app.Application
 import android.content.Context
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
-import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIState
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -25,13 +20,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class InboxDetailViewModel(application: Application, private val inboxRepository: InboxRepository): ViewModel() {
-
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
+class InboxDetailViewModel(private val inboxRepository: InboxRepository): ViewModel() {
 
     private val _uiState = MutableStateFlow(InboxDetailUIState())
     val uiState = _uiState.asStateFlow()

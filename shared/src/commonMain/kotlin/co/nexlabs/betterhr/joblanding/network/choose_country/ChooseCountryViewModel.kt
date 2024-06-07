@@ -1,12 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.choose_country
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
-import co.nexlabs.betterhr.joblanding.local_storage.LocalStorageFunctions
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
@@ -18,9 +12,7 @@ import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -29,15 +21,11 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class ChooseCountryViewModel(application: Application,
+class ChooseCountryViewModel(
+    private val localStorage: LocalStorage,
     private val chooseCountryRepository: ChooseCountryRepository
 ) :
     ViewModel() {
-
-    private val localStorage: LocalStorage
-    init {
-        localStorage = AndroidLocalStorageImpl(application.applicationContext)
-    }
 
     private val _uiState = MutableStateFlow(ChooseCountryUIState())
     val uiState = _uiState.asStateFlow()

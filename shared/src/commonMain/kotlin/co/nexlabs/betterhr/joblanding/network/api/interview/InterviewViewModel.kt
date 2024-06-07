@@ -1,7 +1,5 @@
 package co.nexlabs.betterhr.joblanding.network.api.interview
 
-import android.app.Application
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewUIState
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewsRepository
@@ -21,13 +19,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class InterviewViewModel(application: Application, private val interviewRepository: InterviewsRepository): ViewModel() {
-
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
+class InterviewViewModel(private val localStorage: LocalStorage, private val interviewRepository: InterviewsRepository): ViewModel() {
 
     fun getBearerToken(): String {
         return localStorage.bearerToken

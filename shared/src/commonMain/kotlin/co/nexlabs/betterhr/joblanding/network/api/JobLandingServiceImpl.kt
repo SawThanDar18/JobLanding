@@ -79,12 +79,9 @@ import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.serialization.kotlinx.json.*
 import java.io.FileInputStream
 
-class JobLandingServiceImpl(private val localStorage: LocalStorage, private val client: HttpClient) :
+class JobLandingServiceImpl(private val application: Application, private val localStorage: LocalStorage, private val client: HttpClient) :
     JobLandingService {
 
     val apolloClient = createApolloClient()

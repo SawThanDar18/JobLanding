@@ -1,9 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
-import android.app.Application
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
-import co.nexlabs.betterhr.joblanding.network.register.data.ProfileRegisterUIState
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -29,18 +26,12 @@ sealed class UiState {
 }
 
 class RegisterViewModel(
-    val application: Application,
+    private val localStorage: LocalStorage,
     private val registerRepository: RegisterRepository,
 ) : ViewModel() {
 
     private val _registerUiState = MutableStateFlow(RegisterUIState())
     val registerUiState = _registerUiState.asStateFlow()
-
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState

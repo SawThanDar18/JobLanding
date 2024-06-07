@@ -1,9 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
-import android.app.Application
 import android.net.Uri
 import android.util.Log
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileRepository
 import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileUIState
@@ -24,14 +22,9 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class CompleteProfileViewModel(
-    application: Application,
+    private val localStorage: LocalStorage,
     private val completeProfileRepository: CompleteProfileRepository
 ): ViewModel() {
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application.applicationContext)
-    }
 
     private val _uiState = MutableStateFlow(CompleteProfileUIState())
     val uiState = _uiState.asStateFlow()

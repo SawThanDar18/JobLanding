@@ -1,15 +1,8 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
-import android.app.Application
-import android.util.Log
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeRepository
-import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIState
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.HomeViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
@@ -17,24 +10,16 @@ import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class HomeViewModel(application: Application, private val homeRepository: HomeRepository): ViewModel() {
-
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application.applicationContext)
-    }
+class HomeViewModel(private val localStorage: LocalStorage, private val homeRepository: HomeRepository): ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUIState())
     val uiState = _uiState.asStateFlow()

@@ -1,7 +1,5 @@
 package co.nexlabs.betterhr.joblanding.network.api.login
 
-import android.app.Application
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.login.data.InvalidQRCodeException
 import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInRepository
@@ -28,13 +26,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class QRLogInViewModel(application: Application, private val qrLogInRepository: QRLogInRepository): ViewModel() {
-
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
+class QRLogInViewModel(private val localStorage: LocalStorage, private val qrLogInRepository: QRLogInRepository): ViewModel() {
 
     fun getBearerToken(): String {
         return localStorage.bearerToken
