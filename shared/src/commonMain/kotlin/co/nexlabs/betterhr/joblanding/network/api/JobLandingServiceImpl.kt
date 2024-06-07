@@ -41,6 +41,9 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
+import co.nexlabs.betterhr.joblanding.createApolloClient
+import co.nexlabs.betterhr.joblanding.createApolloClientWithAuth
+import co.nexlabs.betterhr.joblanding.createHttpClientWithAuthWithoutToken
 import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.request_response.ExistingFileIdTypeObject
@@ -82,16 +85,12 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import io.ktor.client.plugins.onUpload
-import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.header
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import io.ktor.client.*
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
@@ -99,6 +98,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
+import com.apollographql.apollo3.network.http.HttpNetworkTransport
 
 class JobLandingServiceImpl(private val application: Application, private val client: HttpClient) :
     JobLandingService {
@@ -109,32 +109,13 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         localStorage = AndroidLocalStorageImpl(application)
     }
 
-    val clientt = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-                encodeDefaults = true
-            })
-        }
+    val apolloClient = createApolloClient()
 
-        install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.HEADERS
-        }
+    val apolloClientWithAuth = createApolloClientWithAuth(localStorage.bearerToken)
 
-        defaultRequest {
-            header(API_KEY, API_VALUE_JOB)
-        }
-    }
+    val apolloClientWithAuthWithoutToken = createHttpClientWithAuthWithoutToken()
 
-    val apolloClient = ApolloClient.Builder()
-        .httpEngine(HttpEngine(clientt))
-        .serverUrl(baseUrlForJob)
-        .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
-        .build()
-
-    val headerInterceptor = Interceptor { chain ->
+    /*val headerInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
             .addHeader(API_KEY, API_VALUE_JOB)
             .build()
@@ -164,11 +145,11 @@ class JobLandingServiceImpl(private val application: Application, private val cl
         .addInterceptor(headerInterceptorWithAuth)
         .build()
 
-    /*val apolloClient = ApolloClient.Builder()
+    val apolloClient = ApolloClient.Builder()
         .okHttpClient(okHttpClient)
         .serverUrl(baseUrlForJob)
         .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
-        .build()*/
+        .build()
 
     val apolloClientWithAuth = ApolloClient.Builder()
         .okHttpClient(okHttpClientWithAuth)
@@ -179,7 +160,7 @@ class JobLandingServiceImpl(private val application: Application, private val cl
     val apolloClientWithAuthWithoutToken = ApolloClient.Builder()
         .serverUrl(baseUrlForAuth)
         .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
-        .build()
+        .build()*/
 
     override suspend fun sendVerification(body: SendVerificationCodeRequest): SendVerificationResponse {
 

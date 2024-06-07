@@ -1,37 +1,51 @@
 package co.nexlabs.betterhr.joblanding
 
+import co.nexlabs.betterhr.joblanding.util.baseUrlForAuth
+import co.nexlabs.betterhr.joblanding.util.baseUrlForJob
+import com.apollographql.apollo3.ApolloClient
+import com.apollographql.apollo3.network.http.HttpNetworkTransport
 import io.ktor.client.HttpClient
+expect fun createHttpClient(): HttpClient
 
-expect val Client: HttpClient
+expect fun createHttpClientWithAuth(bearerToken: String): HttpClient
 
-/*
-@OptIn(InternalAPI::class)
-suspend fun sendVerification(
-    client: HttpClient,
-    baseUrl: String,
-    body: SendVerificationCodeRequest
-): SendVerificationResponse {
-    val response = client.post("$baseUrl/graphql") {
-        headers {
-            append("Content-Type", "application/json")
-        }
-        this.body = Json.encodeToString(body)
-    }
-    return Json.decodeFromString(response.bodyAsText())
+expect fun createHttpClientWithAuthWithoutToken(): HttpClient
+
+fun createApolloClient(): ApolloClient {
+    val ktorClient = createHttpClient()
+
+    return ApolloClient.Builder()
+        /*.networkTransport(
+            HttpNetworkTransport(
+                client = ktorClient,
+                serverUrl = baseUrlForJob
+            )
+        )*/
+        .build()
 }
 
-@OptIn(InternalAPI::class)
-suspend fun validateCode(
-    client: HttpClient,
-    baseUrl: String,
-    body: VerifyOTPRequest
-): VerifyPhoneNumResponse {
-    val response = client.post("$baseUrl/graphql") {
-        headers {
-            append("Content-Type", "application/json")
-        }
-        this.body = Json.encodeToString(body)
-    }
+fun createApolloClientWithAuth(bearerToken: String): ApolloClient {
+    val ktorClientWithAuth = createHttpClientWithAuth(bearerToken)
 
-    return Json.decodeFromString(response.bodyAsText())
-}*/
+    return ApolloClient.Builder()
+        /*.networkTransport(
+            HttpNetworkTransport(
+                client = ktorClientWithAuth,
+                serverUrl = baseUrlForAuth
+            )
+        )*/
+        .build()
+}
+
+fun createApolloClientWithAuthWithoutToken(): ApolloClient {
+    val ktorClient = createHttpClientWithAuthWithoutToken()
+
+    return ApolloClient.Builder()
+        /*.networkTransport(
+            HttpNetworkTransport(
+                client = ktorClient,
+                serverUrl = baseUrlForAuth
+            )
+        )*/
+        .build()
+}
