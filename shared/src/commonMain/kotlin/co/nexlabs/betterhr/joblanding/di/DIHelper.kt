@@ -31,6 +31,7 @@ import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewsRepos
 import co.nexlabs.betterhr.joblanding.network.api.login.QRLogInViewModel
 import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInRepository
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
+import co.nexlabs.betterhr.joblanding.network.api.setting.SettingViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -114,6 +115,7 @@ fun initKoin(application: Application) {
                 factory { SubmitOfferViewModel(application, get()) }
                 factory { InterviewViewModel(application, get()) }
                 factory { QRLogInViewModel(application, get()) }
+                factory { SettingViewModel(application) }
             }
         )
     }

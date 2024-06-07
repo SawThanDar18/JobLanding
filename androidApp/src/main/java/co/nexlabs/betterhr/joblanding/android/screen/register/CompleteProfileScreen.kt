@@ -118,6 +118,10 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     }
 
     if (uiState.candidateData != null) {
+        scope.launch {
+            viewModel.updateCandidateId(uiState.candidateData.id)
+            viewModel.updatePhone(uiState.candidateData.phone)
+        }
         name = uiState.candidateData.name
         position = uiState.candidateData.desiredPosition
         phoneNumber = uiState.candidateData.phone
@@ -193,7 +197,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                 modifier = Modifier
                     .size(20.dp)
                     .clickable {
-                        //showMenu = true
+                        navController.navigate("setting-screen")
                     },
                 alignment = Alignment.Center
             )

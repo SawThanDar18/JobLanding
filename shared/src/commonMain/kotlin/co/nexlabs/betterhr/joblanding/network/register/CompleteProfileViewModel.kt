@@ -36,6 +36,14 @@ class CompleteProfileViewModel(
     private val _uiState = MutableStateFlow(CompleteProfileUIState())
     val uiState = _uiState.asStateFlow()
 
+    fun updateCandidateId(candidateId: String) {
+        localStorage.candidateId = candidateId
+    }
+
+    fun updatePhone(phone: String) {
+        localStorage.phone = phone
+    }
+
     fun getCandidateData() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
