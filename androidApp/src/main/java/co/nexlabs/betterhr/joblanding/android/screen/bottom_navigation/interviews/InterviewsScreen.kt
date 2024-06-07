@@ -67,11 +67,9 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
     var todayInterviewList: MutableList<InterviewUIModel> = ArrayList()
     var upComingInterviewList: MutableList<InterviewUIModel> = ArrayList()
 
-    LaunchedEffect(Unit) {
-        scope.launch {
-            if (!viewModel.getBearerToken().isNullOrBlank()) {
-                viewModel.fetchInterviews()
-            }
+    scope.launch {
+        if (viewModel.getBearerToken() != "") {
+            viewModel.fetchInterviews()
         }
     }
 
@@ -235,7 +233,11 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
                                                     horizontalAlignment = Alignment.Start
                                                 ) {
                                                     Text(
-                                                        text = "${formatTime(item.interviewStartTime)} - ${formatTime(item.interviewEndTime)}",
+                                                        text = "${formatTime(item.interviewStartTime)} - ${
+                                                            formatTime(
+                                                                item.interviewEndTime
+                                                            )
+                                                        }",
                                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                         fontWeight = FontWeight.W400,
                                                         color = Color(0xFF757575),
@@ -359,7 +361,11 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
                                                     horizontalAlignment = Alignment.Start
                                                 ) {
                                                     Text(
-                                                        text = "${formatTime(item.interviewStartTime)} - ${formatTime(item.interviewEndTime)}",
+                                                        text = "${formatTime(item.interviewStartTime)} - ${
+                                                            formatTime(
+                                                                item.interviewEndTime
+                                                            )
+                                                        }",
                                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                         fontWeight = FontWeight.W400,
                                                         color = Color(0xFF757575),
