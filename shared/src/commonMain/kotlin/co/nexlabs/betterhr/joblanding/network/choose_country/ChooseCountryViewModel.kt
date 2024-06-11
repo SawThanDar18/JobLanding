@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.choose_country
 
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
@@ -31,7 +32,7 @@ class ChooseCountryViewModel(
     val uiState = _uiState.asStateFlow()
 
     fun getCountriesList() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -70,7 +71,7 @@ class ChooseCountryViewModel(
     }
 
     fun getDynamicPagesId(countryId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             chooseCountryRepository.getDynamicPages(countryId).toFlow()
                 .catch { e ->
                     _uiState.update {

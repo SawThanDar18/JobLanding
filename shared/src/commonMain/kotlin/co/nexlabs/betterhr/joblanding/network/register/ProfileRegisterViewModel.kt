@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
-import android.net.Uri
-import android.util.Log
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.register.data.ProfileRegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.data.ProfileRegisterUIState
@@ -10,7 +10,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -50,7 +49,7 @@ class ProfileRegisterViewModel(
         desiredPosition: String,
         summary: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isSuccessForCandidateId = false,
@@ -113,10 +112,6 @@ class ProfileRegisterViewModel(
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                             )
                         }
-
-
-                        Log.d("tok>>", localStorage.token)
-                        Log.d("can>>", data.data!!.createCandidate!!.id.toString())
                     } else {
                         _uiState.update {
                             it.copy(
@@ -132,15 +127,14 @@ class ProfileRegisterViewModel(
     }
 
     fun uploadFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             try {
                 profileRegisterRepository.uploadFile(file, fileName, type, localStorage.candidateId)
             } catch (e: Exception) {
-                Log.d("error>>", e.message.toString())
             }
         }
     }
@@ -148,7 +142,7 @@ class ProfileRegisterViewModel(
 
     fun getBearerToken(token: String) {
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isSuccessForCandidateId = false,

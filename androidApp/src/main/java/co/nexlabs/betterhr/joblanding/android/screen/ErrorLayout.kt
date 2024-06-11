@@ -1,4 +1,4 @@
-package co.nexlabs.betterhr.joblanding.common
+package co.nexlabs.betterhr.joblanding.android.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,6 @@ import co.nexlabs.betterhr.joblanding.util.UIErrorType
 @Composable
 fun ErrorLayout(
     errorType: UIErrorType,
-    //onClick: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

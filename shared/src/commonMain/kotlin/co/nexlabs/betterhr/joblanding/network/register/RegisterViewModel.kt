@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterUIState
@@ -8,7 +9,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,7 +40,7 @@ class RegisterViewModel(
     val uiStateForVerify: StateFlow<UiState> = _uiStateForVerify
 
     fun requestOTP(phoneNumber: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             try {
                 var response = registerRepository.requestOTP(phoneNumber)
                 _uiState.value = UiState.Success(response.data.response.message ?: "")
@@ -51,7 +51,7 @@ class RegisterViewModel(
     }
 
     fun verifyOTP(code: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             try {
                 var response = registerRepository.verifyOTP(code)
                 if (response.data.verifyPhoneNumber.token == null) {
@@ -85,7 +85,7 @@ class RegisterViewModel(
 
     fun getBearerToken(token: String) {
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _registerUiState.update {
                 it.copy(
                     isSuccessForBearerToken = false,

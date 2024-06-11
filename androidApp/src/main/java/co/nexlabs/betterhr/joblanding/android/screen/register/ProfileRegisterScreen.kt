@@ -29,15 +29,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,20 +49,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -79,25 +67,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import co.nexlabs.betterhr.joblanding.AndroidFileUri
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.FileInfo
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileName
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileSize
-import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.SelectedFileInfo
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
-import co.nexlabs.betterhr.joblanding.common.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.register.ProfileRegisterViewModel
-import co.nexlabs.betterhr.joblanding.network.register.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
-import moe.tlaster.precompose.viewmodel.viewModel
-import java.io.File
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -184,16 +168,19 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
                 viewModel.updateBearerToken(uiState.bearerToken)
 
                 selectedImageUri?.let { uri ->
-                    viewModel.uploadFile(uri, imageFileName, "profile")
+                    val fileUri = AndroidFileUri(uri)
+                    viewModel.uploadFile(fileUri, imageFileName, "profile")
                 }
 
                 cvFile?.let { file ->
-                    viewModel.uploadFile(file, cvFileName, "cv")
+                    val fileUri = AndroidFileUri(file)
+                    viewModel.uploadFile(fileUri, cvFileName, "cv")
                 }
 
                 if (coverLetterFile.isNotEmpty()) {
                     coverLetterFile[0].let {
-                        viewModel.uploadFile(it.uri, it.fileName ?: "", "cover_letter")
+                        val fileUri = AndroidFileUri(it.uri)
+                        viewModel.uploadFile(fileUri, it.fileName ?: "", "cover_letter")
                     }
                 }
 
