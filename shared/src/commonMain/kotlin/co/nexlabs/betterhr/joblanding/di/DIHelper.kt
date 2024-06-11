@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.di
 
-import android.app.Application
 import co.nexlabs.betterhr.joblanding.AssetProvider
+import co.nexlabs.betterhr.joblanding.FileHandler
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
@@ -52,7 +52,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import io.ktor.serialization.kotlinx.json.json
 
-fun initKoin(localStorage: LocalStorage, application: Application, assetProvider: AssetProvider) {
+fun initKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider: AssetProvider) {
     startKoin {
         modules(
             module {
@@ -82,7 +82,7 @@ fun initKoin(localStorage: LocalStorage, application: Application, assetProvider
                         }
                     }
                 }
-                single<JobLandingService> {JobLandingServiceImpl(localStorage, application, get())}
+                single<JobLandingService> {JobLandingServiceImpl(localStorage, fileHandler, get())}
                 single { RegisterRepository(get()) }
                 single { ChooseCountryRepository(get()) }
                 single { HomeRepository(get()) }

@@ -1,5 +1,7 @@
 package co.nexlabs.betterhr.joblanding
 
+import android.content.ContentResolver
+import android.content.Context
 import co.nexlabs.betterhr.joblanding.util.API_KEY
 import co.nexlabs.betterhr.joblanding.util.API_VALUE_JOB
 import io.ktor.client.HttpClient
@@ -15,13 +17,24 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import java.io.FileInputStream
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineDispatcher
-import android.content.Context
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+
+class AndroidFileHandler(private val contentResolver: ContentResolver) : FileHandler {
+    override fun readFileBytes(fileUri: FileUri): ByteArray {
+        val uri = fileUri.toAndroidUri()
+        val parcelFileDescriptor = contentResolver.openFileDescriptor(uri, "r", null)!!
+        val inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
+        return inputStream.readBytes()
+    }
+
+    private fun FileUri.toAndroidUri(): Uri {
+        return Uri.parse(this.uri)
+    }
+}
 
 class AndroidFileUri(private val androidUri: Uri) : FileUri {
     override val uri: String

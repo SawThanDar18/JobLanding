@@ -13,6 +13,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.readBytes
 import kotlinx.serialization.json.Json
 import platform.darwin.dispatch_async
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,10 +23,21 @@ import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
 import kotlinx.coroutines.Runnable
 import kotlin.coroutines.CoroutineContext
 import platform.Foundation.NSBundle
+import platform.Foundation.NSData
 import platform.Foundation.NSString
 import platform.Foundation.stringWithContentsOfFile
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.NSURL
+import platform.Foundation.dataWithContentsOfURL
+import platform.UIKit.UIApplication
+class iOSFileHandler : FileHandler {
+    @OptIn(ExperimentalForeignApi::class)
+    override fun readFileBytes(fileUri: FileUri): ByteArray {
+        val url = fileUri as? NSURL ?: throw IllegalArgumentException("Invalid FileUri type")
+        val data = NSData.dataWithContentsOfURL(url)
+        return data?.bytes?.readBytes(data.length.toInt()) ?: ByteArray(0)
+    }
+}
 
 class IosFileUri(private val iosUrl: NSURL) : FileUri {
     override val uri: String

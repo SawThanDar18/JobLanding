@@ -1,7 +1,5 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
-import android.os.ParcelFileDescriptor
-import java.io.FileInputStream
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
@@ -38,6 +36,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
+import co.nexlabs.betterhr.joblanding.FileHandler
 import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.createApolloClient
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuth
@@ -98,7 +97,7 @@ fun initializeApolloClientWithAuthWithoutToken(): ApolloClient {
     return createApolloClientWithAuthWithoutToken()
 }
 
-class JobLandingServiceImpl(private val localStorage: LocalStorage, private val application: Application, private val client: HttpClient): JobLandingService {
+class JobLandingServiceImpl(private val localStorage: LocalStorage, private val fileHandler: FileHandler, private val client: HttpClient): JobLandingService {
 
     val apolloClient = initializeApolloClient()
 
@@ -306,12 +305,21 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     ): List<FileUploadResponse> {
         val fileTypeObject = FileTypeObject(types)
 
-        var parcelFileDescriptor: ParcelFileDescriptor
+        val formData = formData {
+            files.forEachIndexed { index, file ->
+                file?.let {
+                    val byteArray = fileHandler.readFileBytes(file)
+                    append("files[]", byteArray, Headers.build {
+                        append(HttpHeaders.ContentDisposition, "filename=${fileNames[index]}")
+                    })
+                }
+            }
+           /*
+           var parcelFileDescriptor: ParcelFileDescriptor
         var inputStream: FileInputStream
         var byteArray: ByteArray
 
-        val formData = formData {
-            files.forEachIndexed { index, file ->
+           files.forEachIndexed { index, file ->
                 parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
                 inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
                 byteArray = inputStream.readBytes()
@@ -319,7 +327,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
                 append("files[]", byteArray, Headers.build {
                     append(HttpHeaders.ContentDisposition, "filename=${fileNames[index]}")
                 })
-            }
+            }*/
             append(
                 "types",
                 Json.encodeToString(fileTypeObject),
@@ -455,13 +463,13 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         val fileTypeObject = FileTypeObject(types)
         val existingFileTypeObject = ExistingFileIdTypeObject(existingFileId)
 
-        var parcelFileDescriptor: ParcelFileDescriptor
+        /*var parcelFileDescriptor: ParcelFileDescriptor
         var inputStream: FileInputStream
-        var byteArray: ByteArray
+        var byteArray: ByteArray*/
 
         val formData = formData {
 
-            files.forEachIndexed { index, file ->
+            /*files.forEachIndexed { index, file ->
                 parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
                 inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
                 byteArray = inputStream.readBytes()
@@ -469,6 +477,14 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
                 append("file$index", byteArray, Headers.build {
                     append(HttpHeaders.ContentDisposition, "filename=${fileName[index]}")
                 })
+            }*/
+            files.forEachIndexed { index, file ->
+                file?.let {
+                    val byteArray = fileHandler.readFileBytes(file)
+                    append("file$index", byteArray, Headers.build {
+                        append(HttpHeaders.ContentDisposition, "filename=${fileName[index]}")
+                    })
+                }
             }
             append(
                 "file_types",
@@ -538,11 +554,12 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         type: String,
         candidateId: String,
     ): FileUploadResponse {
-        val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
+        /*val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
         val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
-        val byteArray = inputStream.readBytes()
+        val byteArray = inputStream.readBytes()*/
 
         val formData = formData {
+            val byteArray = fileHandler.readFileBytes(file)
             append("file", byteArray, Headers.build {
                 append(HttpHeaders.ContentDisposition, "filename=\"${fileName.replace(" ", "_")}\"")
             })
@@ -572,11 +589,12 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         candidateId: String,
         fileId: String
     ): FileUploadResponse {
-        val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
+        /*val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
         val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
-        val byteArray = inputStream.readBytes()
+        val byteArray = inputStream.readBytes()*/
 
         val formData = formData {
+            val byteArray = fileHandler.readFileBytes(file)
             append("file", byteArray, Headers.build {
                 append(HttpHeaders.ContentDisposition, "filename=\"${fileName.replace(" ", "_")}\"")
             })
@@ -633,19 +651,28 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     ): List<FileUploadResponse> {
         val fileTypeObject = FileTypeObject(types)
 
-        var parcelFileDescriptor: ParcelFileDescriptor
+        /*var parcelFileDescriptor: ParcelFileDescriptor
         var inputStream: FileInputStream
-        var byteArray: ByteArray
+        var byteArray: ByteArray*/
 
         val formData = formData {
             files.forEachIndexed { index, file ->
-                parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
+                /*parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
                 inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
                 byteArray = inputStream.readBytes()
 
                 append("files[]", byteArray, Headers.build {
                     append(HttpHeaders.ContentDisposition, "filename=${fileNames[index]}")
-                })
+                })*/
+
+                files.forEachIndexed { index, file ->
+                    file?.let {
+                        val byteArray = fileHandler.readFileBytes(file)
+                        append("file$index", byteArray, Headers.build {
+                            append(HttpHeaders.ContentDisposition, "filename=${fileNames[index]}")
+                        })
+                    }
+                }
             }
             append(
                 "types",
@@ -680,11 +707,12 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         candidateId: String,
         referenceId: String
     ): FileUploadResponse {
-        val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
+        /*val parcelFileDescriptor = application.contentResolver.openFileDescriptor(file, "r", null)
         val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
-        val byteArray = inputStream.readBytes()
+        val byteArray = inputStream.readBytes()*/
 
         val formData = formData {
+            val byteArray = fileHandler.readFileBytes(file)
             append("file", byteArray, Headers.build {
                 append(HttpHeaders.ContentDisposition, "filename=\"${fileName.replace(" ", "_")}\"")
             })

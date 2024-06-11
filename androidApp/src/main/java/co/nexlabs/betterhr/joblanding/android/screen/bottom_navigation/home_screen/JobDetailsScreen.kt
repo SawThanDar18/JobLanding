@@ -107,7 +107,7 @@ import co.nexlabs.betterhr.joblanding.android.data.CurrentDateTimeFormatted
 import co.nexlabs.betterhr.joblanding.android.data.convertDate
 import co.nexlabs.betterhr.joblanding.android.screen.register.MultiStyleText
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
-import co.nexlabs.betterhr.joblanding.common.ErrorLayout
+import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.UiState
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobsUIModel

@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
-import co.nexlabs.betterhr.joblanding.common.ErrorLayout
+import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionCompaniesUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionUIModel

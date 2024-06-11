@@ -7,6 +7,9 @@ import com.apollographql.apollo3.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo3.cache.normalized.normalizedCache
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineDispatcher
+interface FileHandler {
+    fun readFileBytes(fileUri: FileUri): ByteArray
+}
 
 interface FileUri {
     val uri: String
