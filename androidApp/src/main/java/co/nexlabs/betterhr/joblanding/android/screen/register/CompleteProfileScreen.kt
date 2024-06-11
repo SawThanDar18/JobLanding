@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import co.nexlabs.betterhr.joblanding.AndroidFileUri
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -1132,8 +1133,9 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         if (uiState.candidateData != null) {
                                             if (uiState.candidateData.profile != null) {
                                                 selectedImageUri?.let { uri ->
+                                                    val fileUri = AndroidFileUri(uri)
                                                     viewModel.updateFile(
-                                                        uri,
+                                                        fileUri,
                                                         selectedFileName,
                                                         uiState.candidateData.profile.type,
                                                         uiState.candidateData.profile.id,
@@ -1141,8 +1143,9 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                 }
                                             } else {
                                                 selectedImageUri?.let { uri ->
+                                                    val fileUri = AndroidFileUri(uri)
                                                     viewModel.uploadFile(
-                                                        uri,
+                                                        fileUri,
                                                         selectedFileName,
                                                         "profile"
                                                     )

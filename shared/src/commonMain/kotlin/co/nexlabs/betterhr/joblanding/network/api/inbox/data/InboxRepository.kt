@@ -1,6 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.inbox.data
 
-import android.net.Uri
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
 
 class InboxRepository(private val jobLandingService: JobLandingService) {
@@ -14,7 +14,7 @@ class InboxRepository(private val jobLandingService: JobLandingService) {
     suspend fun fetchInboxById(id: String) = jobLandingService.fetchNotificationById(id)
 
     suspend fun uploadMultipleFiles(
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         fileNames: MutableList<String?>,
         types: List<String>,
         candidateId: String,
@@ -37,7 +37,7 @@ class InboxRepository(private val jobLandingService: JobLandingService) {
     ) = jobLandingService.responseAssignment(candidateId, jobId, referenceId, title, description, status, summitedDate, candidateDescription, endTime, attachments, subDomain, referenceApplicationId)
 
     suspend fun uploadSingleFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         candidateId: String,

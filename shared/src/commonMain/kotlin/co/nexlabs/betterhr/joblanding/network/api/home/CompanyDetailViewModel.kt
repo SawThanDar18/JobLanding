@@ -1,6 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
-import android.util.Log
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -10,7 +10,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -25,7 +24,7 @@ class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailR
     val uiState = _uiState.asStateFlow()
 
     fun getCompanyDetail(companyId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             companyDetailRepository.getCompanyDetail(companyId).toFlow()
                 .catch { e ->
                     _uiState.update {
@@ -87,7 +86,7 @@ class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailR
     }
 
     fun getCompanyDetailJob(companyId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             companyDetailRepository.getCompanyDetailJob(companyId).toFlow()
                 .catch { e ->
                     _uiState.update {

@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.apply_job
 
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.data.ApplyJobRepository
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.data.ApplyJobUIState
@@ -8,7 +9,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -29,7 +29,7 @@ private val applyJobRepository: ApplyJobRepository
     fun applyJob(
         referenceId: String, jobId: String, status: String, subDomain: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,

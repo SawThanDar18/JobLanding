@@ -1,22 +1,14 @@
 package co.nexlabs.betterhr.joblanding.network.api.login
 
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
-import co.nexlabs.betterhr.joblanding.network.api.login.data.InvalidQRCodeException
 import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInRepository
 import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInUIState
-import co.nexlabs.betterhr.joblanding.network.api.login.data.WebLoginException
-import co.nexlabs.betterhr.joblanding.network.api.login.data.WebLoginQRCodeDecrypter
-import co.nexlabs.betterhr.joblanding.network.api.login.data.WebLoginQRData
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import io.jsonwebtoken.UnsupportedJwtException
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -35,7 +27,7 @@ class QRLogInViewModel(private val localStorage: LocalStorage, private val qrLog
     private val _uiState = MutableStateFlow(QRLogInUIState())
     val uiState = _uiState.asStateFlow()
 
-    fun validateQRToken(qrToken: String): Observable<WebLoginQRData> {
+    /*fun validateQRToken(qrToken: String): Observable<WebLoginQRData> {
         return Observable.create<WebLoginQRData> { emitter ->
             try {
                 val qrData = WebLoginQRCodeDecrypter()(qrToken)
@@ -52,10 +44,10 @@ class QRLogInViewModel(private val localStorage: LocalStorage, private val qrLog
             }
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-    }
+    }*/
 
     fun qrScanLogIn(qrToken: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,

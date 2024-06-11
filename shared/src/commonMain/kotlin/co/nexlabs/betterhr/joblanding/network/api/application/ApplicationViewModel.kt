@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.application
 
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationRepository
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationUIState
@@ -11,7 +12,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -31,7 +31,7 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
     val uiState = _uiState.asStateFlow()
 
     fun fetchApplication() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isSuccessGetApplicationData = false,
@@ -115,7 +115,7 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
     }
 
     fun getCompanyInfo(ids: List<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -181,7 +181,7 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
     }
 
     fun fetchApplicationById(id: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,

@@ -1,6 +1,5 @@
 package co.nexlabs.betterhr.joblanding.viewmodel
 
-import android.util.Log
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationUIModel
 

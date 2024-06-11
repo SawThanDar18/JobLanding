@@ -1,9 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
-import android.app.Application
-import android.net.Uri
 import android.os.ParcelFileDescriptor
-import android.util.Log
 import java.io.FileInputStream
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
@@ -41,7 +38,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
-import co.nexlabs.betterhr.joblanding.FileHandler
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.createApolloClient
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuth
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuthWithoutToken
@@ -303,7 +300,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun uploadMultipleFilesForCreateApplication(
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         fileNames: MutableList<String?>,
         types: List<String>
     ): List<FileUploadResponse> {
@@ -451,15 +448,12 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         currentCompany: String,
         workingSince: String,
         fileName: MutableList<String?>,
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         types: List<String>,
         existingFileId: List<String>
     ): UploadResponseId {
         val fileTypeObject = FileTypeObject(types)
         val existingFileTypeObject = ExistingFileIdTypeObject(existingFileId)
-
-        Log.d("file>>>Object", fileTypeObject.toString())
-        Log.d("file>>>idObject", existingFileTypeObject.toString())
 
         var parcelFileDescriptor: ParcelFileDescriptor
         var inputStream: FileInputStream
@@ -516,7 +510,6 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
 
             return response.body()
         } catch (e: Exception) {
-            Log.d("err>>", e.message.toString())
         }
         val response = client.submitFormWithBinaryData(
             url = baseUrlForCreateApplication,
@@ -540,7 +533,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun uploadUserFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         candidateId: String,
@@ -573,7 +566,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun updateUserFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         candidateId: String,
@@ -616,7 +609,6 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun fetchApplicationById(id: String): ApolloCall<FetchApplicationByIdQuery.Data> {
-        Log.d("api>>", "callfetchappbyid")
         return apolloClientWithAuth.query(FetchApplicationByIdQuery(id))
     }
 
@@ -633,7 +625,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun uploadMultipleFiles(
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         fileNames: MutableList<String?>,
         types: List<String>,
         candidateId: String,
@@ -682,7 +674,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun uploadSingleFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         candidateId: String,

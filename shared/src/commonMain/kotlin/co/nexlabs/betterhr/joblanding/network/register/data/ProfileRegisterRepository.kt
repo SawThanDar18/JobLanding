@@ -1,6 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.register.data
 
-import android.net.Uri
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
 
 class ProfileRegisterRepository(private val jobLandingService: JobLandingService) {
@@ -16,7 +16,7 @@ class ProfileRegisterRepository(private val jobLandingService: JobLandingService
     suspend fun getBearerToken(token: String) = jobLandingService.getBearerToken(token)
 
     suspend fun uploadFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         candidateId: String

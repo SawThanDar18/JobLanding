@@ -1,6 +1,5 @@
 package co.nexlabs.betterhr.joblanding.viewmodel
 
-import android.util.Log
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobDatUIModel
@@ -12,13 +11,6 @@ object JobDetailViewModelMapper {
 
     fun mapFetchSaveJobDataToViewModel(data: FetchSaveJobByJobIdQuery.Data?): FetchSaveJobsUIModel {
         return if (data != null) {
-            Log.d("fetch>>", FetchSaveJobsUIModel(
-                data = FetchSaveJobDatUIModel(
-                    data.fetchSaveJobByJobId!!.id ?: "",
-                    data.fetchSaveJobByJobId.job_id ?: "",
-                    data.fetchSaveJobByJobId.candidate_id ?: ""
-                )
-            ).toString())
             FetchSaveJobsUIModel(
                 data = FetchSaveJobDatUIModel(
                     data.fetchSaveJobByJobId!!.id ?: "",

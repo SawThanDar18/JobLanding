@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
-import android.net.Uri
-import android.util.Log
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobDatUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobsUIModel
@@ -14,7 +14,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import java.io.File
 
 sealed class UiState {
     object Loading : UiState()
@@ -61,17 +59,6 @@ class JobDetailViewModel(
         return localStorage.bearerToken
     }
 
-    fun checkBearToken(jobId: String) {
-        if (localStorage.bearerToken != "") {
-            fetchSaveJobsById(jobId)
-           /* _uiState.update {
-                it.copy(
-                    isBearerTokenExist = true
-                )
-            }*/
-        }
-    }
-
     fun updateBearerToken(bearerToken: String) {
         localStorage.bearerToken = bearerToken
     }
@@ -85,7 +72,7 @@ class JobDetailViewModel(
     }
 
     fun getJobDetail(jobId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             jobDetailRepository.getJobDetail(jobId).toFlow()
                 .catch { e ->
                     _uiState.update {
@@ -149,9 +136,7 @@ class JobDetailViewModel(
     }
 
     fun saveJob(jobId: String) {
-        Log.d("candi>>", localStorage.candidateId)
-        Log.d("jobId>>", jobId)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             jobDetailRepository.saveJob(localStorage.candidateId, jobId).toFlow()
                 .catch { e ->
                     _uiState.update {
@@ -209,10 +194,7 @@ class JobDetailViewModel(
     }
 
     fun fetchSaveJobsById(jobId: String) {
-        Log.d("bearer>>", localStorage.bearerToken)
-        Log.d("can>>", localStorage.candidateId)
-        Log.d("jobid>>", jobId)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             jobDetailRepository.fetchSaveJobsById(jobId).toFlow()
                 .catch { e ->
                     _uiState.update {
@@ -263,7 +245,6 @@ class JobDetailViewModel(
                                 )
                             }
                         } else {
-                            Log.d("fetch>>", "not null")
                             _uiState.update {
                                 it.copy(
                                     fetchSaveJobId = data.data!!.fetchSaveJobByJobId!!.id ?: "",
@@ -285,7 +266,7 @@ class JobDetailViewModel(
     }
 
     fun unSaveJob(id: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             jobDetailRepository.unSaveJob(id).toFlow()
                 .catch { e ->
                     _uiState.update {
@@ -343,10 +324,10 @@ class JobDetailViewModel(
     }
 
     fun requestOTP(phoneNumber: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             try {
-                var response = jobDetailRepository.requestOTP(phoneNumber)
-                _uiStateRegister.value = UiState.Success(response.data.response.message ?: "")
+                val response = jobDetailRepository.requestOTP(phoneNumber)
+                _uiStateRegister.value = UiState.Success(response.data.response.message)
             } catch (e: Exception) {
                 _uiStateRegister.value = UiState.Error("Error: ${e.message}")
             }
@@ -354,15 +335,10 @@ class JobDetailViewModel(
     }
 
     fun verifyOTP(code: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             try {
-                var response = jobDetailRepository.verifyOTP(code)
-                if (response.data.verifyPhoneNumber.token == null) {
-                    _uiStateForVerify.value =
-                        UiState.Error("Error: ${response.data.verifyPhoneNumber.message}")
-                } else {
-                    _uiStateForVerify.value = UiState.Success(response.data.verifyPhoneNumber.token)
-                }
+                val response = jobDetailRepository.verifyOTP(code)
+                _uiStateForVerify.value = UiState.Success(response.data.verifyPhoneNumber.token)
             } catch (e: Exception) {
                 _uiStateForVerify.value = UiState.Error("Error: ${e.message}")
             }
@@ -371,7 +347,7 @@ class JobDetailViewModel(
 
     //After SignUp
     fun getCandidateData() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -437,11 +413,11 @@ class JobDetailViewModel(
     }
 
     fun uploadMultipleFiles(
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         fileNames: MutableList<String?>,
         types: List<String>
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -450,7 +426,7 @@ class JobDetailViewModel(
                 )
             }
             try {
-                var response = jobDetailRepository.uploadMultipleFiles(files, fileNames, types)
+                val response = jobDetailRepository.uploadMultipleFiles(files, fileNames, types)
                 if (response.isNotEmpty()) {
                     _uiState.update {
                         it.copy(
@@ -486,7 +462,7 @@ class JobDetailViewModel(
 //        types: MutableList<String>,
         fileIds: MutableList<String>
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isSuccessCreateApplication = false,
@@ -496,7 +472,7 @@ class JobDetailViewModel(
                 )
             }
             try {
-                var response = jobDetailRepository.createApplication(
+                val response = jobDetailRepository.createApplication(
                     referenceJobId,
                     subdomain,
                     jobTitle,
@@ -538,11 +514,11 @@ class JobDetailViewModel(
         currentCompany: String,
         workingSince: String,
         fileName: MutableList<String?>,
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         types: MutableList<String>,
         existingFileId: MutableList<String>
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isSuccessCreateApplication = false,
@@ -552,7 +528,7 @@ class JobDetailViewModel(
                 )
             }
             try {
-                var response = jobDetailRepository.createApplicationWithExistingFileIds(
+                val response = jobDetailRepository.createApplicationWithExistingFileIds(
                     referenceJobId,
                     subdomain,
                     jobTitle,
@@ -589,8 +565,7 @@ class JobDetailViewModel(
     }
 
     fun updateApplication(id: String) {
-        Log.d("updateid>>", id)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -659,11 +634,11 @@ class JobDetailViewModel(
     }
 
     fun uploadFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -672,7 +647,7 @@ class JobDetailViewModel(
                 )
             }
             try {
-                var response =
+                val response =
                     jobDetailRepository.uploadFile(file, fileName, type, localStorage.candidateId)
                 _uiState.update {
                     it.copy(
@@ -694,12 +669,12 @@ class JobDetailViewModel(
     }
 
     fun updateFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         fileId: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -740,7 +715,7 @@ class JobDetailViewModel(
         desiredPosition: String,
         summary: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isSuccessForCandidateId = false,
@@ -803,10 +778,6 @@ class JobDetailViewModel(
                                 error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
                             )
                         }
-
-
-                        Log.d("tok>>", localStorage.token)
-                        Log.d("can>>", data.data!!.createCandidate!!.id.toString())
                     } else {
                         _uiState.update {
                             it.copy(
@@ -825,11 +796,7 @@ class JobDetailViewModel(
     fun applyJob(
         referenceId: String, jobId: String, subDomain: String
     ) {
-        Log.d("reference>>>", referenceId)
-        Log.d("candidate>>>", localStorage.candidateId)
-        Log.d("jobId>>>", jobId)
-        Log.d("subdomain>>", subDomain)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             jobDetailRepository.applyJob(
                 referenceId,
                 localStorage.candidateId,
@@ -895,7 +862,7 @@ class JobDetailViewModel(
 
     fun getBearerTokenFromAPI(token: String) {
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isSuccessForCandidateId = false,

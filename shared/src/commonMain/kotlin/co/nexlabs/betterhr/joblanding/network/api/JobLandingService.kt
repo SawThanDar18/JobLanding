@@ -1,6 +1,5 @@
 package co.nexlabs.betterhr.joblanding.network.api
 
-import android.net.Uri
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
@@ -30,6 +29,7 @@ import co.nexlabs.betterhr.job.with_auth.UpdateNotificationMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateSkillMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateSummaryMutation
 import co.nexlabs.betterhr.job.with_auth.VerifySmsTokenAndAuthMutation
+import co.nexlabs.betterhr.job.with_auth.type.File
 import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionJobsQuery
@@ -38,6 +38,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileUploadResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
@@ -47,8 +48,6 @@ import co.nexlabs.betterhr.joblanding.network.api.request_response.UploadRespons
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyOTPRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.VerifyPhoneNumResponse
 import com.apollographql.apollo3.ApolloCall
-import java.io.File
-
 interface JobLandingService {
 
     suspend fun sendVerification(body: SendVerificationCodeRequest): SendVerificationResponse
@@ -93,7 +92,7 @@ interface JobLandingService {
     suspend fun applyJob(referenceId: String, candidateId: String, jobId: String, status: String, subDomain: String): ApolloCall<ApplyJobMutation.Data>
 
     suspend fun uploadMultipleFilesForCreateApplication(
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         fileNames: MutableList<String?>,
         types: List<String>
     ): List<FileUploadResponse>
@@ -125,7 +124,7 @@ interface JobLandingService {
         currentCompany: String,
         workingSince: String,
         fileName: MutableList<String?>,
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         types: List<String>,
         existingFileId: List<String>,
     ): UploadResponseId
@@ -135,14 +134,14 @@ interface JobLandingService {
     ): ApolloCall<UpdateApplicationMutation.Data>
 
     suspend fun uploadUserFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         candidateId: String
     ): FileUploadResponse
 
     suspend fun updateUserFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         candidateId: String,
@@ -170,7 +169,7 @@ interface JobLandingService {
     ): ApolloCall<FetchNotificationByIdQuery.Data>
 
     suspend fun uploadMultipleFiles(
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         fileNames: MutableList<String?>,
         types: List<String>,
         candidateId: String,
@@ -178,7 +177,7 @@ interface JobLandingService {
     ): List<FileUploadResponse>
 
     suspend fun uploadSingleFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         candidateId: String,

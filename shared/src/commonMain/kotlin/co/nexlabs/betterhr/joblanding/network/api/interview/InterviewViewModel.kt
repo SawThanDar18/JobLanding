@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.interview
 
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewUIState
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewsRepository
@@ -29,7 +30,7 @@ class InterviewViewModel(private val localStorage: LocalStorage, private val int
     val uiState = _uiState.asStateFlow()
 
     fun fetchInterviews() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,

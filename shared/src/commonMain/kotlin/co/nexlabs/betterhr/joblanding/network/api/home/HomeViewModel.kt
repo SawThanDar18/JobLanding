@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIState
@@ -9,7 +10,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -25,7 +25,7 @@ class HomeViewModel(private val localStorage: LocalStorage, private val homeRepo
     val uiState = _uiState.asStateFlow()
 
     fun getJobLandingSections(pageId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             homeRepository.getJobLandingSections(pageId).toFlow()
                 .catch { e ->
                     _uiState.update {

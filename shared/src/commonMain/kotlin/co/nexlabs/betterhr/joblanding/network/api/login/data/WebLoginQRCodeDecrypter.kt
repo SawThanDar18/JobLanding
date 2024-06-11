@@ -1,11 +1,11 @@
 package co.nexlabs.betterhr.joblanding.network.api.login.data
 
-import io.jsonwebtoken.Jwts
-import java.util.Calendar
+/*import io.jsonwebtoken.Jwts
+import java.util.Calendar*/
 
 class WebLoginQRCodeDecrypter {
 
-    companion object {
+    /*companion object {
         private const val MAX_TIME = 5 * 60
     }
 
@@ -34,6 +34,6 @@ class WebLoginQRCodeDecrypter {
         if ((nowTimestamp - timestamp) > MAX_TIME) throw QRDataExpiredException()
 
         return WebLoginQRData(decryptedQRString)
-    }
+    }*/
 
 }

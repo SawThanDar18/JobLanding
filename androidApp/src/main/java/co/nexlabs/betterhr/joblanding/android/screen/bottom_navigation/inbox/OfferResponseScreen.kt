@@ -77,6 +77,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import co.nexlabs.betterhr.joblanding.AndroidFileUri
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileName
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
@@ -421,12 +422,12 @@ fun DrawScreen(viewModel: SubmitOfferViewModel, notiId: String, referenceId: Str
                 AsyncImage(
                     model = ImageRequest.Builder(applicationContext)
                         .data(R.drawable.signature)
-                        .decoderFactory { result, options, _ ->
+                        /*.decoderFactory { result, options, _ ->
                             ImageDecoderDecoder(
                                 result.source,
                                 options
                             )
-                        }
+                        }*/
                         .size(Size.ORIGINAL)
                         .build(),
                     contentDescription = "GIF",
@@ -582,8 +583,9 @@ fun DrawScreen(viewModel: SubmitOfferViewModel, notiId: String, referenceId: Str
                                 Log.d("nit>>", uri.toString())
 
                                 if (uri != null) {
+                                    val fileUri = AndroidFileUri(uri!!)
                                     scope.launch {
-                                        viewModel.uploadSingleFile(uri!!, "signature.png", "offer", referenceId)
+                                        viewModel.uploadSingleFile(fileUri, "signature.png", "offer", referenceId)
                                     }
                                 } else {
                                     Toast.makeText(applicationContext, "Please add Signature!", Toast.LENGTH_LONG).show()
@@ -819,8 +821,9 @@ fun UploadScreen(viewModel: SubmitOfferViewModel, notiId: String, referenceId: S
                 .clickable {
                     //upload file sign & response offer
                     if (uploadFile != null) {
+                        val fileUri = AndroidFileUri(uploadFile!!)
                         scope.launch {
-                            viewModel.uploadSingleFile(uploadFile!!, uploadFileName, "offer", referenceId)
+                            viewModel.uploadSingleFile(fileUri, uploadFileName, "offer", referenceId)
                         }
                     } else {
                         Toast

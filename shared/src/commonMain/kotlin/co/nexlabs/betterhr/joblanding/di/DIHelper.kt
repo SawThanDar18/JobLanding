@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding.di
 
 import android.app.Application
+import co.nexlabs.betterhr.joblanding.AssetProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
@@ -51,7 +52,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import io.ktor.serialization.kotlinx.json.json
 
-fun initKoin(localStorage: LocalStorage, application: Application) {
+fun initKoin(localStorage: LocalStorage, application: Application, assetProvider: AssetProvider) {
     startKoin {
         modules(
             module {
@@ -111,7 +112,7 @@ fun initKoin(localStorage: LocalStorage, application: Application) {
                 factory { CompleteProfileViewModel(localStorage, get()) }
                 factory { ApplicationViewModel(localStorage, get()) }
                 factory { InboxViewModel(localStorage, get()) }
-                factory { InboxDetailViewModel(get()) }
+                factory { InboxDetailViewModel(get(), assetProvider) }
                 factory { SubmitAssignmentViewModel(localStorage, get()) }
                 factory { SubmitOfferViewModel(localStorage, get()) }
                 factory { InterviewViewModel(localStorage, get()) }

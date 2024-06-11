@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.register
 
-import android.net.Uri
-import android.util.Log
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileRepository
 import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileUIState
@@ -11,7 +11,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -38,7 +37,7 @@ class CompleteProfileViewModel(
     }
 
     fun getCandidateData() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -102,26 +101,25 @@ class CompleteProfileViewModel(
     }
 
     fun uploadFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             try {
                 completeProfileRepository.uploadFile(file, fileName, type, localStorage.candidateId)
             } catch (e: Exception) {
-                Log.d("error>>", e.message.toString())
             }
         }
     }
 
     fun updateFile(
-        file: Uri,
+        file: FileUri,
         fileName: String,
         type: String,
         fileId: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,

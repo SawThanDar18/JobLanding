@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.inbox
 
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxUIState
@@ -31,7 +32,7 @@ class InboxViewModel(private val localStorage: LocalStorage, private val inboxRe
     fun fetchNotification(
         status: List<String>
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,

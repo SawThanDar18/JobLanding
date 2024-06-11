@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api.inbox
 
-import android.net.Uri
-import android.util.Log
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.SubmitAssignmentUIState
@@ -10,7 +10,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -26,12 +25,12 @@ class SubmitAssignmentViewModel(private val localStorage: LocalStorage, private 
     val uiState = _uiState.asStateFlow()
 
     fun uploadMultipleFiles(
-        files: MutableList<Uri?>,
+        files: MutableList<FileUri?>,
         fileNames: MutableList<String?>,
         types: List<String>,
         referenceId: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -76,19 +75,7 @@ class SubmitAssignmentViewModel(private val localStorage: LocalStorage, private 
         subDomain: String,
         referenceApplicationId: String
     ) {
-        Log.d("candi>>", localStorage.candidateId)
-        Log.d("jobId>>", jobId)
-        Log.d("referenceId>>", referenceId)
-        Log.d("title>>", title)
-        Log.d("description>>", description)
-        Log.d("status>>", status)
-        Log.d("summitedDate>>", summitedDate)
-        Log.d("candidateDescription>>", candidateDescription)
-        Log.d("endTime>>", endTime)
-        Log.d("attachments>>", attachments)
-        Log.d("subDomain>>", subDomain)
-        Log.d("ApplicationId>>", referenceApplicationId)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -162,7 +149,7 @@ class SubmitAssignmentViewModel(private val localStorage: LocalStorage, private 
     fun updateNotification(
         id: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,

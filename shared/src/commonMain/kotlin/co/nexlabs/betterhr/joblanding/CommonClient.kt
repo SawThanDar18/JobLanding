@@ -6,9 +6,18 @@ import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.cache.normalized.api.MemoryCacheFactory
 import com.apollographql.apollo3.cache.normalized.normalizedCache
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.CoroutineDispatcher
 
-expect class FileHandler {
-    suspend fun readFile(uri: String): ByteArray
+interface FileUri {
+    val uri: String
+}
+
+interface AssetProvider {
+    fun getAssetContent(fileName: String): String
+}
+
+expect object DispatcherProvider {
+    val io: CoroutineDispatcher
 }
 
 expect fun createHttpClient(): HttpClient

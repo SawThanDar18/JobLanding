@@ -12,28 +12,49 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.serialization.json.Json
-import platform.Foundation.NSData
+import platform.darwin.dispatch_async
+import kotlinx.coroutines.CoroutineDispatcher
+import platform.darwin.dispatch_get_global_queue
+import platform.darwin.dispatch_queue_t
+import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
+import kotlinx.coroutines.Runnable
+import kotlin.coroutines.CoroutineContext
+import platform.Foundation.NSBundle
+import platform.Foundation.NSString
+import platform.Foundation.stringWithContentsOfFile
+import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.NSURL
-import platform.Foundation.dataWithContentsOfURL
 
-actual class FileHandler {
-    actual suspend fun readFile(uri: String): ByteArray {
-        return withContext(Dispatchers.Default) {
-            val url = NSURL.fileURLWithPath(uri)
-            val data = NSData.dataWithContentsOfURL(url)
-            data?.toByteArray() ?: throw IllegalArgumentException("Cannot read file at URI: $uri")
+class IosFileUri(private val iosUrl: NSURL) : FileUri {
+    override val uri: String
+        get() = iosUrl.absoluteString ?: ""
+}
+
+class IosAssetProvider : AssetProvider {
+    @OptIn(ExperimentalForeignApi::class)
+    override fun getAssetContent(fileName: String): String {
+        val path = NSBundle.mainBundle.pathForResource(fileName, ofType = null) ?: return ""
+        val content = NSString.stringWithContentsOfFile(path, NSUTF8StringEncoding, null) ?: return ""
+        return content as String
+    }
+}
+
+actual object DispatcherProvider {
+    actual val io: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u))
+}
+
+private class NsQueueDispatcher(
+    private val dispatchQueue: dispatch_queue_t
+) : CoroutineDispatcher() {
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+        dispatch_async(dispatchQueue) {
+            block.run()
         }
     }
 }
 
-fun NSData.toByteArray(): ByteArray {
-    val bytes = ByteArray(length.toInt())
-    getBytes(bytes)
-    return bytes
-}
 actual fun createHttpClient(): HttpClient {
     return HttpClient(Ios) {
         install(Logging) {

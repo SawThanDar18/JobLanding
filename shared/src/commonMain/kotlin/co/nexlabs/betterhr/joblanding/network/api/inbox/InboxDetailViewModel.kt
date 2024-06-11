@@ -1,7 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api.inbox
 
-import android.content.Context
-import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.AssetProvider
+import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIState
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -10,7 +10,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -20,18 +19,18 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class InboxDetailViewModel(private val inboxRepository: InboxRepository): ViewModel() {
+class InboxDetailViewModel(private val inboxRepository: InboxRepository, private val context: AssetProvider): ViewModel() {
 
     private val _uiState = MutableStateFlow(InboxDetailUIState())
     val uiState = _uiState.asStateFlow()
 
     fun fetchNotificationDetail(
-        id: String, context: Context
+        id: String
     ) {
 
         InboxDetailViewModelMapper.setContext(context)
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
                     isLoading = true,

@@ -10,8 +10,6 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
-
-import android.content.Context
 import android.net.Uri
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -19,20 +17,29 @@ import java.io.FileInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.coroutines.CoroutineDispatcher
+import android.content.Context
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 
-actual class FileHandler(private val context: Context) {
-    actual suspend fun readFile(uri: String): ByteArray {
-        return withContext(Dispatchers.IO) {
-            val parcelFileDescriptor = context.contentResolver.openFileDescriptor(Uri.parse(uri), "r")
-                ?: throw IllegalArgumentException("Cannot open file descriptor for URI: $uri")
+class AndroidFileUri(private val androidUri: Uri) : FileUri {
+    override val uri: String
+        get() = androidUri.toString()
+}
 
-            val inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
-            inputStream.readBytes().also {
-                inputStream.close()
-                parcelFileDescriptor.close()
-            }
-        }
+class AndroidAssetProvider(private val context: Context) : AssetProvider {
+    override fun getAssetContent(fileName: String): String {
+        val reader = BufferedReader(
+            InputStreamReader(context.assets.open(fileName), StandardCharsets.UTF_8)
+        )
+        val content = reader.use { it.readText() }
+        return content
     }
+}
+
+actual object DispatcherProvider {
+    actual val io: CoroutineDispatcher = Dispatchers.IO
 }
 
 actual fun createHttpClient(): HttpClient {

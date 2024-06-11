@@ -101,6 +101,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.core.net.toFile
 import androidx.core.text.HtmlCompat
+import co.nexlabs.betterhr.joblanding.AndroidFileUri
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.android.data.CurrentDateTimeFormatted
 import co.nexlabs.betterhr.joblanding.android.data.convertDate
 import co.nexlabs.betterhr.joblanding.android.screen.register.MultiStyleText
@@ -488,8 +490,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
             scope.launch {
                 viewModel.updateBearerToken(uiState.bearerToken)
                 selectedImageUri?.let { uri ->
+                    val fileUri = AndroidFileUri(uri)
                     viewModel.uploadFile(
-                        uri,
+                        fileUri,
                         imageFileName,
                         "profile"
                     )
@@ -2035,8 +2038,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 if (uiState.candidateData != null) {
                                                                     if (uiState.candidateData.profile != null) {
                                                                         selectedImageUri?.let { uri ->
+                                                                            val fileUri = AndroidFileUri(uri)
                                                                             viewModel.updateFile(
-                                                                                uri,
+                                                                                fileUri,
                                                                                 imageFileName,
                                                                                 uiState.candidateData.profile.type,
                                                                                 uiState.candidateData.profile.id,
@@ -2044,8 +2048,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                         }
                                                                     } else {
                                                                         selectedImageUri?.let { uri ->
+                                                                            val fileUri = AndroidFileUri(uri)
                                                                             viewModel.uploadFile(
-                                                                                uri,
+                                                                                fileUri,
                                                                                 imageFileName,
                                                                                 "profile"
                                                                             )
@@ -2456,7 +2461,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                         Box(
                                             modifier = Modifier
                                                 .clickable {
-                                                    var files: MutableList<Uri?> = ArrayList()
+                                                    var files: MutableList<FileUri?> = ArrayList()
                                                     var fileNames: MutableList<String?> =
                                                         ArrayList()
                                                     var fileIds: MutableList<String> =
@@ -2471,7 +2476,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     files.clear()
 
                                                     if (cvFile != null) {
-                                                        files.add(cvFile)
+                                                        val fileUri = AndroidFileUri(cvFile!!)
+                                                        files.add(fileUri)
                                                         fileNames.add(cvFileName)
                                                         fileTypes.add("cv")
                                                     } else {
@@ -2484,7 +2490,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     if (coverLetterFileList.isNotEmpty()) {
                                                         coverLetterFileList.let { file ->
                                                             file.map {
-                                                                files.add(it.uri)
+                                                                val fileUri = AndroidFileUri(it.uri)
+                                                                files.add(fileUri)
                                                                 fileNames.add(it.fileName)
                                                                 fileTypes.add("cover_letter")
                                                             }
@@ -2569,8 +2576,14 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                             fileIds.clear()
 
                                                             scope.launch {
+                                                                val filesUri: MutableList<FileUri?> = ArrayList()
+                                                                if (files.isNotEmpty()) {
+                                                                    files.map {
+                                                                        filesUri.add(it)
+                                                                    }
+                                                                }
                                                                 viewModel.uploadMultipleFiles(
-                                                                    files, fileNames, fileTypes
+                                                                    filesUri, fileNames, fileTypes
                                                                 )
 
                                                                 if (uiState.isSuccessUploadMultipleFile) {
@@ -4166,7 +4179,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     Box(
                                         modifier = Modifier
                                             .clickable {
-                                                var files: MutableList<Uri?> = ArrayList()
+                                                var files: MutableList<FileUri?> = ArrayList()
                                                 var fileNames: MutableList<String?> =
                                                     ArrayList()
                                                 var fileTypes: MutableList<String> = ArrayList()
@@ -4179,13 +4192,15 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                 fileIds.clear()
 
                                                 if (cvFile != null) {
-                                                    files.add(cvFile)
+                                                    val fileUri = AndroidFileUri(cvFile!!)
+                                                    files.add(fileUri)
                                                     fileNames.add(cvFileName)
                                                     fileTypes.add("cv")
                                                     if (coverLetterFileList.isNotEmpty()) {
                                                         coverLetterFileList.let { file ->
                                                             file.map {
-                                                                files.add(it.uri)
+                                                                val fileUri = AndroidFileUri(it.uri)
+                                                                files.add(fileUri)
                                                                 fileNames.add(it.fileName)
                                                                 fileTypes.add("cover_letter")
                                                             }

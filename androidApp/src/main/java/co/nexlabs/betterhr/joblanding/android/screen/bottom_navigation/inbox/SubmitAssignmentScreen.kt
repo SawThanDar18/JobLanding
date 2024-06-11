@@ -49,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import co.nexlabs.betterhr.joblanding.AndroidFileUri
+import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.FileInfo
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen.getFileName
@@ -380,7 +382,7 @@ jobId: String, referenceId: String, title: String, status: String, subDomain: St
                             Toast.makeText(applicationContext, "Please upload Assignment File!", Toast.LENGTH_LONG).show()
                         }
                     } else {
-                        var selectedFiles: MutableList<Uri?> = ArrayList()
+                        var selectedFiles: MutableList<FileUri?> = ArrayList()
                         var selectedFileNames: MutableList<String?> = ArrayList()
                         var fileTypes: MutableList<String> = ArrayList()
 
@@ -391,7 +393,9 @@ jobId: String, referenceId: String, title: String, status: String, subDomain: St
                         if (selectedFileList.isNotEmpty()) {
                             selectedFileList.map { fileInfo ->
                                 fileInfo.file.let {
-                                    selectedFiles.add(fileInfo.file)
+                                    val fileUri = AndroidFileUri(it!!)
+                                    selectedFiles.add(fileUri)
+                                    //selectedFiles.add(fileInfo.file)
                                 }
 
                                 fileInfo.name.let {

@@ -61,8 +61,8 @@ kotlin {
 
                 implementation(AndroidArchLifeCycle.livedata)
 
-                api("io.jsonwebtoken:jjwt-api:0.10.5")
-                implementation("io.jsonwebtoken:jjwt-impl:0.10.5")
+                /*api("io.jsonwebtoken:jjwt-api:0.10.5")
+                implementation("io.jsonwebtoken:jjwt-impl:0.10.5")*/
 
                 implementation("com.russhwolf:multiplatform-settings:1.1.1")
 

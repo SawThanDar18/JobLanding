@@ -75,7 +75,7 @@ fun NotificationDetailScreen(
 
     if (notificationId != "") {
         scope.launch {
-            viewModel.fetchNotificationDetail(notificationId, context)
+            viewModel.fetchNotificationDetail(notificationId)
         }
     }
 
