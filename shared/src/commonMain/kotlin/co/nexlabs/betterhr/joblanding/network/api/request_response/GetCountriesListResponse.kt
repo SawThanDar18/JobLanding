@@ -14,6 +14,8 @@ data class DataResponse(
     @SerialName("name") val name: String,
     @SerialName("flag") val flag: String,
     @SerialName("country_code") val countryCode: String,
-    @SerialName("currency_code") val currencyCode: String
+    @SerialName("currency_code") val currencyCode: String,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("updated_at") val updatedAt: String
 )
 

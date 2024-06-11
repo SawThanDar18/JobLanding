@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
+import java.io.FileInputStream
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
@@ -40,9 +41,13 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
+import co.nexlabs.betterhr.joblanding.FileHandler
 import co.nexlabs.betterhr.joblanding.createApolloClient
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuth
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuthWithoutToken
+import co.nexlabs.betterhr.joblanding.createHttpClient
+import co.nexlabs.betterhr.joblanding.createHttpClientWithAuth
+import co.nexlabs.betterhr.joblanding.createHttpClientWithAuthWithoutToken
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.request_response.ExistingFileIdTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileTypeObject
@@ -63,6 +68,7 @@ import co.nexlabs.betterhr.joblanding.util.baseUrlForUploadFile
 import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
 import com.apollographql.apollo3.ApolloCall
+import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -79,16 +85,29 @@ import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.FileInputStream
 
-class JobLandingServiceImpl(private val application: Application, private val localStorage: LocalStorage, private val client: HttpClient) :
-    JobLandingService {
+fun initializeApolloClient(): ApolloClient {
+    val apolloClient = createHttpClient()
+    return createApolloClient()
+}
 
-    val apolloClient = createApolloClient()
+fun initializeApolloClientWithAuth(bearerToken: String): ApolloClient {
+    val apolloClient = createHttpClientWithAuth(bearerToken)
+    return createApolloClientWithAuth(bearerToken)
+}
 
-    val apolloClientWithAuth = createApolloClientWithAuth(localStorage.bearerToken)
+fun initializeApolloClientWithAuthWithoutToken(): ApolloClient {
+    val apolloClient = createHttpClientWithAuthWithoutToken()
+    return createApolloClientWithAuthWithoutToken()
+}
 
-    val apolloClientWithAuthWithoutToken = createApolloClientWithAuthWithoutToken()
+class JobLandingServiceImpl(private val localStorage: LocalStorage, private val application: Application, private val client: HttpClient): JobLandingService {
+
+    val apolloClient = initializeApolloClient()
+
+    val apolloClientWithAuth = initializeApolloClientWithAuth(localStorage.bearerToken)
+
+    val apolloClientWithAuthWithoutToken = initializeApolloClientWithAuthWithoutToken()
 
     override suspend fun sendVerification(body: SendVerificationCodeRequest): SendVerificationResponse {
 
@@ -196,7 +215,7 @@ class JobLandingServiceImpl(private val application: Application, private val lo
     }
 
     override suspend fun getCountriesList(): GetCountriesListResponse {
-        val response = client.post("${getCountriesUrl}") {
+        val response = client.post(getCountriesUrl) {
             headers {
                 append(API_KEY, API_VALUE)
             }
@@ -247,7 +266,7 @@ class JobLandingServiceImpl(private val application: Application, private val lo
     }
 
     override suspend fun getCompanyDetailJob(companyId: String): ApolloCall<JobLandingCompanyJobsQuery.Data> {
-        return apolloClient.query(JobLandingCompanyJobsQuery(companyId))
+        return apolloClient.query(JobLandingCompanyJobsQuery(companyId, false))
     }
 
     override suspend fun saveJob(
@@ -295,7 +314,6 @@ class JobLandingServiceImpl(private val application: Application, private val lo
         var byteArray: ByteArray
 
         val formData = formData {
-
             files.forEachIndexed { index, file ->
                 parcelFileDescriptor = file?.let { application.contentResolver.openFileDescriptor(it, "r", null) }!!
                 inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)

@@ -51,7 +51,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import io.ktor.serialization.kotlinx.json.json
 
-fun initKoin(application: Application, localStorage: LocalStorage) {
+fun initKoin(localStorage: LocalStorage, application: Application) {
     startKoin {
         modules(
             module {
@@ -81,7 +81,7 @@ fun initKoin(application: Application, localStorage: LocalStorage) {
                         }
                     }
                 }
-                single<JobLandingService> {JobLandingServiceImpl(application, localStorage, get())}
+                single<JobLandingService> {JobLandingServiceImpl(localStorage, application, get())}
                 single { RegisterRepository(get()) }
                 single { ChooseCountryRepository(get()) }
                 single { HomeRepository(get()) }
