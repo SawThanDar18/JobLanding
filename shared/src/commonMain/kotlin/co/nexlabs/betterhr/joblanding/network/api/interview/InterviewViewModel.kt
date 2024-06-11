@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.interview
 
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewUIState
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewsRepository
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -18,7 +19,11 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class InterviewViewModel(private val interviewRepository: InterviewsRepository): ViewModel() {
+class InterviewViewModel(private val localStorage: LocalStorage, private val interviewRepository: InterviewsRepository): ViewModel() {
+
+    fun getBearerToken(): String {
+        return localStorage.bearerToken
+    }
 
     private val _uiState = MutableStateFlow(InterviewUIState())
     val uiState = _uiState.asStateFlow()

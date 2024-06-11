@@ -86,7 +86,7 @@ fun ApplicationDetailScreen(
 
 
         AnimatedVisibility(
-            uiState.isLoading,
+            applicationId != "",
             enter = fadeIn(),
             exit = fadeOut()
         ) {

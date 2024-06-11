@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -67,7 +68,9 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
     var upComingInterviewList: MutableList<InterviewUIModel> = ArrayList()
 
     scope.launch {
-        viewModel.fetchInterviews()
+        if (viewModel.getBearerToken() != "") {
+            viewModel.fetchInterviews()
+        }
     }
 
     if (uiState.interviewList.isNotEmpty()) {
@@ -230,7 +233,11 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
                                                     horizontalAlignment = Alignment.Start
                                                 ) {
                                                     Text(
-                                                        text = "${formatTime(item.interviewStartTime)} - ${formatTime(item.interviewEndTime)}",
+                                                        text = "${formatTime(item.interviewStartTime)} - ${
+                                                            formatTime(
+                                                                item.interviewEndTime
+                                                            )
+                                                        }",
                                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                         fontWeight = FontWeight.W400,
                                                         color = Color(0xFF757575),
@@ -354,7 +361,11 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
                                                     horizontalAlignment = Alignment.Start
                                                 ) {
                                                     Text(
-                                                        text = "${formatTime(item.interviewStartTime)} - ${formatTime(item.interviewEndTime)}",
+                                                        text = "${formatTime(item.interviewStartTime)} - ${
+                                                            formatTime(
+                                                                item.interviewEndTime
+                                                            )
+                                                        }",
                                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                         fontWeight = FontWeight.W400,
                                                         color = Color(0xFF757575),

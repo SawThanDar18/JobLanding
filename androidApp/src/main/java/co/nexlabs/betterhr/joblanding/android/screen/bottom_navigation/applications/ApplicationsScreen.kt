@@ -69,7 +69,9 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
     var jobIds by remember { mutableStateOf<List<String>>(emptyList()) }
 
     scope.launch {
-        viewModel.fetchApplication()
+        if (viewModel.getBearerToken() != "") {
+            viewModel.fetchApplication()
+        }
     }
 
     /*if (uiState.isSuccessGetApplicationData) {

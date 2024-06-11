@@ -1,19 +1,12 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
-import android.app.Application
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobDatUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobsUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailRepository
-import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIState
-import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CandidateViewModelMapper
 import co.nexlabs.betterhr.joblanding.viewmodel.JobDetailViewModelMapper
@@ -40,7 +33,7 @@ sealed class UiState {
 }
 
 class JobDetailViewModel(
-    application: Application,
+    private val localStorage: LocalStorage,
     private val jobDetailRepository: JobDetailRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(JobDetailUIState())
@@ -51,12 +44,6 @@ class JobDetailViewModel(
 
     private val _uiStateForVerify = MutableStateFlow<UiState>(UiState.Loading)
     val uiStateForVerify: StateFlow<UiState> = _uiStateForVerify
-
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
 
     fun updateToken(token: String) {
         localStorage.token = token

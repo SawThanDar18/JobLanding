@@ -491,7 +491,10 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel) {
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W600,
                     color = Color(0xFF1ED292),
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    modifier = Modifier.clickable {
+                        navController.navigate("login-screen")
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))

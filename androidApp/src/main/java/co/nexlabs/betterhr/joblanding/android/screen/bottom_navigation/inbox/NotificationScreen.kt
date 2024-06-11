@@ -39,6 +39,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -96,7 +97,9 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
     val uiState by viewModel.uiState.collectAsState()
 
     scope.launch {
-        viewModel.fetchNotification(emptyList())
+        if (viewModel.getBearerToken() != "") {
+            viewModel.fetchNotification(emptyList())
+        }
     }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -115,7 +118,8 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
             exit = fadeOut()
         ) {
             Column(
-                modifier = Modifier.padding(16.dp, 16.dp, 0.dp, 0.dp)
+                modifier = Modifier
+                    .padding(16.dp, 16.dp, 0.dp, 0.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
@@ -241,16 +245,18 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                     .fillMaxWidth(),
                                 verticalArrangement = Arrangement.spacedBy(24.dp)
                             ) {
-                                repeat(uiState.notificationList.size) {index ->
+                                repeat(uiState.notificationList.size) { index ->
 
                                     var item = uiState.notificationList[index]
 
-                                    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                    val dateFormat =
+                                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                                     val timestamp = dateFormat.parse(item.updateAt)
                                     val calendarTimestamp = Calendar.getInstance()
                                     calendarTimestamp.time = timestamp
                                     val now = Calendar.getInstance()
-                                    val diffMillis = now.timeInMillis - calendarTimestamp.timeInMillis
+                                    val diffMillis =
+                                        now.timeInMillis - calendarTimestamp.timeInMillis
                                     val diffSeconds = diffMillis / 1000
 
                                     statusColor = when (item.status) {
@@ -265,7 +271,7 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clickable {
-                                                       navController.navigate("notification-details/${item.id}/${item.notiType}/${"link"}")
+                                                navController.navigate("notification-details/${item.id}/${item.notiType}/${"link"}")
                                             },
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
@@ -318,7 +324,10 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                                         diffSeconds < 60 -> "Just now"
                                                         diffSeconds < 3600 -> "${diffSeconds / 60} minutes ago"
                                                         diffSeconds < 86400 -> "${diffSeconds / 3600} hours ago"
-                                                        else -> SimpleDateFormat("h:mma", Locale.getDefault()).format(timestamp)
+                                                        else -> SimpleDateFormat(
+                                                            "h:mma",
+                                                            Locale.getDefault()
+                                                        ).format(timestamp)
                                                     },
                                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                     fontWeight = FontWeight.W500,
@@ -434,7 +443,7 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                         .size(width = 4.dp, height = 21.dp),
                                     alignment = Alignment.Center
                                 )
-                                
+
                                 Spacer(modifier = Modifier.width(8.dp))
 
                                 Text(

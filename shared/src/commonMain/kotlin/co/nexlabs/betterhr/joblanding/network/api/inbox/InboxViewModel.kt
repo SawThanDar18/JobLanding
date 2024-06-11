@@ -1,7 +1,5 @@
 package co.nexlabs.betterhr.joblanding.network.api.inbox
 
-import android.app.Application
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxUIState
@@ -21,12 +19,10 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class InboxViewModel(application: Application, private val inboxRepository: InboxRepository): ViewModel() {
+class InboxViewModel(private val localStorage: LocalStorage, private val inboxRepository: InboxRepository): ViewModel() {
 
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
+    fun getBearerToken(): String {
+        return localStorage.bearerToken
     }
 
     private val _uiState = MutableStateFlow(InboxUIState())

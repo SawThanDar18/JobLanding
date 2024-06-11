@@ -4,10 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.text.Html
+import android.text.Spanned
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -87,12 +90,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.core.net.toFile
+import androidx.core.text.HtmlCompat
 import co.nexlabs.betterhr.joblanding.android.data.CurrentDateTimeFormatted
 import co.nexlabs.betterhr.joblanding.android.data.convertDate
 import co.nexlabs.betterhr.joblanding.android.screen.register.MultiStyleText
@@ -128,6 +136,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalLayoutApi::class, ExperimentalLayoutApi::class,
     ExperimentalLayoutApi::class
@@ -772,8 +781,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                             .fillMaxWidth()
                             .padding(top = 10.dp),
                     ) {
+                        val annotatedString = remember(uiState.jobDetail.description) { htmlToAnnotatedString(uiState.jobDetail.description) }
                         Text(
-                            text = uiState.jobDetail.description,
+                            text = annotatedString,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                             fontWeight = FontWeight.W400,
                             color = Color(0xFF757575),
@@ -820,8 +830,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                             .fillMaxWidth()
                             .padding(top = 10.dp),
                     ) {
+                        val annotatedString = remember(uiState.jobDetail.requirement) { htmlToAnnotatedString(uiState.jobDetail.requirement) }
                         Text(
-                            text = uiState.jobDetail.requirement,
+                            text = annotatedString,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                             fontWeight = FontWeight.W400,
                             color = Color(0xFF757575),
@@ -868,8 +879,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                             .fillMaxWidth()
                             .padding(top = 10.dp),
                     ) {
+                        val annotatedString = remember(uiState.jobDetail.benefitsAndPerks) { htmlToAnnotatedString(uiState.jobDetail.benefitsAndPerks) }
                         Text(
-                            text = uiState.jobDetail.benefitsAndPerks,
+                            text = annotatedString,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                             fontWeight = FontWeight.W400,
                             color = Color(0xFF757575),
@@ -2669,7 +2681,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     AsyncImage(
                                         model = ImageRequest.Builder(applicationContext)
                                             .data(R.drawable.apply_job_success)
-                                            .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                                            //.decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
                                             .size(Size.ORIGINAL)
                                             .build(),
                                         contentDescription = "GIF",
@@ -4350,7 +4362,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                 AsyncImage(
                                     model = ImageRequest.Builder(applicationContext)
                                         .data(R.drawable.apply_job_success)
-                                        .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                                        //.decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
                                         .size(Size.ORIGINAL)
                                         .build(),
                                     contentDescription = "GIF",
@@ -4507,4 +4519,26 @@ fun humanReadableByteCount(bytes: Long, si: Boolean): String {
     val exp = (Math.log(bytes.toDouble()) / Math.log(unit.toDouble())).toInt()
     val pre = (if (si) "kMGTPE" else "KMGTPE")[exp - 1] + (if (si) "" else "i")
     return String.format("%.1f %sB", bytes / Math.pow(unit.toDouble(), exp.toDouble()), pre)
+}
+
+fun htmlToAnnotatedString(html: String): AnnotatedString {
+    val spanned = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_COMPACT)
+    val result = buildAnnotatedString {
+        val spans = spanned.getSpans(0, spanned.length, Any::class.java)
+        var currentIndex = 0
+        for (span in spans) {
+            val start = spanned.getSpanStart(span)
+            val end = spanned.getSpanEnd(span)
+            append(spanned.subSequence(currentIndex, start).toString())
+            withStyle(style = when (span) {
+                is android.text.style.StyleSpan -> SpanStyle(fontWeight = if (span.style == Typeface.BOLD) FontWeight.Bold else FontWeight.Normal)
+                else -> SpanStyle()
+            }) {
+                append(spanned.subSequence(start, end).toString())
+            }
+            currentIndex = end
+        }
+        append(spanned.subSequence(currentIndex, spanned.length).toString())
+    }
+    return result
 }

@@ -13,4 +13,6 @@ class RegisterRepository(private val jobLandingService: JobLandingService) {
     suspend fun verifyOTP(code: String) = jobLandingService.validateCode(
         VerifyOTPRequest(code)
     )
+
+    suspend fun getBearerToken(token: String) = jobLandingService.getBearerToken(token)
 }

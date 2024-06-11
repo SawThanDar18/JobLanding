@@ -16,15 +16,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import co.nexlabs.betterhr.joblanding.AndroidLocalStorageImpl
+import co.nexlabs.betterhr.joblanding.FileHandler
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.splash.ScreenPortal
 import co.nexlabs.betterhr.joblanding.di.initKoin
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var localStorage: LocalStorage
+    private lateinit var fileHandler: FileHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        initKoin(this.application)
+        localStorage = AndroidLocalStorageImpl(this)
+        fileHandler = FileHandler(this)
+
+        initKoin(localStorage, this.application)
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
         val controller = WindowCompat.getInsetsController(window, window.decorView)

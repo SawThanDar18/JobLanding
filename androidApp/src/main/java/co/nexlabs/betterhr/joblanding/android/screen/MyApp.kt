@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen
 
+import QRScannerScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,11 +35,15 @@ import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_scre
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.NotificationDetailScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.OfferResponseScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.SubmitAssignmentScreen
+import co.nexlabs.betterhr.joblanding.android.screen.login.LogInScreen
+import co.nexlabs.betterhr.joblanding.android.screen.setting.SettingScreen
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
+import co.nexlabs.betterhr.joblanding.network.api.login.QRLogInViewModel
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
+import co.nexlabs.betterhr.joblanding.network.api.setting.SettingViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
 import co.nexlabs.betterhr.joblanding.network.register.ProfileRegisterViewModel
@@ -60,9 +65,17 @@ fun MyApp() {
                 val viewModel: ScreenPortalViewModel = getKoin().get()
                 ScreenPortal(navController, viewModel)
             }
+            composable("login-screen") {
+                val viewModel: RegisterViewModel = getKoin().get()
+                LogInScreen(navController, viewModel)
+            }
             composable("register-screen") {
                 val viewModel: RegisterViewModel = getKoin().get()
                 RegisterScreen(navController, viewModel)
+            }
+            composable("setting-screen") {
+                val viewModel: SettingViewModel = getKoin().get()
+                SettingScreen(navController, viewModel)
             }
             composable("profile-register-screen") {
                 val viewModel: ProfileRegisterViewModel = getKoin().get()
@@ -157,6 +170,11 @@ fun MyApp() {
                         it.arguments?.getString("subDomain") ?: "",
                         it.arguments?.getString("link") ?: "")
                 }
+            }
+
+            composable("qr-scan-login-screen") {
+                val viewModel: QRLogInViewModel = getKoin().get()
+                QRScannerScreen(viewModel, navController)
             }
         }
     }

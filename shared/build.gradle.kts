@@ -48,16 +48,12 @@ kotlin {
                 api("moe.tlaster:precompose-viewmodel:1.5.0")
                 api("moe.tlaster:precompose-koin:1.5.0")
 
-                implementation(KTOR.clientCore)
-                implementation(KTOR.clientLogging)
-                implementation(KTOR.clientSerilization)
-                implementation(KTOR.serilization)
-                implementation(KTOR.clientNegotiation)
-                implementation(KTOR.clientEncoding)
-                implementation(KTOR.ktorSerialization)
-                implementation(KTOR.kotlinXSerialization)
-                implementation(KTOR.ktorJson)
-                implementation(KTOR.ktorAuth)
+                implementation("io.ktor:ktor-client-core:2.3.11")
+                implementation("io.ktor:ktor-client-cio:2.3.11")
+                implementation("io.ktor:ktor-client-logging:2.3.11")
+                implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.11")
+
 
                 implementation(ReactiveX.rxjava)
                 implementation(ReactiveX.rxandroid)
@@ -65,10 +61,10 @@ kotlin {
 
                 implementation(AndroidArchLifeCycle.livedata)
 
-                implementation("com.squareup.okhttp3:okhttp:4.9.1")
-                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+                api("io.jsonwebtoken:jjwt-api:0.10.5")
+                implementation("io.jsonwebtoken:jjwt-impl:0.10.5")
 
-                implementation("io.github.joelkanyi:sain:2.0.3")
+                implementation("com.russhwolf:multiplatform-settings:1.1.1")
 
             }
         }
@@ -96,42 +92,33 @@ kotlin {
 
                 implementation("com.squareup.okhttp3:okhttp:4.9.1")
                 implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
-                //implementation("com.russhwolf:multiplatform-settings:0.7.4")
             }
         }
 
         val iosX64Main by getting {
             dependencies {
-                //implementation(KTOR.clientOKHttp)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosArm64Main by getting {
             dependencies {
-                //implementation(KTOR.clientOKHttp)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosSimulatorArm64Main by getting {
             dependencies {
-                //implementation(KTOR.clientOKHttp)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
-        /*val iosMain by creating {
+        val iosMain by getting {
             dependencies {
-                implementation(KTOR.clientOKHttp)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
-            iosX64Main.dependsOn(this)
-            iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
-        }*/
+        }
     }
 }
 
@@ -165,3 +152,21 @@ apollo {
 kotlin.sourceSets.all {
     this.languageSettings.enableLanguageFeature("DataObjects")
 }
+
+
+
+//                implementation("com.squareup.okhttp3:okhttp:4.9.1")
+//                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
+//implementation("com.apollographql.apollo3:apollo-runtime-kotlin:3.8.2")
+
+/*implementation(KTOR.clientCore)
+implementation(KTOR.clientLogging)
+implementation(KTOR.clientSerilization)
+implementation(KTOR.serilization)
+implementation(KTOR.clientNegotiation)
+implementation(KTOR.clientEncoding)
+implementation(KTOR.ktorSerialization)
+implementation(KTOR.kotlinXSerialization)
+implementation(KTOR.ktorJson)
+implementation(KTOR.ktorAuth)*/

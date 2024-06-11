@@ -1,12 +1,9 @@
 package co.nexlabs.betterhr.joblanding.network.api.inbox
 
-import android.app.Application
 import android.net.Uri
 import android.util.Log
-import co.nexlabs.betterhr.joblanding.local_storage.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
-import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxUIState
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.SubmitAssignmentUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import com.apollographql.apollo3.exception.ApolloException
@@ -23,13 +20,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class SubmitAssignmentViewModel(application: Application, private val inboxRepository: InboxRepository): ViewModel() {
-
-    private val localStorage: LocalStorage
-
-    init {
-        localStorage = AndroidLocalStorageImpl(application)
-    }
+class SubmitAssignmentViewModel(private val localStorage: LocalStorage, private val inboxRepository: InboxRepository): ViewModel() {
 
     private val _uiState = MutableStateFlow(SubmitAssignmentUIState())
     val uiState = _uiState.asStateFlow()
