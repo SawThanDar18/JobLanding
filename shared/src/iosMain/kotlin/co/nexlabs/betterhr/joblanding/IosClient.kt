@@ -1,8 +1,11 @@
 package co.nexlabs.betterhr.joblanding
 
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.util.API_KEY
+import co.nexlabs.betterhr.joblanding.util.API_VALUE
 import co.nexlabs.betterhr.joblanding.util.API_VALUE_JOB
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.engine.ios.Ios
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -30,6 +33,7 @@ import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.NSURL
 import platform.Foundation.dataWithContentsOfURL
 import platform.UIKit.UIApplication
+
 class iOSFileHandler : FileHandler {
     @OptIn(ExperimentalForeignApi::class)
     override fun readFileBytes(fileUri: FileUri): ByteArray {
@@ -67,8 +71,24 @@ private class NsQueueDispatcher(
     }
 }
 
+actual fun createHttpClientNonAuth() = HttpClient(Darwin) {
+    install(ContentNegotiation) {
+        json(Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        })
+    }
+    install(Logging) {
+        level = LogLevel.INFO
+    }
+    defaultRequest {
+        header(API_KEY, API_VALUE)
+    }
+}
+
+/*
 actual fun createHttpClient(): HttpClient {
-    return HttpClient(Ios) {
+    return HttpClient(Darwin) {
         install(Logging) {
             logger = Logger.DEFAULT
             level = LogLevel.HEADERS
@@ -86,7 +106,7 @@ actual fun createHttpClient(): HttpClient {
 }
 
 actual fun createHttpClientWithAuth(bearerToken: String): HttpClient {
-    return HttpClient(Ios) {
+    return HttpClient(Darwin) {
         install(Logging) {
             logger = Logger.DEFAULT
             level = LogLevel.HEADERS
@@ -104,7 +124,7 @@ actual fun createHttpClientWithAuth(bearerToken: String): HttpClient {
 }
 
 actual fun createHttpClientWithAuthWithoutToken(): HttpClient {
-    return HttpClient(Ios) {
+    return HttpClient(Darwin) {
         install(Logging) {
             logger = Logger.DEFAULT
             level = LogLevel.HEADERS
@@ -117,3 +137,4 @@ actual fun createHttpClientWithAuthWithoutToken(): HttpClient {
         }
     }
 }
+*/

@@ -1,12 +1,11 @@
 package co.nexlabs.betterhr.joblanding
 
 import android.content.Context
-import android.preference.PreferenceManager
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 
 class AndroidLocalStorageImpl(context: Context): LocalStorage {
     //private val preferences = AndroidSettings.Factory(context).create("job_landing_preferences")
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val preferences = context.getSharedPreferences("job_landing_preferences", Context.MODE_PRIVATE)
 
     override var countryId: String
         get() = preferences.getString("country_id", "") ?: ""

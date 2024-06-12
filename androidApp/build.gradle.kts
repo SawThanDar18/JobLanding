@@ -63,6 +63,8 @@ dependencies {
     implementation(EdgeToEdge.edgeToEdgeJava)
     implementation(EdgeToEdge.edgeToEdgeKotlin)
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+
     implementation(KTOR.clientCore)
     implementation(KTOR.clientLogging)
     implementation(KTOR.clientSerilization)
@@ -101,6 +103,5 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.1.0")
     implementation("androidx.camera:camera-view:1.1.0")
     implementation("androidx.camera:camera-extensions:1.1.0")
-
 
 }

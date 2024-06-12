@@ -13,6 +13,8 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import android.net.Uri
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.util.API_VALUE
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import java.io.FileInputStream
@@ -22,7 +24,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-
 class AndroidFileHandler(private val contentResolver: ContentResolver) : FileHandler {
     override fun readFileBytes(fileUri: FileUri): ByteArray {
         val uri = fileUri.toAndroidUri()
@@ -55,7 +56,22 @@ actual object DispatcherProvider {
     actual val io: CoroutineDispatcher = Dispatchers.IO
 }
 
-actual fun createHttpClient(): HttpClient {
+actual fun createHttpClientNonAuth() = HttpClient {
+    install(ContentNegotiation) {
+        json(Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        })
+    }
+    install(Logging) {
+        level = LogLevel.INFO
+    }
+    defaultRequest {
+        header(API_KEY, API_VALUE)
+    }
+}
+
+/*actual fun createHttpClient(): HttpClient {
     return HttpClient(OkHttp) {
         install(Logging) {
             logger = Logger.DEFAULT
@@ -104,5 +120,5 @@ actual fun createHttpClientWithAuthWithoutToken(): HttpClient {
             })
         }
     }
-}
+}*/
 

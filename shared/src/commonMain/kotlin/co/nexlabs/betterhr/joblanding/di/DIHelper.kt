@@ -3,6 +3,7 @@ package co.nexlabs.betterhr.joblanding.di
 import co.nexlabs.betterhr.joblanding.AssetProvider
 import co.nexlabs.betterhr.joblanding.FileHandler
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.local_storage.LocalStorageProvider
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService

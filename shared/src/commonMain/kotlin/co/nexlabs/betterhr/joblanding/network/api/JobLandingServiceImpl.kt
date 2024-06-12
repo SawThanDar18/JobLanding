@@ -41,9 +41,7 @@ import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.createApolloClient
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuth
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuthWithoutToken
-import co.nexlabs.betterhr.joblanding.createHttpClient
-import co.nexlabs.betterhr.joblanding.createHttpClientWithAuth
-import co.nexlabs.betterhr.joblanding.createHttpClientWithAuthWithoutToken
+import co.nexlabs.betterhr.joblanding.createHttpClientNonAuth
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.request_response.ExistingFileIdTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileTypeObject
@@ -82,22 +80,25 @@ import io.ktor.client.request.forms.submitFormWithBinaryData
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+fun initializeClientNonAuth(): HttpClient {
+    return createHttpClientNonAuth()
+}
+
 fun initializeApolloClient(): ApolloClient {
-    val apolloClient = createHttpClient()
     return createApolloClient()
 }
 
 fun initializeApolloClientWithAuth(bearerToken: String): ApolloClient {
-    val apolloClient = createHttpClientWithAuth(bearerToken)
     return createApolloClientWithAuth(bearerToken)
 }
 
 fun initializeApolloClientWithAuthWithoutToken(): ApolloClient {
-    val apolloClient = createHttpClientWithAuthWithoutToken()
     return createApolloClientWithAuthWithoutToken()
 }
 
 class JobLandingServiceImpl(private val localStorage: LocalStorage, private val fileHandler: FileHandler, private val client: HttpClient): JobLandingService {
+
+    val clientt = initializeClientNonAuth()
 
     val apolloClient = initializeApolloClient()
 

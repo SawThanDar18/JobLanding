@@ -58,7 +58,7 @@ class RegisterViewModel(
                     _uiStateForVerify.value =
                         UiState.Error("Error: ${response.data.verifyPhoneNumber.message}")
                 } else {
-                    _uiStateForVerify.value = UiState.Success(response.data.verifyPhoneNumber.token)
+                    _uiStateForVerify.value = UiState.Success(response.data.verifyPhoneNumber.token ?: "")
                 }
             } catch (e: Exception) {
                 _uiStateForVerify.value = UiState.Error("Error: ${e.message}")

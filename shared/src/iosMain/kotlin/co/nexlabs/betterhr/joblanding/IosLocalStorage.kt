@@ -1,9 +1,11 @@
 package co.nexlabs.betterhr.joblanding
 
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import com.russhwolf.settings.Settings
 import platform.Foundation.NSUserDefaults
 
 class IOSLocalStorage : LocalStorage {
+    //private val settings: Settings = AppleSettings()
     private val userDefaults = NSUserDefaults.standardUserDefaults
 
     override var countryId: String

@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.network.api.request_response
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,15 +16,15 @@ data class VerifyOTPRequest(val code: String) {
 }
 
 @Serializable
-data class VerifyPhoneNumResponse(val data: VerifyResponse) {
+data class VerifyPhoneNumResponse(@SerialName("data") val data: VerifyResponse) {
 
     @Serializable
-    data class VerifyResponse(val verifyPhoneNumber: Response)
+    data class VerifyResponse(@SerialName("verifyPhoneNumber") val verifyPhoneNumber: Response)
 
     @Serializable
     data class Response(
-        val status: Int,
-        val message: String,
-        val token: String
+        @SerialName("status") val status: Int,
+        @SerialName("message") val message: String,
+        @SerialName("token") val token: String?
     )
 }

@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
     id("com.android.library")
     id("org.jetbrains.compose")
     id("com.apollographql.apollo3")
@@ -47,6 +48,8 @@ kotlin {
                 api("moe.tlaster:precompose:1.5.0")
                 api("moe.tlaster:precompose-viewmodel:1.5.0")
                 api("moe.tlaster:precompose-koin:1.5.0")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
                 implementation("io.ktor:ktor-client-core:2.3.11")
                 implementation("io.ktor:ktor-client-cio:2.3.11")
@@ -120,6 +123,8 @@ kotlin {
             }
         }
     }
+
+    task("testClasses")
 }
 
 android {
