@@ -2694,7 +2694,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     AsyncImage(
                                         model = ImageRequest.Builder(applicationContext)
                                             .data(R.drawable.apply_job_success)
-                                            //.decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                                            .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
                                             .size(Size.ORIGINAL)
                                             .build(),
                                         contentDescription = "GIF",
@@ -4377,7 +4377,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                 AsyncImage(
                                     model = ImageRequest.Builder(applicationContext)
                                         .data(R.drawable.apply_job_success)
-                                        //.decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                                        .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
                                         .size(Size.ORIGINAL)
                                         .build(),
                                     contentDescription = "GIF",

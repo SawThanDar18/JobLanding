@@ -58,6 +58,7 @@ fun createApolloClient(): ApolloClient {
 }
 
 fun createApolloClientWithAuth(bearerToken: String): ApolloClient {
+    print("be>>$bearerToken")
     val headers = mapOf(
         "Authorization" to "bearer $bearerToken",
     )

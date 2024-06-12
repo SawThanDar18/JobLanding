@@ -474,7 +474,7 @@ class JobDetailViewModel(
             try {
                 val response = jobDetailRepository.createApplication(
                     referenceJobId,
-                    subdomain,
+                    "tenantrickshaw",
                     jobTitle,
                     "applied",
                     appliedDate,

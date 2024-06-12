@@ -422,12 +422,12 @@ fun DrawScreen(viewModel: SubmitOfferViewModel, notiId: String, referenceId: Str
                 AsyncImage(
                     model = ImageRequest.Builder(applicationContext)
                         .data(R.drawable.signature)
-                        /*.decoderFactory { result, options, _ ->
+                        .decoderFactory { result, options, _ ->
                             ImageDecoderDecoder(
                                 result.source,
                                 options
                             )
-                        }*/
+                        }
                         .size(Size.ORIGINAL)
                         .build(),
                     contentDescription = "GIF",
