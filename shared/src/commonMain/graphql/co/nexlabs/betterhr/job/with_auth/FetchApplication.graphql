@@ -1,0 +1,15 @@
+query FetchApplication ($updated_at: String, $limit: Int!, $status: String) {
+    applications(updated_at: $updated_at, limit: $limit, status: $status) {
+        id
+        subdomain
+        reference_job_id
+        job_title
+        status
+        applied_date
+        current_job_title
+        current_company
+        working_since
+        have_assignment
+        assignment_submitted
+    }
+}

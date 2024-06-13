@@ -1,0 +1,20 @@
+{
+  "name": "Without Auth API",
+  "schemaPath": "schema.json",
+  "extensions": {
+    "endpoints": {
+      "Better HR Debug": {
+        "url": "https://jobdev.better.hr/api/graphql",
+        "headers": {
+          "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vZGVidWcuYmV0dGVyLmhyL2FwaS9hY2NvdW50LWtpdC9hdXRoL2xvZ2luIiwiaWF0IjoxNTU2MDA0MDQ2LCJleHAiOjE1NjExODgwNDYsIm5iZiI6MTU1NjAwNDA0NiwianRpIjoib01kd0lmeGV3U085WWE2aCIsInN1YiI6IjU3MzkyMzkwLTQ2ZjgtMTFlOC1iOGRjLWU1YWY4NDlkNWJhMyIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.wzCkyAazYCeftYxSMQBpuc-t-huXMsp0SArKROEI_dc"
+        }
+      },
+      "Local": {
+        "url": "http://192.168.1.55:8000/graphql",
+        "headers": {
+          "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vYmV0dGVyLmxvY2FsL2dyYXBocWwvYXV0aCIsImlhdCI6MTU0NzU2MzQyOSwiZXhwIjoxNTUyNzQ3NDI5LCJuYmYiOjE1NDc1NjM0MjksImp0aSI6IlViMWg1Y3pGQUwyTTh6QWMiLCJzdWIiOiI1YmRiMGNkMC00NmY4LTExZTgtYmRkMy02M2M3ZmJjNTZiYzMiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.2YhM4ggVzI56rxgC34fb-9kMwXM737ozAoetvfGnAtM"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+query JobLandingCollectionCompanies($collection_id: String!, $is_paginate: Boolean!, $limit: Int, $page: Int){
+    jobLandingCollectionCompanies(
+        collection_id: $collection_id,
+        is_paginate: $is_paginate,
+        limit: $limit,
+        page: $page)
+    {
+        data {
+            id
+            collection_id
+            state_name
+            job_opening_count
+            last3_view_count
+            last3_conversation_rate
+            last3_cv_count
+            last1_view_count
+            last1_conversation_rate
+            last1_cv_count
+            company{
+                id
+                name
+                subdomain
+            }
+        }
+        paginatorInfo{
+            total
+            per_page
+            has_page
+            current_page
+        }
+    }
+}

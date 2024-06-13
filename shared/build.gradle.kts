@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
     id("com.android.library")
     id("org.jetbrains.compose")
     id("com.apollographql.apollo3")
@@ -43,9 +44,30 @@ kotlin {
                 api("io.insert-koin:koin-core:3.4.3")
                 api("io.insert-koin:koin-compose:1.0.4")
 
-//                api("moe.tlaster:precompose:1.5.0")
-//                api("moe.tlaster:precompose-viewmodel:1.5.0")
-//                api("moe.tlaster:precompose-koin:1.5.0")
+                api("moe.tlaster:precompose:1.5.0")
+                api("moe.tlaster:precompose-viewmodel:1.5.0")
+                api("moe.tlaster:precompose-koin:1.5.0")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+
+                implementation("io.ktor:ktor-client-core:2.3.11")
+                implementation("io.ktor:ktor-client-cio:2.3.11")
+                implementation("io.ktor:ktor-client-logging:2.3.11")
+                implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.11")
+
+
+                implementation(ReactiveX.rxjava)
+                implementation(ReactiveX.rxandroid)
+                implementation(ReactiveX.rxKotlin)
+
+                implementation(AndroidArchLifeCycle.livedata)
+
+                /*api("io.jsonwebtoken:jjwt-api:0.10.5")
+                implementation("io.jsonwebtoken:jjwt-impl:0.10.5")*/
+
+                implementation("com.russhwolf:multiplatform-settings:1.1.1")
+
             }
         }
         val androidMain by getting {
@@ -53,14 +75,55 @@ kotlin {
                 api("androidx.activity:activity-compose:1.7.2")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.10.1")
+
+                implementation(KTOR.clientCore)
+                implementation(KTOR.clientAndroid)
+                implementation(KTOR.clientOKHttp)
+                implementation(KTOR.kotlinXSerialization)
+                implementation(KTOR.ktorJson)
+                implementation(KTOR.clientLogging)
+                implementation(KTOR.clientSerilization)
+                implementation(KTOR.clientNegotiation)
+                implementation(KTOR.ktorSerialization)
+
+                implementation(ReactiveX.rxjava)
+                implementation(ReactiveX.rxandroid)
+                implementation(ReactiveX.rxKotlin)
+
+                implementation(AndroidArchLifeCycle.livedata)
+
+                implementation("com.squareup.okhttp3:okhttp:4.9.1")
+                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
             }
         }
 
-        val iosMain by getting{
+        val iosX64Main by getting {
             dependencies {
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
+            }
+        }
+        val iosArm64Main by getting {
+            dependencies {
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
+            }
+        }
+        val iosSimulatorArm64Main by getting {
+            dependencies {
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
+            }
+        }
+        val iosMain by getting {
+            dependencies {
+                implementation(KTOR.clientiOS)
+                implementation(KTOR.clientDarwin)
             }
         }
     }
+
+    task("testClasses")
 }
 
 android {
@@ -75,12 +138,39 @@ android {
     }
 }
 
+dependencies {
+    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0")
+}
+
 apollo {
-    service("service") {
-        packageName.set("co.nexlabs.betterhr.joblanding")
+    service("with_auth") {
+        sourceFolder.set("co/nexlabs/betterhr/job/with_auth")
+        packageName.set("co.nexlabs.betterhr.job.with_auth")
+    }
+    service("without_auth") {
+        sourceFolder.set("co/nexlabs/betterhr/job/without_auth")
+        packageName.set("co.nexlabs.betterhr.job.without_auth")
     }
 }
 
 kotlin.sourceSets.all {
     this.languageSettings.enableLanguageFeature("DataObjects")
 }
+
+
+
+//                implementation("com.squareup.okhttp3:okhttp:4.9.1")
+//                implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
+//implementation("com.apollographql.apollo3:apollo-runtime-kotlin:3.8.2")
+
+/*implementation(KTOR.clientCore)
+implementation(KTOR.clientLogging)
+implementation(KTOR.clientSerilization)
+implementation(KTOR.serilization)
+implementation(KTOR.clientNegotiation)
+implementation(KTOR.clientEncoding)
+implementation(KTOR.ktorSerialization)
+implementation(KTOR.kotlinXSerialization)
+implementation(KTOR.ktorJson)
+implementation(KTOR.ktorAuth)*/

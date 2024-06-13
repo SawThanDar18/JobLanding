@@ -1,0 +1,88 @@
+query Candidate {
+    me {
+        id
+        name
+        email
+        phone
+        summary
+        desired_position
+        country_id
+        files {
+            id
+            name
+            type
+            folder
+            full_path
+        }
+        applications {
+            files {
+                name
+                full_path
+            }
+        }
+        applicationsByReferenceJobId {
+            id
+            reference_job_id
+        }
+        certificates {
+            id
+            candidate_id
+            course_name
+            issuing_organization
+            issue_date
+            expire_date
+            is_expire
+            credential_url
+        }
+        skills {
+            id
+            name
+        }
+        educations {
+            id
+            country_name
+            institution
+            education_level
+            degree
+            field_of_study
+            start_date
+            end_date
+            is_current_study
+            description
+        }
+        languages {
+            id
+            name
+            proficiency_level
+        }
+        companies {
+            id
+            name
+            file {
+                id
+                name
+                folder
+                full_path
+            }
+            experiences {
+                id
+                position_id
+                candidate_id
+                company_id
+                title
+                location
+                experience_level
+                employment_type
+                start_date
+                end_date
+                is_current_job
+                description
+                company_id
+                position {
+                    id
+                    name
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+mutation CreateExperience(
+    $position_id: String
+    $candidate_id: String
+    $company_id: String
+    $title: String
+    $location: String
+    $experience_level: String
+    $employment_type: String
+    $start_date: String
+    $end_date: String
+    $is_current_job: Boolean
+    $description: String
+) {
+    createExperience (
+        position_id: $position_id
+        candidate_id: $candidate_id
+        company_id: $company_id
+        title: $title
+        location: $location
+        experience_level: $experience_level
+        employment_type: $employment_type
+        start_date: $start_date
+        end_date: $end_date
+        is_current_job: $is_current_job
+        description: $description
+    ) {
+        id
+        candidate_id
+        company_id
+        title
+        location
+        experience_level
+        employment_type
+        start_date
+        end_date
+        is_current_job
+        description
+    }
+}

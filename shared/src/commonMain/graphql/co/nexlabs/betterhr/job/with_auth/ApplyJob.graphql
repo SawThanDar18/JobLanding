@@ -1,0 +1,23 @@
+mutation ApplyJob (
+    $reference_application_id: String,
+    $candidate_id: String!,
+    $job_id: String!,
+    $status: String,
+    $subdomain: String!
+)
+{
+    candidateApplyJob (
+        reference_application_id: $reference_application_id
+        candidate_id: $candidate_id,
+        job_id: $job_id,
+        status: $status,
+        subdomain: $subdomain
+    ) {
+        id
+        candidate_id
+        job_id
+        status
+        rating
+        documents
+    }
+}

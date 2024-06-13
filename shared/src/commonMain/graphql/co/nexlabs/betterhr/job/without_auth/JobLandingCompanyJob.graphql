@@ -1,0 +1,42 @@
+query JobLandingCompanyJobs($company_id: String!, $is_paginate: Boolean!){
+    jobLandingCompanyJobs(company_id: $company_id, is_paginate: $is_paginate){
+        data {
+            id
+            company_id
+            company_name
+            title
+            department_id
+            location_id
+            created_by
+            state_id
+            state_name
+            city_id
+            city_name
+            hiring_date
+            seniority_level
+            #            employment_type
+            workplace_type
+            office_address
+            currency_code
+            min_salary
+            max_salary
+            description
+            requirement
+            benefits_and_perks
+            overview
+            status
+            last3_view_count
+            last3_conversation_rate
+            last3_cv_count
+            last1_view_count
+            last1_conversation_rate
+            last1_cv_count
+        }
+        paginatorInfo {
+            total
+            per_page
+            has_page
+            current_page
+        }
+    }
+}

@@ -1,0 +1,15 @@
+query FetchNotifications($status: [String], $search: String, $updated_at: String, $limit: Int!) {
+    notifications(status: $status ,search: $search, updated_at: $updated_at, limit: $limit) {
+        id
+        candidate_id
+        reference_id
+        job_id
+        title
+        status
+        noti_type
+        updated_at
+        sender_name
+        sender_position
+        reference_application_id
+    }
+}

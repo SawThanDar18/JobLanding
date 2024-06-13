@@ -1,0 +1,11 @@
+query JobLandingSavedJobs($job_ids: [String!]!){
+    jobLandingJobList(job_ids: $job_ids)
+    {
+        id
+        company {
+            id
+            name
+            company_logo
+        }
+    }
+}

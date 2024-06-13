@@ -1,0 +1,7 @@
+query fetchSaveJobByJobId($job_id: String!) {
+    fetchSaveJobByJobId(job_id: $job_id) {
+        id
+        job_id
+        candidate_id
+    }
+}

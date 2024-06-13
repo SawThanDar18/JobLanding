@@ -1,0 +1,18 @@
+mutation UpdateLanguage(
+    $id: String!
+    $name: String
+    $proficiency_level: String
+) {
+    updateLanguage (
+        id: $id
+        name: $name
+        proficiency_level: $proficiency_level
+    ) {
+        id
+        name
+        proficiency_level
+        candidate {
+            name
+        }
+    }
+}
