@@ -33,54 +33,27 @@ class ScreenPortal: UIViewController {
             showCustomTabbar()
         }else{
             showLandingCountry()
+            //            showHome()
         }
         
         
-        //           if let isFirstTimeUser =
-        //           if let authToken = APCCredentialsManager.getUserAuthToken() {
-        //               if authToken != "" {
-        //   //                showChatList()
-        //                   showCustomTabbar()
-        //               }
-        //               else{
-        //                   showLandingCountry()
-        //               }
-        //           }else{
-        //
-        //           }
     }
     
-           func showCustomTabbar(){
-               let vc = CustomTabBarController()
-               UIApplication.shared.windows.first?.rootViewController = vc
-               UIApplication.shared.windows.first?.makeKeyAndVisible()
-           }
+    func showCustomTabbar(){
+        let vc = CustomTabBarController()
+        UIApplication.shared.windows.first?.rootViewController = vc
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
+    }
     
     func showHome(){
         print("Home")
-        //           let vc = HomeScene.create(viewModel: HomeViewModel())
-        //           UIApplication.shared.windows.first?.rootViewController = vc
-        //           UIApplication.shared.windows.first?.makeKeyAndVisible()
+        let vc = HomeScene.create(viewModel:HomeViewModel())
+        UIApplication.shared.windows.first?.rootViewController = vc
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
     }
-    //
-    //       func showChatList(){
-    //           let vc = ChatListContainerScene.create()
-    //           UIApplication.shared.windows.first?.rootViewController = vc
-    //           UIApplication.shared.windows.first?.makeKeyAndVisible()
-    //       }
     
-    //       func showOnboarding(){
-    //           let vc = GetStartedScene.create()
-    //           UIApplication.shared.windows.first?.rootViewController = vc
-    //           UIApplication.shared.windows.first?.makeKeyAndVisible()
-    //       }
     
     func showLandingCountry(){
-//        let rootviewcontroller = LandingCountryScene.create()
-//        let nav = UINavigationController(rootViewController: rootviewcontroller)
-//        window?.rootViewController = nav
-//        window?.makeKeyAndVisible()
-        
         let vc = LandingCountryScene.create()
         UIApplication.shared.windows.first?.rootViewController = vc
         UIApplication.shared.windows.first?.makeKeyAndVisible()

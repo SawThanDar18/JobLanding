@@ -9,14 +9,14 @@ import Foundation
 import UIKit
 
 enum HomeScene {
-    static func create() -> UIViewController {
+    static func create(viewModel: HomeViewModel) -> UIViewController {
         let st = UIStoryboard(name: "Home", bundle: BHRJobLandingConstants.General.bundle)
-        let destination = st.instantiateViewController(withIdentifier: "Home") as! Home
+        let destination = st.instantiateViewController(withIdentifier: "Home") as! HomeViewController
         //let interactor = GroupListingInteractor()
         let router = HomeRouter()
         //destination.title = "GetStarted"
         //destination.interactor = interactor
-        //destination.viewModel = viewModel
+        destination.viewModel = viewModel
         destination.router = router
         router.viewController = destination
         destination.modalPresentationStyle = .fullScreen

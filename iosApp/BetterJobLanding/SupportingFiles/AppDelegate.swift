@@ -9,14 +9,18 @@ import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-
-
+    let screenPortal = ScreenPortalScene.create() as! ScreenPortal
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         return true
     }
 
+    func showScreenPortal(){
+        UIApplication.shared.windows.first?.rootViewController = screenPortal
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
+    }
+    
     // MARK: UISceneSession Lifecycle
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {

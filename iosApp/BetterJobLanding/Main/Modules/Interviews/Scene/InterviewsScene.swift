@@ -11,7 +11,7 @@ import UIKit
 enum InterviewsScene {
     static func create() -> UIViewController {
         let st = UIStoryboard(name: "Interviews", bundle: BHRJobLandingConstants.General.bundle)
-        let destination = st.instantiateViewController(withIdentifier: "Interviews") as! Interviews
+        let destination = st.instantiateViewController(withIdentifier: "InterviewsViewController") as! InterviewsViewController
         //let interactor = GroupListingInteractor()
         let router = InterviewsRouter()
         //destination.title = "GetStarted"

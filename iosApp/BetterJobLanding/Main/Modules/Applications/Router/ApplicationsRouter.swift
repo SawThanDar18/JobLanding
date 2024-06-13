@@ -12,7 +12,7 @@ protocol ApplicationsRouting: AnyObject {
 }
 
 class ApplicationsRouter: ApplicationsRouting {
-    weak var viewController: Applications?
+    weak var viewController: ApplicationsViewController?
     
     func goToScreen(){
        print("GO GO GO")

@@ -27,7 +27,7 @@ class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
     private func generateTabBar() {
         viewControllers = [
             generateVC(
-                viewController: HomeScene.create(),
+                viewController: HomeScene.create(viewModel: HomeViewModel()),
                 title: "Home",
                 image: UIImage(named: "home"),
                 selectedImage: UIImage(named: "home_fill")
@@ -82,10 +82,13 @@ class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
                 width: width,
                 height: height
             ),
-            cornerRadius: 15
+            cornerRadius: 0
         )
         
         roundLayer.path = bezierPath.cgPath
+        
+        tabBar.selectionIndicatorImage = UIImage().createSelectionIndicator(color: BHRJobLandingColors.bhrBJPrimary, size: CGSize(width: tabBar.frame.width/CGFloat(tabBar.items!.count), height:  tabBar.frame.height), lineWidth: 1.0)
+      
         tabBar.backgroundColor = .white
         tabBar.layer.insertSublayer(roundLayer, at: 0)
         tabBar.itemWidth = width / 5
@@ -95,14 +98,14 @@ class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
         roundLayer.addShadow()
         if #available(iOS 13, *) {
             let appearance = UITabBarAppearance()
-//            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black,NSAttributedString.Key.font: APCFont.menuTitle]
-//            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [NSAttributedString.Key.foregroundColor: APCColors.aplusSecondary,NSAttributedString.Key.font: APCFont.menuTitle]
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.6, green: 0.6, blue: 0.6, alpha: 1),NSAttributedString.Key.font: UIFont.poppinsRegular(ofSize: 12)]
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [NSAttributedString.Key.foregroundColor: BHRJobLandingColors.bhrBJPrimary,NSAttributedString.Key.font: UIFont.poppinsRegular(ofSize: 12)]
             self.tabBar.standardAppearance = appearance
         } else {
             // For normal state, the color is clear color, so you will not see any title until your tab is selected.
-//            UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.clear,NSAttributedString.Key.font:APCFont.menuTitle], for: .normal)
-//            // Set any color for selected state
-//            UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: APCColors.aplusSecondary,NSAttributedString.Key.font:APCFont.menuTitle], for: .selected)
+            UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.6, green: 0.6, blue: 0.6, alpha: 1),NSAttributedString.Key.font:UIFont.poppinsRegular(ofSize: 12)], for: .normal)
+            // Set any color for selected state
+            UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: BHRJobLandingColors.bhrBJPrimary,NSAttributedString.Key.font:UIFont.poppinsRegular(ofSize: 12)], for: .selected)
         }
     }
 }

@@ -19,8 +19,7 @@ class LandingCountry: UIViewController {
     @IBOutlet weak var countryDropDownImageView: UIImageView!
     var router: LandingCountryRouting?
     var deviceLocationPopup: DeviceLocation = DeviceLocation()
-    let window: UIWindow? = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
-    
+  
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupFormStyle()
@@ -37,7 +36,7 @@ class LandingCountry: UIViewController {
         self.selectingCountryStackView.layer.borderWidth = 1.0
         self.selectingCountryStackView.layer.masksToBounds = true
         self.selectCountryView.layer.masksToBounds = true
-        self.selectCountryView.layer.borderColor = #colorLiteral(red: 0.8941176471, green: 0.9058823529, blue: 0.9294117647, alpha: 1)
+        self.selectCountryView.layer.borderColor = BHRJobLandingColors.bhrBJBorderColor.cgColor
         self.selectCountryView.layer.borderWidth = 1.0
         self.selectCountryView.layer.cornerRadius = 8
         self.getStartedButton.layer.cornerRadius = 8
@@ -105,16 +104,13 @@ class LandingCountry: UIViewController {
     
     @IBAction func getStartedAction(_ sender: Any) {
         BHRJobLandingConstants.shared.getStarted = true
-        showCustomTabbar()
+        let screenPortal = ScreenPortalScene.create()
+        UIApplication.shared.windows.first?.rootViewController = screenPortal
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
     }
 }
 
 extension LandingCountry{
-    func showCustomTabbar(){
-        let vc = CustomTabBarController()
-        UIApplication.shared.windows.first?.rootViewController = vc
-        UIApplication.shared.windows.first?.makeKeyAndVisible()
-    }
     
     func showAccessLocation()  {
         self.deviceLocationPopup = DeviceLocation(frame: self.view.frame)

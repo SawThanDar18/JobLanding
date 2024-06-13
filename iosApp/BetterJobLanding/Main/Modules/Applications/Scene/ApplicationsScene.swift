@@ -11,7 +11,7 @@ import UIKit
 enum ApplicationsScene {
     static func create() -> UIViewController {
         let st = UIStoryboard(name: "Applications", bundle: BHRJobLandingConstants.General.bundle)
-        let destination = st.instantiateViewController(withIdentifier: "Applications") as! Applications
+        let destination = st.instantiateViewController(withIdentifier: "Applications") as! ApplicationsViewController
         //let interactor = GroupListingInteractor()
         let router = ApplicationsRouter()
         //destination.title = "GetStarted"

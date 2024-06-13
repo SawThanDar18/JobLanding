@@ -11,7 +11,7 @@ import UIKit
 enum InboxScene {
     static func create() -> UIViewController {
         let st = UIStoryboard(name: "Inbox", bundle: BHRJobLandingConstants.General.bundle)
-        let destination = st.instantiateViewController(withIdentifier: "Inbox") as! Inbox
+        let destination = st.instantiateViewController(withIdentifier: "InboxViewController") as! InboxViewController
         //let interactor = GroupListingInteractor()
         let router = InboxRouter()
         //destination.title = "GetStarted"

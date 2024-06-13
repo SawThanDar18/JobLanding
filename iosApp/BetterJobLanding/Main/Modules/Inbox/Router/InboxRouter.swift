@@ -12,7 +12,7 @@ protocol InboxRouting: AnyObject {
 }
 
 class InboxRouter: InboxRouting {
-    weak var viewController: Inbox?
+    weak var viewController: InboxViewController?
     
     func goToScreen(){
        print("GO GO GO")

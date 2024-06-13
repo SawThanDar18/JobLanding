@@ -7,13 +7,14 @@
 import Foundation
 
 protocol ProfileRouting: AnyObject {
-    func goToScreen()
+    func goToRegister()
 }
 
 class ProfileRouter: ProfileRouting {
-    weak var viewController: Profile?
+    weak var viewController: ProfileViewController?
     
-    func goToScreen(){
+    func goToRegister(){
        print("GO GO GO")
+        viewController?.navigationController?.pushViewController(RegisterScene.create(), animated: true)
     }
 }

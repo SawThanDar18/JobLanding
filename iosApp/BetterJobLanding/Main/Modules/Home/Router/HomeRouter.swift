@@ -8,13 +8,14 @@
 import Foundation
 
 protocol HomeRouting: AnyObject {
-    func goToScreen()
+    func goToRegister()
 }
 
 class HomeRouter: HomeRouting {
-    weak var viewController: Home?
-    func goToScreen(){
-       print("GO GO GO")
+    weak var viewController: HomeViewController?
+    
+    func goToRegister(){
+        viewController?.navigationController?.pushViewController(RegisterScene.create(), animated: true)
     }
 }
 

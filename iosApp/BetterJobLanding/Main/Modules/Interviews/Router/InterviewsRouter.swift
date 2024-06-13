@@ -12,7 +12,7 @@ protocol InterviewsRouting: AnyObject {
 }
 
 class InterviewsRouter: InterviewsRouting {
-    weak var viewController: Interviews?
+    weak var viewController: InterviewsViewController?
     
     func goToScreen(){
        print("GO GO GO")
