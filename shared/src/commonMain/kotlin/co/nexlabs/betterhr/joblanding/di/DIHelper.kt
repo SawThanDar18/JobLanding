@@ -123,9 +123,3 @@ fun initKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider
         )
     }
 }
-
-object DIHelper {
-    fun initializeKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider: AssetProvider) {
-        initKoin(localStorage, fileHandler, assetProvider)
-    }
-}
