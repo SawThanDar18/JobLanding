@@ -19,15 +19,14 @@ class HomeViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
-//       let temp = DIHelperKt.doInitKoin(localStorage: IOSLocalStorage(), fileHandler: iOSFileHandler(), assetProvider: IosAssetProvider())
-//        let tt: Void = HomeRepository.getJobLandingSections(HomeRepository)
-      let tete = SharedViewModel()
-        print(tete.sharedData)
+//        let temp = Koin
+        DIHelperKt.doInitKoin(localStorage: IOSLocalStorage(), fileHandler: iOSFileHandler(), assetProvider: IosAssetProvider())
+//        let test = getKoin().get()
         
 //        let test = HomeViewModel(localStorage: IOSLocalStorage(), homeRepository: homere)
 //        print(
-        let viewModel: HomeViewModels = DIHelperKt.getko
-        KoinKt.getKoin().get()
+//        let viewModel: HomeViewModels = DIHelperKt.getko
+//        KoinKt.getKoin().get()
 //        let test = HomeRepository.getJobLandingSections(<#T##self: HomeRepository##HomeRepository#>)
       
         setupHomeStyle()
