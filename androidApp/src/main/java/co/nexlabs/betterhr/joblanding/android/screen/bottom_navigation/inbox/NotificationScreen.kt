@@ -75,6 +75,8 @@ import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.glide.rememberGlidePainter
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -88,6 +90,8 @@ import java.util.TimeZone
 @Composable
 fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) {
 
+    var refreshing by remember { mutableStateOf(false) }
+
     var statusColor by remember { mutableStateOf(Color(0xFFFFFFFF)) }
     var searchText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -96,27 +100,37 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            scope.launch {
+                if (viewModel.getBearerToken() != "") {
+                    viewModel.fetchNotification(emptyList())
+                }
+            }
+            refreshing = false
+        }
+    }
+
     scope.launch {
         if (viewModel.getBearerToken() != "") {
             viewModel.fetchNotification(emptyList())
         }
     }
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = refreshing),
+        onRefresh = { refreshing = true },
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-        AnimatedVisibility(
-            uiState.error != UIErrorType.Nothing,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            ErrorLayout(uiState.error)
-        }
+            AnimatedVisibility(
+                uiState.error != UIErrorType.Nothing,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                ErrorLayout(uiState.error)
+            }
 
-        AnimatedVisibility(
-            uiState.notificationList.isNotEmpty(),
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp, 16.dp, 0.dp, 0.dp)
@@ -152,13 +166,23 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                 .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(100.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = uiState.notificationList.size.toString(),
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFFAAAAAA),
-                                fontSize = 14.sp
-                            )
+                            if (uiState.notificationList.isEmpty()) {
+                                Text(
+                                    text = "0",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFFAAAAAA),
+                                    fontSize = 14.sp
+                                )
+                            } else {
+                                Text(
+                                    text = uiState.notificationList.size.toString(),
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFFAAAAAA),
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
 
                     }
@@ -177,61 +201,63 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(end = 16.dp)
-                        .height(45.dp)
-                        .fillMaxWidth()
-                        .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
-                        .background(
-                            color = Color.Transparent,
-                            shape = MaterialTheme.shapes.medium
-                        ),
-                    value = searchText,
-                    onValueChange = {
-                        searchText = it
-                    },
-                    placeholder = { Text("Search", color = Color(0xFFAAAAAA)) },
-                    textStyle = TextStyle(
-                        fontWeight = FontWeight.W400,
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        color = Color(0xFFAAAAAA)
-                    ),
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color(0xFFAAAAAA),
-                        backgroundColor = Color.Transparent,
-                        cursorColor = Color(0xFF1ED292),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                        }
-                    ),
-                    singleLine = true,
-                    leadingIcon = {
-                        Image(
-                            painter = painterResource(id = R.drawable.search),
-                            contentDescription = "Search Icon",
-                            modifier = Modifier
-                                .size(16.dp)
-                        )
-                    },
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
                 AnimatedVisibility(
                     uiState.notificationList.isNotEmpty(),
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .height(45.dp)
+                            .fillMaxWidth()
+                            .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
+                            .background(
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.medium
+                            ),
+                        value = searchText,
+                        onValueChange = {
+                            searchText = it
+                        },
+                        placeholder = { Text("Search", color = Color(0xFFAAAAAA)) },
+                        textStyle = TextStyle(
+                            fontWeight = FontWeight.W400,
+                            fontSize = 13.sp,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            color = Color(0xFFAAAAAA)
+                        ),
+                        colors = TextFieldDefaults.textFieldColors(
+                            textColor = Color(0xFFAAAAAA),
+                            backgroundColor = Color.Transparent,
+                            cursorColor = Color(0xFF1ED292),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                            }
+                        ),
+                        singleLine = true,
+                        leadingIcon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.search),
+                                contentDescription = "Search Icon",
+                                modifier = Modifier
+                                    .size(16.dp)
+                            )
+                        },
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (uiState.notificationList.isNotEmpty()) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -250,7 +276,10 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                     var item = uiState.notificationList[index]
 
                                     val dateFormat =
-                                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                        SimpleDateFormat(
+                                            "yyyy-MM-dd HH:mm:ss",
+                                            Locale.getDefault()
+                                        )
                                     val timestamp = dateFormat.parse(item.updateAt)
                                     val calendarTimestamp = Calendar.getInstance()
                                     calendarTimestamp.time = timestamp
@@ -365,6 +394,21 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                 }
                             }
                         }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "There is no Notifications yet!",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF1ED292),
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

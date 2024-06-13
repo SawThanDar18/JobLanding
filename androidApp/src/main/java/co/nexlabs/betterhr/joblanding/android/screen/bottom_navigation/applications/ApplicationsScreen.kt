@@ -54,6 +54,8 @@ import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -62,10 +64,23 @@ import java.util.Locale
 @Composable
 fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavController) {
 
+    var refreshing by remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
     var jobIds by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            scope.launch {
+                if (viewModel.getBearerToken() != "") {
+                    viewModel.fetchApplication()
+                }
+            }
+            refreshing = false
+        }
+    }
 
     scope.launch {
         if (viewModel.getBearerToken() != "") {
@@ -91,21 +106,19 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
         }
     }
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = refreshing),
+        onRefresh = { refreshing = true },
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-        AnimatedVisibility(
-            uiState.error != UIErrorType.Nothing,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            ErrorLayout(uiState.error)
-        }
-
-        AnimatedVisibility(
-            (uiState.application.isNotEmpty()),
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
+            AnimatedVisibility(
+                uiState.error != UIErrorType.Nothing,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                ErrorLayout(uiState.error)
+            }
 
             Column(
                 modifier = Modifier
@@ -141,13 +154,23 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                                 .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(100.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = uiState.application.size.toString(),
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFFAAAAAA),
-                                fontSize = 14.sp
-                            )
+                            if (uiState.application.isEmpty()) {
+                                Text(
+                                    text = "0",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFFAAAAAA),
+                                    fontSize = 14.sp
+                                )
+                            } else {
+                                Text(
+                                    text = uiState.application.size.toString(),
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFFAAAAAA),
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
 
                     }
@@ -163,149 +186,169 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                LazyColumn(
-                    modifier = Modifier.padding(bottom = 80.dp)
-                ) {
-                    item {
-                        FlowRow(
-                            maxItemsInEachRow = 1,
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            repeat(uiState.application.size) { index ->
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(81.dp)
-                                        .border(1.dp, Color(0xFFFE4E7ED), RoundedCornerShape(8.dp))
-                                        .background(
-                                            color = Color.Transparent,
-                                            shape = MaterialTheme.shapes.medium
-                                        ),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(
+                if (uiState.application.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier.padding(bottom = 80.dp)
+                    ) {
+                        item {
+                            FlowRow(
+                                maxItemsInEachRow = 1,
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                repeat(uiState.application.size) { index ->
+                                    Box(
                                         modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(horizontal = 16.dp)
-                                            .clickable {
-                                                navController.navigate("application-details/${uiState.application[index].id}")
-                                            },
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                            .fillMaxWidth()
+                                            .height(81.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFFE4E7ED),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                            .background(
+                                                color = Color.Transparent,
+                                                shape = MaterialTheme.shapes.medium
+                                            ),
+                                        contentAlignment = Alignment.Center
                                     ) {
                                         Row(
-                                            modifier = Modifier.weight(1f),
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(horizontal = 16.dp)
+                                                .clickable {
+                                                    navController.navigate("application-details/${uiState.application[index].id}")
+                                                },
+                                            horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
+                                            Row(
+                                                modifier = Modifier.weight(1f),
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
 
-                                            Image(
-                                                painter = painterResource(id = R.drawable.bank_logo),
-                                                //painter = rememberGlidePainter(request = uiState.companyData[0].company.companyLogo),
-                                                contentDescription = "Company Icon",
-                                                modifier = Modifier
-                                                    .size(32.dp)
-                                                    .clip(CircleShape)
-                                            )
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.bank_logo),
+                                                    //painter = rememberGlidePainter(request = uiState.companyData[0].company.companyLogo),
+                                                    contentDescription = "Company Icon",
+                                                    modifier = Modifier
+                                                        .size(32.dp)
+                                                        .clip(CircleShape)
+                                                )
+
+                                                Column(
+                                                    modifier = Modifier
+                                                        .wrapContentWidth()
+                                                        .height(65.dp),
+                                                    verticalArrangement = Arrangement.Center,
+                                                    horizontalAlignment = Alignment.Start
+                                                ) {
+                                                    Text(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        text = DateConversion(uiState.application[index].appliedDate),
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        fontWeight = FontWeight.W400,
+                                                        color = Color(0xFF757575),
+                                                        fontSize = 12.sp
+                                                    )
+
+                                                    Spacer(modifier = Modifier.height(2.dp))
+
+                                                    Text(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        text = uiState.application[index].jobTitle,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        fontWeight = FontWeight.W600,
+                                                        color = Color(0xFF4A4A4A),
+                                                        fontSize = 14.sp
+                                                    )
+
+                                                    Spacer(modifier = Modifier.height(2.dp))
+
+                                                    Text(
+                                                        modifier = Modifier.width(120.dp),
+                                                        text = "Oway",
+                                                        //text = uiState.companyData[0].company.companyName,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        fontWeight = FontWeight.W400,
+                                                        color = Color(0xFF757575),
+                                                        fontSize = 12.sp,
+                                                        maxLines = 1,
+                                                        softWrap = true,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+                                                }
+
+                                            }
 
                                             Column(
-                                                modifier = Modifier
-                                                    .wrapContentWidth()
-                                                    .height(65.dp),
-                                                verticalArrangement = Arrangement.Center,
-                                                horizontalAlignment = Alignment.Start
+                                                horizontalAlignment = Alignment.End,
+                                                verticalArrangement = Arrangement.Bottom
                                             ) {
-                                                Text(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    text = DateConversion(uiState.application[index].appliedDate),
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W400,
-                                                    color = Color(0xFF757575),
-                                                    fontSize = 12.sp
-                                                )
-
-                                                Spacer(modifier = Modifier.height(2.dp))
-
-                                                Text(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    text = uiState.application[index].jobTitle,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W600,
-                                                    color = Color(0xFF4A4A4A),
-                                                    fontSize = 14.sp
-                                                )
-
-                                                Spacer(modifier = Modifier.height(2.dp))
-
-                                                Text(
-                                                    modifier = Modifier.width(120.dp),
-                                                    text = "Oway",
-                                                    //text = uiState.companyData[0].company.companyName,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W400,
-                                                    color = Color(0xFF757575),
-                                                    fontSize = 12.sp,
-                                                    maxLines = 1,
-                                                    softWrap = true,
-                                                    overflow = TextOverflow.Ellipsis
-                                                )
-                                            }
-
-                                        }
-
-                                        Column(
-                                            horizontalAlignment = Alignment.End,
-                                            verticalArrangement = Arrangement.Bottom
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .width(62.dp)
-                                                    .height(26.dp)
-                                                    .border(
-                                                        1.dp,
-                                                        Color(0xFFEDFCF7),
-                                                        RoundedCornerShape(4.dp)
-                                                    )
-                                                    .background(
-                                                        color = Color(0xFFEDFCF7),
-                                                        shape = MaterialTheme.shapes.medium
-                                                    ),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    modifier = Modifier.width(46.dp),
-                                                    text = uiState.application[index].status,
-                                                    textAlign = TextAlign.Center,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W400,
-                                                    color = Color(0xFF1ED292),
-                                                    fontSize = 12.sp,
-                                                    maxLines = 1,
-                                                    softWrap = true,
-                                                    overflow = TextOverflow.Ellipsis
-                                                )
-                                            }
-
-                                            if (uiState.application[index].haveAssignment && !uiState.application[index].isAssignmentSubmmitted) {
-                                                Image(
-                                                    painter = painterResource(id = R.drawable.pending_assignment),
-                                                    contentDescription = "Pending Assignment Icon",
+                                                Box(
                                                     modifier = Modifier
-                                                        .size(124.dp, 16.dp),
-                                                    alignment = Alignment.Center
-                                                )
-                                            }
+                                                        .width(62.dp)
+                                                        .height(26.dp)
+                                                        .border(
+                                                            1.dp,
+                                                            Color(0xFFEDFCF7),
+                                                            RoundedCornerShape(4.dp)
+                                                        )
+                                                        .background(
+                                                            color = Color(0xFFEDFCF7),
+                                                            shape = MaterialTheme.shapes.medium
+                                                        ),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        modifier = Modifier.width(46.dp),
+                                                        text = uiState.application[index].status,
+                                                        textAlign = TextAlign.Center,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        fontWeight = FontWeight.W400,
+                                                        color = Color(0xFF1ED292),
+                                                        fontSize = 12.sp,
+                                                        maxLines = 1,
+                                                        softWrap = true,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+                                                }
 
+                                                if (uiState.application[index].haveAssignment && !uiState.application[index].isAssignmentSubmmitted) {
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.pending_assignment),
+                                                        contentDescription = "Pending Assignment Icon",
+                                                        modifier = Modifier
+                                                            .size(124.dp, 16.dp),
+                                                        alignment = Alignment.Center
+                                                    )
+                                                }
+
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "There is no Applications yet!",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF1ED292),
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
-
             }
         }
     }

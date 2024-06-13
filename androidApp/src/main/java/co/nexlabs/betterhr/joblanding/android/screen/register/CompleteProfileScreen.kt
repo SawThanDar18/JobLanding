@@ -82,17 +82,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.AndroidFileUri
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
+import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.glide.rememberGlidePainter
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import java.io.File
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: NavController) {
+    var refreshing by remember { mutableStateOf(false) }
+
     var profilePath by remember { mutableStateOf("") }
     var cvFileName by remember { mutableStateOf("") }
     var coverLetterName by remember { mutableStateOf("") }
@@ -113,6 +119,15 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var addLanguageVisible by remember { mutableStateOf(false) }
     var addSkillVisible by remember { mutableStateOf(false) }
     var addCertificationVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            scope.launch {
+                viewModel.getCandidateData()
+            }
+            refreshing = false
+        }
+    }
 
     scope.launch {
         viewModel.getCandidateData()
@@ -169,753 +184,791 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 80.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = refreshing),
+        onRefresh = { refreshing = true },
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp, 16.dp, 16.dp, 0.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = "Profile",
-                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = FontWeight.W600,
-                color = Color(0xFF6A6A6A),
-                fontSize = 24.sp
-            )
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
-            Spacer(modifier = Modifier.width(8.dp))
+            AnimatedVisibility(
+                uiState.error != UIErrorType.Nothing,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                ErrorLayout(uiState.error)
+            }
 
-            Image(
-                painter = painterResource(id = R.drawable.setting),
-                contentDescription = "Setting Icon",
-                modifier = Modifier
-                    .size(20.dp)
-                    .clickable {
-                        navController.navigate("setting-screen")
-                    },
-                alignment = Alignment.Center
-            )
-        }
-
-        LazyColumn {
-            item {
-                Row(
+            AnimatedVisibility(
+                (uiState.candidateData != null),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Column(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 24.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (profilePath != "") {
-                        val imageRequest = remember(profilePath) {
-                            ImageRequest.Builder(applicationContext)
-                                .data(profilePath).build()
-                        }
-
-                        Image(
-                            painter = rememberImagePainter(
-                                request = imageRequest,
-                            ),
-                            contentDescription = "Profile Icon",
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clip(CircleShape)
-                                .graphicsLayer {
-                                    shape = CircleShape
-                                },
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(id = R.drawable.camera),
-                            contentDescription = "Edit Camera Logo",
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clip(CircleShape),
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Column(
-                        modifier = Modifier.height(58.dp),
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = uiState.candidateData.name,
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W600,
-                            color = Color(0xFF6A6A6A),
-                            fontSize = 14.sp
-                        )
-
-                        Text(
-                            text = uiState.candidateData.desiredPosition,
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W400,
-                            color = Color(0xFF6A6A6A),
-                            fontSize = 14.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(2.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    bottomBarVisible = true
-                                    //navController.navigate("profile-edit-detail-screen")
-                                },
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "edit profile",
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFF757575),
-                                fontSize = 12.sp
-                            )
-
-                            Image(
-                                painter = painterResource(id = R.drawable.chevron_right),
-                                contentDescription = "Arrow Icon",
-                                modifier = Modifier
-                                    .size(20.dp)
-                            )
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.phone_icon),
-                        contentDescription = "Phone Icon",
-                        modifier = Modifier
-                            .size(20.dp),
-                        alignment = Alignment.Center
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = uiState.candidateData.phone,
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 12.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.emil_icon),
-                        contentDescription = "Email Icon",
-                        modifier = Modifier
-                            .size(20.dp),
-                        alignment = Alignment.Center
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = uiState.candidateData.email,
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W400,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 12.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(30.dp)
-                        .border(1.dp, Color(0xFFFDEDEC), RoundedCornerShape(4.dp))
-                        .background(color = Color(0xFFFDEDEC), shape = MaterialTheme.shapes.medium),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.warning),
-                            contentDescription = "Warning Icon",
-                            modifier = Modifier
-                                .size(13.33.dp),
-                            alignment = Alignment.Center
-                        )
-
-                        Text(
-                            text = " Need Verification. ",
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W400,
-                            color = Color(0xFFEE4744),
-                            fontSize = 12.sp
-                        )
-
-                        Text(
-                            modifier = Modifier.drawBehind {
-                                val strokeWidthPx = 1.dp.toPx()
-                                val verticalOffset = size.height - 2.sp.toPx()
-                                drawLine(
-                                    color = Color(0xFFEE4744),
-                                    strokeWidth = strokeWidthPx,
-                                    start = Offset(0f, verticalOffset),
-                                    end = Offset(size.width, verticalOffset)
-                                )
-                            },
-                            text = "Click here to verify your email.",
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W400,
-                            color = Color(0xFFEE4744),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                        .height(2.dp)
-                        .background(color = Color(0xFFE4E7ED))
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(52.dp)
-                        .border(1.dp, Color(0xFFFEF9E6), RoundedCornerShape(4.dp))
-                        .background(color = Color(0xFFFEF9E6), shape = MaterialTheme.shapes.medium),
-                    contentAlignment = Alignment.Center
+                        .fillMaxSize()
+                        .padding(bottom = 80.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(16.dp, 16.dp, 16.dp, 0.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.alert_circle),
-                            contentDescription = "Alert Icon",
-                            modifier = Modifier
-                                .size(20.dp),
-                            alignment = Alignment.Center
+                        Text(
+                            text = "Profile",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 24.sp
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        Text(
-                            text = "Please complete your profile!",
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W400,
-                            color = Color(0xFF757575),
-                            fontSize = 12.sp
+                        Image(
+                            painter = painterResource(id = R.drawable.setting),
+                            contentDescription = "Setting Icon",
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    navController.navigate("setting-screen")
+                                },
+                            alignment = Alignment.Center
                         )
                     }
-                }
 
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    MultiStyleTextForCompleteProfile(
-                        text1 = "Resume or CV ",
-                        color1 = Color(0xFF6A6A6A),
-                        text2 = "*",
-                        color2 = Color(0xFFEE4744)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(200.dp)
-                        .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium)
-                        .DashBorder(1.dp, Color(0xFF757575), 4.dp),
-                ) {
-
-                    if (cvFileName != "") {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 16.dp),
-                            verticalArrangement = Arrangement.SpaceBetween,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-
-                            Box(
+                    LazyColumn {
+                        item {
+                            Row(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(0.5f),
-                                contentAlignment = Alignment.TopEnd,
+                                    .padding(horizontal = 16.dp, vertical = 24.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.x),
-                                    contentDescription = "X Icon",
-                                    modifier = Modifier
-                                        .size(14.dp),
-                                    alignment = Alignment.CenterEnd
-                                )
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(2f),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.pdf_file_icon),
-                                    contentDescription = "Attach File Icon",
-                                    modifier = Modifier
-                                        .size(width = 39.08.dp, height = 48.dp),
-                                    alignment = Alignment.Center
-                                )
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    maxLines = 2,
-                                    softWrap = true,
-                                    overflow = TextOverflow.Ellipsis,
-                                    text = cvFileName,
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W400,
-                                    color = Color(0xFF757575),
-                                    fontSize = 14.sp,
-                                    modifier = Modifier
-                                        .width(114.dp),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.attach_file),
-                                contentDescription = "Attach File Icon",
-                                modifier = Modifier
-                                    .size(width = 114.dp, height = 180.dp),
-                                alignment = Alignment.Center
-                            )
-                        }
-                    }
-
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    text = "Files Attachments",
-                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFF6A6A6A),
-                    fontSize = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                AnimatedVisibility(
-                    visible = !coverLetterName.isNullOrBlank(),
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    FlowRow(
-                        maxItemsInEachRow = 1,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        repeat(1) { index ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp)
-                                    .background(
-                                        color = Color(0xFFF2F6FC),
-                                        shape = MaterialTheme.shapes.medium
-                                    )
-                                    .DashBorder(1.dp, Color(0xFFA7BAC5), 4.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-
-                                Row(
-                                    modifier = Modifier
-                                        .padding(10.dp)
-                                        .fillMaxSize(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row(
-                                        modifier = Modifier.weight(1f),
-                                        horizontalArrangement = Arrangement.Start,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.pdf_file_logo),
-                                            contentDescription = "PDF Logo Icon",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                        )
-
-                                        Spacer(modifier = Modifier.width(16.dp))
-
-                                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                            Text(
-                                                text = coverLetterName,
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                fontWeight = FontWeight.W400,
-                                                color = Color(0xFF4A4A4A),
-                                                fontSize = 14.sp,
-                                                softWrap = true,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-
-                                            Text(
-                                                text = "138 KB",
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                fontWeight = FontWeight.W400,
-                                                color = Color(0xFF757575),
-                                                fontSize = 8.sp
-                                            )
-                                        }
+                                if (profilePath != "") {
+                                    val imageRequest = remember(profilePath) {
+                                        ImageRequest.Builder(applicationContext)
+                                            .data(profilePath).build()
                                     }
 
                                     Image(
-                                        painter = painterResource(id = R.drawable.x),
-                                        contentDescription = "X Icon",
+                                        painter = rememberImagePainter(
+                                            request = imageRequest,
+                                        ),
+                                        contentDescription = "Profile Icon",
                                         modifier = Modifier
-                                            .size(16.dp)
+                                            .size(64.dp)
+                                            .clip(CircleShape)
+                                            .graphicsLayer {
+                                                shape = CircleShape
+                                            },
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.camera),
+                                        contentDescription = "Edit Camera Logo",
+                                        modifier = Modifier
+                                            .size(64.dp)
+                                            .clip(CircleShape),
                                     )
                                 }
 
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Column(
+                                    modifier = Modifier.height(58.dp),
+                                    horizontalAlignment = Alignment.Start,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = uiState.candidateData.name,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W600,
+                                        color = Color(0xFF6A6A6A),
+                                        fontSize = 14.sp
+                                    )
+
+                                    Text(
+                                        text = uiState.candidateData.desiredPosition,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFF6A6A6A),
+                                        fontSize = 14.sp
+                                    )
+
+                                    Spacer(modifier = Modifier.height(2.dp))
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                bottomBarVisible = true
+                                                //navController.navigate("profile-edit-detail-screen")
+                                            },
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "edit profile",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFF757575),
+                                            fontSize = 12.sp
+                                        )
+
+                                        Image(
+                                            painter = painterResource(id = R.drawable.chevron_right),
+                                            contentDescription = "Arrow Icon",
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                        )
+                                    }
+                                }
                             }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.phone_icon),
+                                    contentDescription = "Phone Icon",
+                                    modifier = Modifier
+                                        .size(20.dp),
+                                    alignment = Alignment.Center
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Text(
+                                    text = uiState.candidateData.phone,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 12.sp
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.emil_icon),
+                                    contentDescription = "Email Icon",
+                                    modifier = Modifier
+                                        .size(20.dp),
+                                    alignment = Alignment.Center
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Text(
+                                    text = uiState.candidateData.email,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 12.sp
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .height(30.dp)
+                                    .border(1.dp, Color(0xFFFDEDEC), RoundedCornerShape(4.dp))
+                                    .background(
+                                        color = Color(0xFFFDEDEC),
+                                        shape = MaterialTheme.shapes.medium
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.Start,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.warning),
+                                        contentDescription = "Warning Icon",
+                                        modifier = Modifier
+                                            .size(13.33.dp),
+                                        alignment = Alignment.Center
+                                    )
+
+                                    Text(
+                                        text = " Need Verification. ",
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFFEE4744),
+                                        fontSize = 12.sp
+                                    )
+
+                                    Text(
+                                        modifier = Modifier.drawBehind {
+                                            val strokeWidthPx = 1.dp.toPx()
+                                            val verticalOffset = size.height - 2.sp.toPx()
+                                            drawLine(
+                                                color = Color(0xFFEE4744),
+                                                strokeWidth = strokeWidthPx,
+                                                start = Offset(0f, verticalOffset),
+                                                end = Offset(size.width, verticalOffset)
+                                            )
+                                        },
+                                        text = "Click here to verify your email.",
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFFEE4744),
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp)
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .height(52.dp)
+                                    .border(1.dp, Color(0xFFFEF9E6), RoundedCornerShape(4.dp))
+                                    .background(
+                                        color = Color(0xFFFEF9E6),
+                                        shape = MaterialTheme.shapes.medium
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    horizontalArrangement = Arrangement.Start,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.alert_circle),
+                                        contentDescription = "Alert Icon",
+                                        modifier = Modifier
+                                            .size(20.dp),
+                                        alignment = Alignment.Center
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Text(
+                                        text = "Please complete your profile!",
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFF757575),
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                MultiStyleTextForCompleteProfile(
+                                    text1 = "Resume or CV ",
+                                    color1 = Color(0xFF6A6A6A),
+                                    text2 = "*",
+                                    color2 = Color(0xFFEE4744)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .height(200.dp)
+                                    .background(
+                                        color = Color.Transparent,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .DashBorder(1.dp, Color(0xFF757575), 4.dp),
+                            ) {
+
+                                if (cvFileName != "") {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 16.dp, vertical = 16.dp),
+                                        verticalArrangement = Arrangement.SpaceBetween,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .weight(0.5f),
+                                            contentAlignment = Alignment.TopEnd,
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.x),
+                                                contentDescription = "X Icon",
+                                                modifier = Modifier
+                                                    .size(14.dp),
+                                                alignment = Alignment.CenterEnd
+                                            )
+                                        }
+
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .weight(2f),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.pdf_file_icon),
+                                                contentDescription = "Attach File Icon",
+                                                modifier = Modifier
+                                                    .size(width = 39.08.dp, height = 48.dp),
+                                                alignment = Alignment.Center
+                                            )
+                                        }
+
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .weight(1f),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                maxLines = 2,
+                                                softWrap = true,
+                                                overflow = TextOverflow.Ellipsis,
+                                                text = cvFileName,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                fontWeight = FontWeight.W400,
+                                                color = Color(0xFF757575),
+                                                fontSize = 14.sp,
+                                                modifier = Modifier
+                                                    .width(114.dp),
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.attach_file),
+                                            contentDescription = "Attach File Icon",
+                                            modifier = Modifier
+                                                .size(width = 114.dp, height = 180.dp),
+                                            alignment = Alignment.Center
+                                        )
+                                    }
+                                }
+
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                text = "Files Attachments",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF6A6A6A),
+                                fontSize = 16.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            AnimatedVisibility(
+                                visible = !coverLetterName.isNullOrBlank(),
+                                enter = fadeIn(),
+                                exit = fadeOut()
+                            ) {
+                                FlowRow(
+                                    maxItemsInEachRow = 1,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    repeat(1) { index ->
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(50.dp)
+                                                .background(
+                                                    color = Color(0xFFF2F6FC),
+                                                    shape = MaterialTheme.shapes.medium
+                                                )
+                                                .DashBorder(1.dp, Color(0xFFA7BAC5), 4.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .padding(10.dp)
+                                                    .fillMaxSize(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.weight(1f),
+                                                    horizontalArrangement = Arrangement.Start,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.pdf_file_logo),
+                                                        contentDescription = "PDF Logo Icon",
+                                                        modifier = Modifier
+                                                            .size(24.dp)
+                                                    )
+
+                                                    Spacer(modifier = Modifier.width(16.dp))
+
+                                                    Column(
+                                                        verticalArrangement = Arrangement.spacedBy(
+                                                            4.dp
+                                                        )
+                                                    ) {
+                                                        Text(
+                                                            text = coverLetterName,
+                                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                            fontWeight = FontWeight.W400,
+                                                            color = Color(0xFF4A4A4A),
+                                                            fontSize = 14.sp,
+                                                            softWrap = true,
+                                                            maxLines = 1,
+                                                            overflow = TextOverflow.Ellipsis
+                                                        )
+
+                                                        Text(
+                                                            text = "138 KB",
+                                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                            fontWeight = FontWeight.W400,
+                                                            color = Color(0xFF757575),
+                                                            fontSize = 8.sp
+                                                        )
+                                                    }
+                                                }
+
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.x),
+                                                    contentDescription = "X Icon",
+                                                    modifier = Modifier
+                                                        .size(16.dp)
+                                                )
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .height(40.dp)
+                                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                                    .background(
+                                        color = Color.Transparent,
+                                        shape = MaterialTheme.shapes.medium
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.upload_icon),
+                                        contentDescription = "Upload Icon",
+                                        modifier = Modifier
+                                            .size(20.dp)
+                                    )
+
+                                    Text(
+                                        text = "Upload Documents",
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W500,
+                                        color = Color(0xFF1ED292),
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 72.dp)
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                                    .padding(horizontal = 16.dp)
+                                    .clickable {
+                                        addSummaryVisible = true
+                                    },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Summary",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 16.sp
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.x),
+                                    contentDescription = "Plus Icon",
+                                    modifier = Modifier
+                                        .size(24.dp),
+                                )
+
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                                    .padding(horizontal = 16.dp)
+                                    .clickable {
+                                        addExperienceVisible = true
+                                    },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Experience",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 16.sp
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.x),
+                                    contentDescription = "Plus Icon",
+                                    modifier = Modifier
+                                        .size(24.dp),
+                                    alignment = Alignment.Center
+                                )
+
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                                    .padding(horizontal = 16.dp)
+                                    .clickable {
+                                        addEducationVisible = true
+                                    },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Education",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 16.sp
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.x),
+                                    contentDescription = "Plus Icon",
+                                    modifier = Modifier
+                                        .size(24.dp),
+                                    alignment = Alignment.Center
+                                )
+
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                                    .padding(horizontal = 16.dp)
+                                    .clickable {
+                                        addLanguageVisible = true
+                                    },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Language",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 16.sp
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.x),
+                                    contentDescription = "Plus Icon",
+                                    modifier = Modifier
+                                        .size(24.dp),
+                                    alignment = Alignment.Center
+                                )
+
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                                    .padding(horizontal = 16.dp)
+                                    .clickable {
+                                        addSkillVisible = true
+                                    },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Other Skills",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 16.sp
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.x),
+                                    contentDescription = "Plus Icon",
+                                    modifier = Modifier
+                                        .size(24.dp),
+                                    alignment = Alignment.Center
+                                )
+
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                                    .padding(horizontal = 16.dp)
+                                    .clickable {
+                                        addCertificationVisible = true
+                                    },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Certifications",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFF6A6A6A),
+                                    fontSize = 16.sp
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.x),
+                                    contentDescription = "Plus Icon",
+                                    modifier = Modifier
+                                        .size(24.dp),
+                                    alignment = Alignment.Center
+                                )
+
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 72.dp)
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )
+
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(40.dp)
-                        .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                        .background(color = Color.Transparent, shape = MaterialTheme.shapes.medium),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.upload_icon),
-                            contentDescription = "Upload Icon",
-                            modifier = Modifier
-                                .size(20.dp)
-                        )
-
-                        Text(
-                            text = "Upload Documents",
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W500,
-                            color = Color(0xFF1ED292),
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 72.dp)
-                        .height(2.dp)
-                        .background(color = Color(0xFFE4E7ED))
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(72.dp)
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            addSummaryVisible = true
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Summary",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.x),
-                        contentDescription = "Plus Icon",
-                        modifier = Modifier
-                            .size(24.dp),
-                    )
-
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(color = Color(0xFFE4E7ED))
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(72.dp)
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            addExperienceVisible = true
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Experience",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.x),
-                        contentDescription = "Plus Icon",
-                        modifier = Modifier
-                            .size(24.dp),
-                        alignment = Alignment.Center
-                    )
-
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(color = Color(0xFFE4E7ED))
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(72.dp)
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            addEducationVisible = true
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Education",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.x),
-                        contentDescription = "Plus Icon",
-                        modifier = Modifier
-                            .size(24.dp),
-                        alignment = Alignment.Center
-                    )
-
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(color = Color(0xFFE4E7ED))
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(72.dp)
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            addLanguageVisible = true
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Language",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.x),
-                        contentDescription = "Plus Icon",
-                        modifier = Modifier
-                            .size(24.dp),
-                        alignment = Alignment.Center
-                    )
-
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(color = Color(0xFFE4E7ED))
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(72.dp)
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            addSkillVisible = true
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Other Skills",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.x),
-                        contentDescription = "Plus Icon",
-                        modifier = Modifier
-                            .size(24.dp),
-                        alignment = Alignment.Center
-                    )
-
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(color = Color(0xFFE4E7ED))
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(72.dp)
-                        .padding(horizontal = 16.dp)
-                        .clickable {
-                            addCertificationVisible = true
-                        },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Certifications",
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        fontWeight = FontWeight.W600,
-                        color = Color(0xFF6A6A6A),
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.x),
-                        contentDescription = "Plus Icon",
-                        modifier = Modifier
-                            .size(24.dp),
-                        alignment = Alignment.Center
-                    )
-
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 72.dp)
-                        .height(2.dp)
-                        .background(color = Color(0xFFE4E7ED))
-                )
-
             }
         }
     }
@@ -1035,7 +1088,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                         )
 
 
-
                     }
 
                     Row(
@@ -1055,9 +1107,9 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     shape = MaterialTheme.shapes.medium
                                 )
                                 .clickable {
-                                           if (!summary.isNullOrBlank()) {
+                                    if (!summary.isNullOrBlank()) {
 
-                                           }
+                                    }
                                 },
                             contentAlignment = Alignment.Center,
                         ) {

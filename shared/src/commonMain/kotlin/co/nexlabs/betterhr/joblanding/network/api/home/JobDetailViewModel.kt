@@ -232,12 +232,22 @@ class JobDetailViewModel(
                         )
                     }
                     if (!data.hasErrors()) {
-                        _uiState.update {
-                            it.copy(
-                                appliedJobStatus = data.data!!.applicationIsApplied!!.status ?: "",
-                                isLoading = false,
-                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
-                            )
+                        if (data.data!!.applicationIsApplied != null) {
+                            _uiState.update {
+                                it.copy(
+                                    appliedJobStatus = data.data!!.applicationIsApplied!!.status ?: "",
+                                    isLoading = false,
+                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                )
+                            }
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    appliedJobStatus = "",
+                                    isLoading = false,
+                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                )
+                            }
                         }
                     } else {
                         _uiState.update {
