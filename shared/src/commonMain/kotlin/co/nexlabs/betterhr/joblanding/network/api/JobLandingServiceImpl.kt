@@ -636,7 +636,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         search: String,
         limit: Int
     ): ApolloCall<FetchNotificationsQuery.Data> {
-        return apolloClientWithAuth.query(FetchNotificationsQuery(Optional.present(status), Optional.present(search), limit))
+        return apolloClientWithAuth.query(FetchNotificationsQuery(Optional.present(status), Optional.present(search), Optional.present(null), limit))
     }
 
     override suspend fun fetchNotificationById(id: String): ApolloCall<FetchNotificationByIdQuery.Data> {
@@ -992,7 +992,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         limit: Int,
         page: Int
     ): ApolloCall<FetchInterviewQuery.Data> {
-        return apolloClientWithAuth.query(FetchInterviewQuery(limit, page))
+        return apolloClientWithAuth.query(FetchInterviewQuery(limit, Optional.present(null)))
     }
 
     override suspend fun scanWebLogIn(qrToken: String): ApolloCall<ScanWebLogInMutation.Data> {

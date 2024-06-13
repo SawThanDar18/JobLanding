@@ -1,22 +1,14 @@
-query FetchInterview($limit: Int!, $page: Int!) {
-    upcomingInterviews(limit: $limit, page: $page) {
-        data {
-            id
-            candidate_id
-            reference_notification_id
-            job_id
-            interview_type
-            interview_round
-            interview_date
-            interview_start_time
-            interview_end_time
-        }
-        paginatorInfo {
-            total
-            currentPage
-            lastPage
-            hasMorePages
-        }
-
+query FetchInterview($limit: Int!, $updated_at: String) {
+    upcomingInterviews(limit: $limit, updated_at: $updated_at) {
+        id
+        candidate_id
+        reference_notification_id
+        job_id
+        interview_type
+        interview_round
+        interview_date
+        interview_start_time
+        interview_end_time
+        updated_at
     }
 }

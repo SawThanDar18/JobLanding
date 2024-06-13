@@ -5,12 +5,12 @@ import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewUIMode
 
 object InterviewViewModelMapper {
     fun mapResponseToViewModel(data: FetchInterviewQuery.Data): List<InterviewUIModel> {
-        return data.upcomingInterviews.data.map {
+        return data.upcomingInterviews.map {
             mapDataToInterview(it)
         }
     }
 
-    fun mapDataToInterview(data: FetchInterviewQuery.Data1): InterviewUIModel {
+    fun mapDataToInterview(data: FetchInterviewQuery.UpcomingInterview): InterviewUIModel {
         return InterviewUIModel(
             data.id ?: "",
             data.candidate_id ?: "",
