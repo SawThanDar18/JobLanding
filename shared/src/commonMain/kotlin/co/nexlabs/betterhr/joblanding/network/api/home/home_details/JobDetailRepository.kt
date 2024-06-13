@@ -14,6 +14,8 @@ class JobDetailRepository(private val jobLandingService: JobLandingService) {
 
     suspend fun unSaveJob(id: String) = jobLandingService.unSaveJob(id)
 
+    suspend fun checkJobIsApplied(referenceJobId: String, candidateId: String) = jobLandingService.checkJobIsApplied(referenceJobId, candidateId)
+
     suspend fun requestOTP(phoneNumber: String) = jobLandingService.sendVerification(
         SendVerificationCodeRequest(phoneNumber)
     )

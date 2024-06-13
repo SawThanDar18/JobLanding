@@ -80,7 +80,7 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
                         )
                     }
                     if (!data.hasErrors()) {
-                        /*var jobIds: List<String> = ArrayList()
+                        var jobIds: List<String> = ArrayList()
                         if (data.data != null) {
                             if (data.data!!.applications.isNotEmpty()) {
                                 jobIds = data.data!!.applications.map {
@@ -91,7 +91,7 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
 
                         if (jobIds.isNotEmpty()) {
                             getCompanyInfo(jobIds)
-                        }*/
+                        }
 
                         _uiState.update {
                             it.copy(

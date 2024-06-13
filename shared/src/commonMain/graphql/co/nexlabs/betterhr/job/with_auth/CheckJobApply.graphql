@@ -1,0 +1,5 @@
+query CheckJobIsApply($reference_job_id: String, $candidate_id: String) {
+    applicationIsApplied(reference_job_id: $reference_job_id, candidate_id: $candidate_id) {
+        status
+    }
+}

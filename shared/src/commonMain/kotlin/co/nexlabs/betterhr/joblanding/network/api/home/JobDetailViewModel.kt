@@ -193,6 +193,65 @@ class JobDetailViewModel(
         }
     }
 
+    fun checkJobIsApplied(referenceJobId: String) {
+        viewModelScope.launch(DispatcherProvider.io) {
+            jobDetailRepository.checkJobIsApplied(referenceJobId, localStorage.candidateId).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            appliedJobStatus = "",
+                            isLoading = true,
+                            error = UIErrorType.Other(e.message.toString())
+                        )
+                    }
+
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            appliedJobStatus = "",
+                            isLoading = true,
+                            error = UIErrorType.Nothing
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                appliedJobStatus = data.data!!.applicationIsApplied!!.status ?: "",
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                appliedJobStatus = "",
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
     fun fetchSaveJobsById(jobId: String) {
         viewModelScope.launch(DispatcherProvider.io) {
             jobDetailRepository.fetchSaveJobsById(jobId).toFlow()

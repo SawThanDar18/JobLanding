@@ -134,7 +134,9 @@ class ProfileRegisterViewModel(
         viewModelScope.launch(DispatcherProvider.io) {
             try {
                 profileRegisterRepository.uploadFile(file, fileName, type, localStorage.candidateId)
+                println("fileuploadsingle>>>success")
             } catch (e: Exception) {
+                println("fileuploadsingle>>>${e.message}")
             }
         }
     }

@@ -147,6 +147,7 @@ import java.util.Locale
 fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController, jobId: String) {
 
     var isJobSaved by remember { mutableStateOf(false) }
+    var isJobApplied by remember { mutableStateOf(false) }
 
     val currentDateTime = remember { Calendar.getInstance().time }
     val formattedDateTime = remember {
@@ -318,6 +319,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
             scope.launch {
                 if (viewModel.getBearerToken() != "") {
                     viewModel.fetchSaveJobsById(jobId)
+                    viewModel.checkJobIsApplied(jobId)
                 }
             }
         }
@@ -373,6 +375,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
     if (uiState.isSuccessCreateApplication) {
         LaunchedEffect(Unit) {
+            isJobApplied = true
             step = if (bottomBarVisibleAfterSignUp) {
                 "stepThree"
             } else {
@@ -439,14 +442,17 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
     var coverLetterFileList = remember { mutableStateListOf<FileInfo>() }
     val fileListChooserLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
         uri?.let {
-            coverLetterFileList.add(FileInfo(
-                "cover_letter",
-                uri,
-                getFileName(applicationContext, uri),
-                getFileSize(applicationContext, uri)
-            ))
+            coverLetterFileList.add(
+                FileInfo(
+                    "cover_letter",
+                    uri,
+                    getFileName(applicationContext, uri),
+                    getFileSize(applicationContext, uri)
+                )
+            )
         }
 
     }
@@ -784,7 +790,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                             .fillMaxWidth()
                             .padding(top = 10.dp),
                     ) {
-                        val annotatedString = remember(uiState.jobDetail.description) { htmlToAnnotatedString(uiState.jobDetail.description) }
+                        val annotatedString =
+                            remember(uiState.jobDetail.description) { htmlToAnnotatedString(uiState.jobDetail.description) }
                         Text(
                             text = annotatedString,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
@@ -833,7 +840,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                             .fillMaxWidth()
                             .padding(top = 10.dp),
                     ) {
-                        val annotatedString = remember(uiState.jobDetail.requirement) { htmlToAnnotatedString(uiState.jobDetail.requirement) }
+                        val annotatedString =
+                            remember(uiState.jobDetail.requirement) { htmlToAnnotatedString(uiState.jobDetail.requirement) }
                         Text(
                             text = annotatedString,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
@@ -882,7 +890,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                             .fillMaxWidth()
                             .padding(top = 10.dp),
                     ) {
-                        val annotatedString = remember(uiState.jobDetail.benefitsAndPerks) { htmlToAnnotatedString(uiState.jobDetail.benefitsAndPerks) }
+                        val annotatedString = remember(uiState.jobDetail.benefitsAndPerks) {
+                            htmlToAnnotatedString(uiState.jobDetail.benefitsAndPerks)
+                        }
                         Text(
                             text = annotatedString,
                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
@@ -1135,31 +1145,50 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 16.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .height(44.dp)
-                .weight(2f)
-                .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
-                .clickable {
-                    scope.launch {
-                        if (viewModel.getBearerToken() != "") {
-                            bottomBarVisibleAfterSignUp = true
-                            viewModel.getCandidateData()
-                        } else {
-                            bottomBarVisible = true
+        if (isJobApplied || uiState.appliedJobStatus == "applied") {
+            Box(
+                modifier = Modifier
+                    .height(44.dp)
+                    .weight(2f)
+                    .border(1.dp, Color(0xFF6A6A6A), RoundedCornerShape(8.dp))
+                    .background(color = Color(0xFF6A6A6A), shape = MaterialTheme.shapes.medium),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "Applied",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFFFFFFFF),
+                    fontSize = 14.sp,
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .height(44.dp)
+                    .weight(2f)
+                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                    .background(color = Color(0xFF1ED292), shape = MaterialTheme.shapes.medium)
+                    .clickable {
+                        scope.launch {
+                            if (viewModel.getBearerToken() != "") {
+                                bottomBarVisibleAfterSignUp = true
+                                viewModel.getCandidateData()
+                            } else {
+                                bottomBarVisible = true
+                            }
                         }
-                    }
-                },
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "Apply Job",
-                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                fontWeight = FontWeight.W600,
-                color = Color(0xFFFFFFFF),
-                fontSize = 14.sp,
-            )
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "Apply Job",
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W600,
+                    color = Color(0xFFFFFFFF),
+                    fontSize = 14.sp,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -1974,7 +2003,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                     modifier = Modifier
                                                                         .size(16.dp)
                                                                         .clickable {
-                                                                            coverLetterFileList.remove(coverLetterFileList[fileInfo])
+                                                                            coverLetterFileList.remove(
+                                                                                coverLetterFileList[fileInfo]
+                                                                            )
                                                                         }
                                                                 )
                                                             }
@@ -2038,7 +2069,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 if (uiState.candidateData != null) {
                                                                     if (uiState.candidateData.profile != null) {
                                                                         selectedImageUri?.let { uri ->
-                                                                            val fileUri = AndroidFileUri(uri)
+                                                                            val fileUri =
+                                                                                AndroidFileUri(uri)
                                                                             viewModel.updateFile(
                                                                                 fileUri,
                                                                                 imageFileName,
@@ -2048,7 +2080,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                         }
                                                                     } else {
                                                                         selectedImageUri?.let { uri ->
-                                                                            val fileUri = AndroidFileUri(uri)
+                                                                            val fileUri =
+                                                                                AndroidFileUri(uri)
                                                                             viewModel.uploadFile(
                                                                                 fileUri,
                                                                                 imageFileName,
@@ -2576,7 +2609,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                             fileIds.clear()
 
                                                             scope.launch {
-                                                                val filesUri: MutableList<FileUri?> = ArrayList()
+                                                                val filesUri: MutableList<FileUri?> =
+                                                                    ArrayList()
                                                                 if (files.isNotEmpty()) {
                                                                     files.map {
                                                                         filesUri.add(it)
@@ -2587,7 +2621,10 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 )
 
                                                                 if (uiState.isSuccessUploadMultipleFile) {
-                                                                    Log.d("toast>>", "isSuccessUploadMultipleFile")
+                                                                    Log.d(
+                                                                        "toast>>",
+                                                                        "isSuccessUploadMultipleFile"
+                                                                    )
                                                                     if (uiState.multiFileList.isNotEmpty()) {
                                                                         uiState.multiFileList.map {
                                                                             fileIds.add(it.id)
@@ -2596,7 +2633,10 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 }
 
                                                                 if (fileIds.isNotEmpty()) {
-                                                                    Log.d("toast>>", "file ids not empty")
+                                                                    Log.d(
+                                                                        "toast>>",
+                                                                        "file ids not empty"
+                                                                    )
                                                                     scope.launch {
                                                                         viewModel.createApplication(
                                                                             uiState.jobDetail.id,
@@ -2694,7 +2734,12 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     AsyncImage(
                                         model = ImageRequest.Builder(applicationContext)
                                             .data(R.drawable.apply_job_success)
-                                            .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                                            .decoderFactory { result, options, _ ->
+                                                ImageDecoderDecoder(
+                                                    result.source,
+                                                    options
+                                                )
+                                            }
                                             .size(Size.ORIGINAL)
                                             .build(),
                                         contentDescription = "GIF",
@@ -3668,7 +3713,9 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 modifier = Modifier
                                                                     .size(16.dp)
                                                                     .clickable {
-                                                                        coverLetterFileList.remove(coverLetterFileList[fileInfo])
+                                                                        coverLetterFileList.remove(
+                                                                            coverLetterFileList[fileInfo]
+                                                                        )
                                                                     }
                                                             )
                                                         }
@@ -4272,7 +4319,10 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                         )
 
                                                         if (uiState.isSuccessUploadMultipleFile) {
-                                                            Log.d("toast>>", "isSuccessUploadMultipleFile")
+                                                            Log.d(
+                                                                "toast>>",
+                                                                "isSuccessUploadMultipleFile"
+                                                            )
                                                             if (uiState.multiFileList.isNotEmpty()) {
                                                                 uiState.multiFileList.map {
                                                                     fileIds.add(it.id)
@@ -4281,7 +4331,10 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                         }
 
                                                         if (fileIds.isNotEmpty()) {
-                                                            Log.d("toast>>", "multi file list not null")
+                                                            Log.d(
+                                                                "toast>>",
+                                                                "multi file list not null"
+                                                            )
                                                             scope.launch {
                                                                 viewModel.createApplication(
                                                                     uiState.jobDetail.id,
@@ -4377,7 +4430,12 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                 AsyncImage(
                                     model = ImageRequest.Builder(applicationContext)
                                         .data(R.drawable.apply_job_success)
-                                        .decoderFactory { result, options, _ -> ImageDecoderDecoder(result.source, options) }
+                                        .decoderFactory { result, options, _ ->
+                                            ImageDecoderDecoder(
+                                                result.source,
+                                                options
+                                            )
+                                        }
                                         .size(Size.ORIGINAL)
                                         .build(),
                                     contentDescription = "GIF",
@@ -4545,10 +4603,12 @@ fun htmlToAnnotatedString(html: String): AnnotatedString {
             val start = spanned.getSpanStart(span)
             val end = spanned.getSpanEnd(span)
             append(spanned.subSequence(currentIndex, start).toString())
-            withStyle(style = when (span) {
-                is android.text.style.StyleSpan -> SpanStyle(fontWeight = if (span.style == Typeface.BOLD) FontWeight.Bold else FontWeight.Normal)
-                else -> SpanStyle()
-            }) {
+            withStyle(
+                style = when (span) {
+                    is android.text.style.StyleSpan -> SpanStyle(fontWeight = if (span.style == Typeface.BOLD) FontWeight.Bold else FontWeight.Normal)
+                    else -> SpanStyle()
+                }
+            ) {
                 append(spanned.subSequence(start, end).toString())
             }
             currentIndex = end

@@ -39,5 +39,6 @@ data class JobDetailUIState(
     val idFromProfileUpload: String = "",
     val idFromCreateApplication: String = "",
     val isSuccessUploadMultipleFile: Boolean = false,
-    val multiFileList: List<FileUploadResponse> = ArrayList()
+    val multiFileList: List<FileUploadResponse> = ArrayList(),
+    val appliedJobStatus: String = ""
 )

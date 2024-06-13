@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.network.api
 
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
+import co.nexlabs.betterhr.job.with_auth.CheckJobIsApplyQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.CreateCertificateMutation
 import co.nexlabs.betterhr.job.with_auth.CreateEducationMutation
@@ -88,6 +89,8 @@ interface JobLandingService {
     suspend fun fetchSaveJobsById(jobId: String): ApolloCall<FetchSaveJobByJobIdQuery.Data>
 
     suspend fun unSaveJob(id: String): ApolloCall<UnSaveJobMutation.Data>
+
+    suspend fun checkJobIsApplied(referenceJobId: String, candidateId: String): ApolloCall<CheckJobIsApplyQuery.Data>
 
     suspend fun applyJob(referenceId: String, candidateId: String, jobId: String, status: String, subDomain: String): ApolloCall<ApplyJobMutation.Data>
 

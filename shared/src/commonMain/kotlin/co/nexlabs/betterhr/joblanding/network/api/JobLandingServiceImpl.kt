@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.network.api
 
 import co.nexlabs.betterhr.job.with_auth.ApplyJobMutation
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
+import co.nexlabs.betterhr.job.with_auth.CheckJobIsApplyQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.CreateCertificateMutation
 import co.nexlabs.betterhr.job.with_auth.CreateEducationMutation
@@ -279,6 +280,13 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
 
     override suspend fun unSaveJob(id: String): ApolloCall<UnSaveJobMutation.Data> {
         return apolloClientWithAuth.mutation(UnSaveJobMutation(id))
+    }
+
+    override suspend fun checkJobIsApplied(
+        referenceJobId: String,
+        candidateId: String
+    ): ApolloCall<CheckJobIsApplyQuery.Data> {
+        return apolloClientWithAuth.query(CheckJobIsApplyQuery(Optional.present(referenceJobId), Optional.present(candidateId)))
     }
 
     override suspend fun applyJob(
