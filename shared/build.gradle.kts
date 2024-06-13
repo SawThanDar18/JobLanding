@@ -100,24 +100,28 @@ kotlin {
 
         val iosX64Main by getting {
             dependencies {
+                implementation(KTOR.clientCore)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosArm64Main by getting {
             dependencies {
+                implementation(KTOR.clientCore)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosSimulatorArm64Main by getting {
             dependencies {
+                implementation(KTOR.clientCore)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosMain by getting {
             dependencies {
+                implementation(KTOR.clientCore)
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }

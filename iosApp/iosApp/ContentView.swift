@@ -3,7 +3,7 @@ import shared
 
 struct ContentView: View {
     let greet = Greeting().greets()
-
+    
 	var body: some View {
 		Text(greet)
 	}
