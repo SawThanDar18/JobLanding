@@ -100,28 +100,32 @@ kotlin {
 
         val iosX64Main by getting {
             dependencies {
-                implementation(KTOR.clientCore)
+                implementation("io.insert-koin:koin-core:3.1.5")
+
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosArm64Main by getting {
             dependencies {
-                implementation(KTOR.clientCore)
+                implementation("io.insert-koin:koin-core:3.1.5")
+
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosSimulatorArm64Main by getting {
             dependencies {
-                implementation(KTOR.clientCore)
+                implementation("io.insert-koin:koin-core:3.1.5")
+
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosMain by getting {
             dependencies {
-                implementation(KTOR.clientCore)
+                implementation("io.insert-koin:koin-core:3.1.5")
+
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
