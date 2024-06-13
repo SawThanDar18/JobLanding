@@ -73,6 +73,8 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
+                api("io.insert-koin:koin-core:3.4.3")
+
                 api("androidx.activity:activity-compose:1.7.2")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.10.1")
@@ -100,7 +102,7 @@ kotlin {
 
         val iosX64Main by getting {
             dependencies {
-                implementation("io.insert-koin:koin-core:3.1.5")
+                api("io.insert-koin:koin-core:3.4.3")
 
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
@@ -108,7 +110,7 @@ kotlin {
         }
         val iosArm64Main by getting {
             dependencies {
-                implementation("io.insert-koin:koin-core:3.1.5")
+                api("io.insert-koin:koin-core:3.4.3")
 
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
@@ -116,7 +118,7 @@ kotlin {
         }
         val iosSimulatorArm64Main by getting {
             dependencies {
-                implementation("io.insert-koin:koin-core:3.1.5")
+                api("io.insert-koin:koin-core:3.4.3")
 
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
@@ -124,7 +126,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
-                implementation("io.insert-koin:koin-core:3.1.5")
+                api("io.insert-koin:koin-core:3.4.3")
 
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
