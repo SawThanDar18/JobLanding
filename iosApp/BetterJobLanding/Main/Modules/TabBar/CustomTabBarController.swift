@@ -27,7 +27,7 @@ class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
     private func generateTabBar() {
         viewControllers = [
             generateVC(
-                viewController: HomeScene.create(viewModel: HomeViewModel()),
+                viewController: HomeScene.create(viewModel: HomeViewModels()),
                 title: "Home",
                 image: UIImage(named: "home"),
                 selectedImage: UIImage(named: "home_fill")

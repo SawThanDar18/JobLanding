@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 enum HomeScene {
-    static func create(viewModel: HomeViewModel) -> UIViewController {
+    static func create(viewModel: HomeViewModels) -> UIViewController {
         let st = UIStoryboard(name: "Home", bundle: BHRJobLandingConstants.General.bundle)
         let destination = st.instantiateViewController(withIdentifier: "Home") as! HomeViewController
         //let interactor = GroupListingInteractor()

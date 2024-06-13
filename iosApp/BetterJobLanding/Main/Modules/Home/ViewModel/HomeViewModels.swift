@@ -1,5 +1,5 @@
 //
-//  HomeViewModel.swift
+//  HomeViewModels.swift
 //  BetterJobLanding
 //
 //  Created by Myint Zu on 06/06/2024.
@@ -36,7 +36,7 @@ enum HomeFields {
     }
 }
 
-struct HomeViewModel {
+struct HomeViewModels {
     let formFields:[HomeFields] =
     [.searchTextBar,.recentJobs,.topJobsShortcut,.topJobsOneDetail,.topCompanies,.topJobsTwoDetail,.popularJobs,.campaigns,.suggestedHeader,.suggestedForYou]
    

@@ -47,7 +47,7 @@ class ScreenPortal: UIViewController {
     
     func showHome(){
         print("Home")
-        let vc = HomeScene.create(viewModel:HomeViewModel())
+        let vc = HomeScene.create(viewModel:HomeViewModels())
         UIApplication.shared.windows.first?.rootViewController = vc
         UIApplication.shared.windows.first?.makeKeyAndVisible()
     }

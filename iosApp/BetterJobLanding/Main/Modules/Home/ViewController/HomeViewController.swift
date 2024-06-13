@@ -6,17 +6,30 @@
 //
 
 import UIKit
+import shared
 
 class HomeViewController: BaseViewController {
     @IBOutlet weak var homeTableView: UITableView!
     @IBOutlet weak var signUpMainView: UIView!
     @IBOutlet weak var signUpLabel: UILabel!
     @IBOutlet weak var signUpButton: UIButton!
-    var viewModel: HomeViewModel!
+    var viewModel: HomeViewModels!
     var router: HomeRouter?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    
+//       let temp = DIHelperKt.doInitKoin(localStorage: IOSLocalStorage(), fileHandler: iOSFileHandler(), assetProvider: IosAssetProvider())
+//        let tt: Void = HomeRepository.getJobLandingSections(HomeRepository)
+      let tete = SharedViewModel()
+        print(tete.sharedData)
+        
+//        let test = HomeViewModel(localStorage: IOSLocalStorage(), homeRepository: homere)
+//        print(
+        let viewModel: HomeViewModels = DIHelperKt.getko
+        KoinKt.getKoin().get()
+//        let test = HomeRepository.getJobLandingSections(<#T##self: HomeRepository##HomeRepository#>)
+      
         setupHomeStyle()
         configureTableView()
         self.homeTableView.addSubview(signUpMainView)
