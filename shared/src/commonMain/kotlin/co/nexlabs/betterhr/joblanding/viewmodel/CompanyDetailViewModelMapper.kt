@@ -56,6 +56,8 @@ object CompanyDetailViewModelMapper {
             data.company_mail ?: "",
             data.company_link ?: "",
             data.jobs_count ?: 0,
+            data.company_logo ?: "",
+            data.cover_image ?: ""
             //collectionJobsList
         )
     }

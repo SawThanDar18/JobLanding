@@ -38,7 +38,8 @@ object CompanyDetailJobViewModelMapper {
                 it.last3_cv_count ?: 0,
                 CompanyDetailCompanyUIModel(
                     it.company_id ?: "",
-                    it.company_name ?: ""
+                    it.company_name ?: "",
+                    it.company!!.company_logo ?: ""
                 )
             )
         }

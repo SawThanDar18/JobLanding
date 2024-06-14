@@ -47,6 +47,7 @@ query JobLandingSections($page_id: String!){
             company{
                 id
                 name
+                company_logo
             }
         }
         collectionCompanies {
@@ -63,6 +64,7 @@ query JobLandingSections($page_id: String!){
             company{
                 id
                 name
+                company_logo
             }
         }
     }

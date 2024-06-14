@@ -23,7 +23,8 @@ object CollectionCompaniesViewModelMapper {
             data.last3_cv_count ?: 0,
             CompaniesCompanyUIModel(
                 data.company!!.id,
-                data.company.name
+                data.company.name,
+                data.company.company_logo ?: ""
             )
         )
     }

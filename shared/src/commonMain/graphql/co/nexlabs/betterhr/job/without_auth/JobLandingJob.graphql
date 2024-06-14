@@ -34,6 +34,7 @@ query JobLandingJob($job_id: String!){
         company {
             id
             name
+            company_logo
         }
     }
 }

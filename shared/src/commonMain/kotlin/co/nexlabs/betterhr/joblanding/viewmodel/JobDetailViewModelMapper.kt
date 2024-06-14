@@ -61,7 +61,9 @@ object JobDetailViewModelMapper {
             JobDetailCompanyUIModel(
                 data.company!!.id,
                 data.company.name,
-                data.company.subdomain
+                data.company.subdomain,
+                data.company.company_logo ?: "",
+                data.company.cover_image ?: ""
             )
         )
     }

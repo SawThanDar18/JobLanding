@@ -13,6 +13,8 @@ class InboxRepository(private val jobLandingService: JobLandingService) {
 
     suspend fun fetchInboxById(id: String) = jobLandingService.fetchNotificationById(id)
 
+    suspend fun getJobLandingJobList(jobIds: List<String>) = jobLandingService.getJobLandingJobList(jobIds)
+
     suspend fun uploadMultipleFiles(
         files: MutableList<FileUri?>,
         fileNames: MutableList<String?>,

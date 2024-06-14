@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.AlertDialogDefaults.shape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -58,6 +60,8 @@ import co.nexlabs.betterhr.joblanding.network.api.home.data.CollectionUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.data.JobsListUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -165,7 +169,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
                                 modifier = Modifier
                                     .width(30.dp)
                                     .clickable {
-                                               navController.navigate("qr-scan-login-screen")
+                                        navController.navigate("qr-scan-login-screen")
                                     },
                             )
                         }
@@ -710,12 +714,13 @@ fun StyleOneLazyLayout(
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.bank_logo),
-                            contentDescription = "Company Logo",
+                        AsyncImage(
                             modifier = Modifier
-                                .size(32.dp),
-                            contentScale = ContentScale.Fit
+                                .size(32.dp)
+                                .clip(shape = RoundedCornerShape(8.dp)),
+                            model = collectionJobList[index].company.logo,
+                            contentDescription = "Company Logo",
+                            contentScale = ContentScale.Crop,
                         )
 
                         Text(
@@ -871,12 +876,13 @@ fun StyleTwoLazyLayout(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.company_logo),
-                            contentDescription = "Company Logo",
+                        AsyncImage(
                             modifier = Modifier
-                                .size(42.dp),
-                            contentScale = ContentScale.Fit
+                                .size(42.dp)
+                                .clip(shape = RoundedCornerShape(8.dp)),
+                            model = collectionJobList[index].company.logo,
+                            contentDescription = "Company Logo",
+                            contentScale = ContentScale.Crop,
                         )
                     }
                 }
@@ -937,13 +943,13 @@ fun StyleThreeLazyLayout(
                             modifier = Modifier.width(60.dp)
                         )
 
-                        Image(
-                            painter = painterResource(id = R.drawable.company_logo),
-                            contentDescription = "Company Logo",
+                        AsyncImage(
                             modifier = Modifier
-                                .padding(start = 2.dp)
-                                .size(32.dp),
-                            contentScale = ContentScale.Fit
+                                .size(32.dp).padding(start = 2.dp)
+                                .clip(shape = RoundedCornerShape(8.dp)),
+                            model = collectionJobList[index].company.logo,
+                            contentDescription = "Company Logo",
+                            contentScale = ContentScale.Crop,
                         )
                     }
 
@@ -1039,12 +1045,13 @@ fun StyleFourLazyLayout(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.company_logo),
-                            contentDescription = "Company Logo",
+                        AsyncImage(
                             modifier = Modifier
-                                .size(48.dp),
-                            contentScale = ContentScale.Fit
+                                .size(48.dp)
+                                .clip(shape = RoundedCornerShape(8.dp)),
+                            model = collectionCompanyList[index].company.logo,
+                            contentDescription = "Company Logo",
+                            contentScale = ContentScale.Crop,
                         )
                     }
 

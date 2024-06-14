@@ -109,10 +109,10 @@ fun MyApp() {
                     JobDetailsScreen(viewModel, navController, it.arguments?.getString("jobId") ?: "")
                 }
             }
-            composable("application-details/{applicationDetailId}") {
+            composable("application-details/{applicationDetailId}/{companyName}") {
                 val viewModel: ApplicationViewModel = getKoin().get()
-                if (it.arguments?.getString("applicationDetailId") != "") {
-                    ApplicationDetailScreen(viewModel, navController, it.arguments?.getString("applicationDetailId") ?: "")
+                if (it.arguments?.getString("applicationDetailId") != "" && it.arguments?.getString("companyName") != "") {
+                    ApplicationDetailScreen(viewModel, navController, it.arguments?.getString("applicationDetailId") ?: "", it.arguments?.getString("companyName") ?: "")
                 }
             }
             composable("company-details/{companyId}") {

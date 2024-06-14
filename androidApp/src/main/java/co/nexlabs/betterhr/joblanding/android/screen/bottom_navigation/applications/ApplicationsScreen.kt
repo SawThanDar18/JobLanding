@@ -54,6 +54,9 @@ import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -99,10 +102,8 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
     }
 
     if (jobIds.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            scope.launch {
-                viewModel.getCompanyInfo(jobIds)
-            }
+        scope.launch {
+            viewModel.getCompanyInfo(jobIds)
         }
     }
 
@@ -186,7 +187,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (uiState.application.isNotEmpty()) {
+                if (uiState.application.isNotEmpty() && uiState.companyData.isNotEmpty()) {
                     LazyColumn(
                         modifier = Modifier.padding(bottom = 80.dp)
                     ) {
@@ -218,7 +219,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                                                 .fillMaxSize()
                                                 .padding(horizontal = 16.dp)
                                                 .clickable {
-                                                    navController.navigate("application-details/${uiState.application[index].id}")
+                                                    navController.navigate("application-details/${uiState.application[index].id}/${uiState.companyData[index].company.companyName}")
                                                 },
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
@@ -230,8 +231,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                                             ) {
 
                                                 Image(
-                                                    painter = painterResource(id = R.drawable.bank_logo),
-                                                    //painter = rememberGlidePainter(request = uiState.companyData[0].company.companyLogo),
+                                                    painter = rememberAsyncImagePainter(uiState.companyData[index].company.companyLogo),
                                                     contentDescription = "Company Icon",
                                                     modifier = Modifier
                                                         .size(32.dp)
@@ -269,8 +269,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
                                                     Text(
                                                         modifier = Modifier.width(120.dp),
-                                                        text = "Oway",
-                                                        //text = uiState.companyData[0].company.companyName,
+                                                        text = uiState.companyData[index].company.companyName,
                                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                         fontWeight = FontWeight.W400,
                                                         color = Color(0xFF757575),

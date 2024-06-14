@@ -34,5 +34,7 @@ data class JobDetailUIModel(
 data class JobDetailCompanyUIModel(
     val id: String,
     val name: String,
-    val subDomain: String
+    val subDomain: String,
+    val logo: String,
+    val coverImage: String
 )

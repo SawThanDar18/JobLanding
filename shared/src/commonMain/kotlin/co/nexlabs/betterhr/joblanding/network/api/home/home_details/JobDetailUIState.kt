@@ -25,7 +25,7 @@ data class JobDetailUIState(
         "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 0.0, 0.0, "", "", "", "", "",
         0, 0, 0,
         JobDetailCompanyUIModel(
-            "", "", ""
+            "", "", "", "", ""
         )
     ),
     var fetchSaveJobs: FetchSaveJobsUIModel = FetchSaveJobsUIModel(

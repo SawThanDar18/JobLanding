@@ -78,7 +78,7 @@ class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJo
                     }
                     if (!data.hasErrors()) {
 
-                        _items.value = _items.value + CollectionJobsViewModelMapper.mapResponseToViewModel(data.data!!)
+                        _items.value += CollectionJobsViewModelMapper.mapResponseToViewModel(data.data!!)
 
                         _uiState.update {
                             it.copy(

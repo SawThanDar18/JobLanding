@@ -564,22 +564,22 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                 Boxes(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.yoma_cover),
-                        contentDescription = "Background Image",
+                    AsyncImage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(160.dp),
-                        contentScale = ContentScale.FillWidth
+                        model = uiState.jobDetail.company.coverImage,
+                        contentDescription = "Cover",
+                        contentScale = ContentScale.Crop,
                     )
 
-                    Image(
-                        painter = painterResource(id = R.drawable.bank_logo),
-                        contentDescription = "Company Logo",
+                    AsyncImage(
                         modifier = Modifier
-                            .width(61.dp)
-                            .height(61.dp)
+                            .size(61.dp)
                             .clip(CircleShape),
+                        model = uiState.jobDetail.company.logo,
+                        contentDescription = "Company Logo",
+                        contentScale = ContentScale.Crop,
                     )
                 }
             }

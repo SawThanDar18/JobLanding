@@ -7,6 +7,7 @@ query JobLandingCompany($company_id: String!){
         country_name
         name
         description
+        company_logo
         company_mail
         company_link
         jobs_count

@@ -80,7 +80,9 @@ class CollectionCompaniesViewModel(private val collectionJobsRepository: Collect
                         )
                     }
                     if (!data.hasErrors()) {
-                        _items.value = _items.value + CollectionCompaniesViewModelMapper.mapResponseToViewModel(data.data!!)
+                        _items.value += CollectionCompaniesViewModelMapper.mapResponseToViewModel(
+                            data.data!!
+                        )
 
                         //collectionCompaniesList.addAll(CollectionCompaniesViewModelMapper.mapResponseToViewModel(data.data!!))
                         _uiState.update {

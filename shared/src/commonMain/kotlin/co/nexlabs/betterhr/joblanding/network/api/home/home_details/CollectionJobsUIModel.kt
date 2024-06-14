@@ -39,5 +39,7 @@ data class JobsCompanyUIModel(
     val name: String,
     val description: String,
     val companyMail: String,
-    val companyLink: String
+    val companyLink: String,
+    val logo: String,
+    val coverImage: String
 )

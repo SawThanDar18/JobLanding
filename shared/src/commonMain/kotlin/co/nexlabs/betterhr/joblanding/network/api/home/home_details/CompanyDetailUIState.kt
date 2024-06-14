@@ -7,7 +7,7 @@ data class CompanyDetailUIState(
     val error: UIErrorType = UIErrorType.Nothing,
     val companyDetail: CompanyDetailUIModel = CompanyDetailUIModel(
         "", "", "", "", "", "",
-        0,
+        0, "", ""
     ),
     val isSuccessGetCompanyDetail: Boolean = false,
     val companyDetailJobList: List<CompanyDetailJobUIModel> = emptyList()

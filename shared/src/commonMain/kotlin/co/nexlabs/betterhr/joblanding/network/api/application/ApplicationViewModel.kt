@@ -115,6 +115,7 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
     }
 
     fun getCompanyInfo(ids: List<String>) {
+        println("jobids>>$ids")
         viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(

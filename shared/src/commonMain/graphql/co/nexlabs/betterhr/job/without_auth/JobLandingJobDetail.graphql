@@ -35,6 +35,8 @@ query JobLandingJobDetail($job_id: String!){
             id
             name
             subdomain
+            company_logo
+            cover_image
         }
     }
 }

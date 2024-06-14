@@ -51,7 +51,8 @@ object CollectionJobsViewModelMapper {
                 data.company.description ?: "",
                 data.company.company_mail ?: "",
                 data.company.company_link ?: "",
-
+                data.company.company_logo ?: "",
+                data.company.cover_image ?: ""
             )
         )
     }

@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -51,6 +52,7 @@ import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.interview.InterviewViewModel
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -69,6 +71,8 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+
+    var jobIds by remember { mutableStateOf<List<String>>(emptyList()) }
 
     val dateFormat = SimpleDateFormat("E, d MMM", Locale.getDefault())
 
@@ -89,6 +93,22 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
     scope.launch {
         if (viewModel.getBearerToken() != "") {
             viewModel.fetchInterviews()
+        }
+    }
+
+    if (uiState.isSuccessGetInterviewData) {
+        LaunchedEffect(Unit) {
+            if (uiState.interviewList.isNotEmpty()) {
+                jobIds = uiState.interviewList.map {
+                    it.jobId
+                }
+            }
+        }
+    }
+
+    if (jobIds.isNotEmpty()) {
+        scope.launch {
+            viewModel.getCompanyInfo(jobIds)
         }
     }
 
@@ -309,12 +329,13 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
 
                                                     Spacer(modifier = Modifier.width(8.dp))
 
-                                                    Image(
-                                                        painter = painterResource(id = R.drawable.bank_logo),
-                                                        contentDescription = "Company Icon",
+                                                    AsyncImage(
                                                         modifier = Modifier
                                                             .size(32.dp)
-                                                            .clip(CircleShape)
+                                                            .clip(CircleShape),
+                                                        model = uiState.companyData[index].company.companyLogo,
+                                                        contentDescription = "Company Logo",
+                                                        contentScale = ContentScale.Fit,
                                                     )
                                                 }
 

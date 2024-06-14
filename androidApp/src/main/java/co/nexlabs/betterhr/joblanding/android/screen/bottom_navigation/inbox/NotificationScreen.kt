@@ -72,6 +72,7 @@ import co.nexlabs.betterhr.joblanding.android.screen.register.Overlap
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.glide.rememberGlidePainter
@@ -100,6 +101,8 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
+    var jobIds by remember { mutableStateOf<List<String>>(emptyList()) }
+
     LaunchedEffect(refreshing) {
         if (refreshing) {
             scope.launch {
@@ -114,6 +117,22 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
     scope.launch {
         if (viewModel.getBearerToken() != "") {
             viewModel.fetchNotification(emptyList())
+        }
+    }
+
+    if (uiState.isSuccessGetInboxData) {
+        LaunchedEffect(Unit) {
+            if (uiState.notificationList.isNotEmpty()) {
+                jobIds = uiState.notificationList.map {
+                    it.referenceId
+                }
+            }
+        }
+    }
+
+    if (jobIds.isNotEmpty()) {
+        scope.launch {
+            viewModel.getCompanyInfo(jobIds)
         }
     }
 
@@ -202,7 +221,7 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 AnimatedVisibility(
-                    uiState.notificationList.isNotEmpty(),
+                    uiState.notificationList.isNotEmpty() && uiState.companyData.isNotEmpty(),
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
@@ -375,12 +394,13 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.bank_logo),
-                                                contentDescription = "Company Icon",
+                                            AsyncImage(
                                                 modifier = Modifier
                                                     .size(32.dp)
-                                                    .clip(CircleShape)
+                                                    .clip(CircleShape),
+                                                model = uiState.companyData[index].company.companyLogo,
+                                                contentDescription = "Company Logo",
+                                                contentScale = ContentScale.Fit,
                                             )
 
                                             Image(

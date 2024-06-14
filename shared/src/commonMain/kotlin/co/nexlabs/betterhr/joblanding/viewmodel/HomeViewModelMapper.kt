@@ -49,7 +49,8 @@ object HomeViewModelMapper {
                         it.last3_cv_count ?: 0,
                         CompanyUIModel(
                             it.company!!.id,
-                            it.company.name
+                            it.company.name,
+                            it.company.company_logo ?: ""
                         )
                     )
                 )
@@ -70,7 +71,8 @@ object HomeViewModelMapper {
                         it.last3_cv_count ?: 0,
                         CompanyUIModel(
                             it.company!!.id,
-                            it.company.name
+                            it.company.name,
+                            it.company.company_logo ?: ""
                         )
                     )
                 )

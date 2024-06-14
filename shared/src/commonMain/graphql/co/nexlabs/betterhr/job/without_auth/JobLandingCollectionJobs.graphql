@@ -45,6 +45,8 @@ query JobLandingCollectionJobs($collection_id: String!, $is_paginate: Boolean!, 
                 description
                 company_mail
                 company_link
+                company_logo
+                cover_image
             }
         }
         paginatorInfo{

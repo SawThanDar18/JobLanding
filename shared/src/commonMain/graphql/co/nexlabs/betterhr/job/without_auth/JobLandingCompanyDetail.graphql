@@ -9,5 +9,7 @@ query JobLandingCompanyDetail($company_id: String!){
         company_mail
         company_link
         jobs_count
+        company_logo
+        cover_image
     }
 }
