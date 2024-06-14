@@ -30,7 +30,7 @@ class CellStyleTwoTableViewCell: UITableViewCell {
         cellStyleTwoCollectionView.delegate = self
         cellStyleTwoCollectionView.backgroundColor = .clear
         if let layout = cellStyleTwoCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.scrollDirection = .vertical
+            layout.scrollDirection = .horizontal
             layout.minimumLineSpacing = 0
             layout.minimumInteritemSpacing = 0
         }

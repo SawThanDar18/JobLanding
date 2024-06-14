@@ -31,7 +31,7 @@ class CellStyleFourTableViewCell: UITableViewCell {
         cellStyleFourCollectionView.delegate = self
         cellStyleFourCollectionView.backgroundColor = .clear
         if let layout = cellStyleFourCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.scrollDirection = .vertical
+            layout.scrollDirection = .horizontal
             layout.minimumLineSpacing = 0
             layout.minimumInteritemSpacing = 0
         }
