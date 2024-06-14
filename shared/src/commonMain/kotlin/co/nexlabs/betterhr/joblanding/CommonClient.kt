@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding
 
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
 import co.nexlabs.betterhr.joblanding.util.API_KEY
 import co.nexlabs.betterhr.joblanding.util.API_VALUE_JOB
 import co.nexlabs.betterhr.joblanding.util.baseUrlForAuth
@@ -12,6 +13,11 @@ import com.apollographql.apollo3.cache.normalized.normalizedCache
 import com.apollographql.apollo3.network.http.HttpNetworkTransport
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineDispatcher
+
+expect object DIHelperClient {
+    fun initialize(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider: AssetProvider)
+    fun getHomeViewModel(): HomeViewModel
+}
 
 interface FileHandler {
     fun readFileBytes(fileUri: FileUri): ByteArray
@@ -85,3 +91,4 @@ fun createApolloClientWithAuthWithoutToken(): ApolloClient {
         .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
         .build()
 }
+
