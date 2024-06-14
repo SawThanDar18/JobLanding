@@ -99,7 +99,7 @@ kotlin {
             }
         }
 
-        /*val iosX64Main by getting {
+        val iosX64Main by getting {
             dependencies {
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
@@ -116,7 +116,7 @@ kotlin {
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
-        }*/
+        }
         val iosMain by getting {
             dependencies {
                 implementation(KTOR.clientiOS)
