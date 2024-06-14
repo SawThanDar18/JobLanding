@@ -10,9 +10,8 @@ import co.nexlabs.betterhr.joblanding.AndroidAssetProvider
 import co.nexlabs.betterhr.joblanding.AndroidFileHandler
 import co.nexlabs.betterhr.joblanding.AndroidLocalStorageImpl
 import co.nexlabs.betterhr.joblanding.AssetProvider
+import co.nexlabs.betterhr.joblanding.DIHelperClient
 import co.nexlabs.betterhr.joblanding.FileHandler
-import co.nexlabs.betterhr.joblanding.di.initKoin
-import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorageProvider
 
 class MainActivity : ComponentActivity() {
@@ -30,7 +29,7 @@ class MainActivity : ComponentActivity() {
             AndroidLocalStorageImpl(this)
         }
 
-        initKoin(LocalStorageProvider.instance, fileHandler, assetProvider)
+        DIHelperClient.initialize(LocalStorageProvider.instance, fileHandler, assetProvider)
 
         WindowCompat.setDecorFitsSystemWindows(window, true)
         val controller = WindowCompat.getInsetsController(window, window.decorView)

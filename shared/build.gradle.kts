@@ -17,7 +17,6 @@ kotlin {
             }
         }
     }
-
     listOf(
         iosX64(),
         iosArm64(),
@@ -42,7 +41,7 @@ kotlin {
                 api("com.apollographql.apollo3:apollo-runtime:3.8.2")
                 api("com.apollographql.apollo3:apollo-normalized-cache:3.8.2")
 
-                api("io.insert-koin:koin-core:3.4.3")
+                implementation("io.insert-koin:koin-core:3.1.2")
                 api("io.insert-koin:koin-compose:1.0.4")
 
                 api("moe.tlaster:precompose:1.5.0")
@@ -73,6 +72,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
+
                 api("androidx.activity:activity-compose:1.7.2")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.10.1")
@@ -100,24 +100,28 @@ kotlin {
 
         val iosX64Main by getting {
             dependencies {
+                implementation("io.insert-koin:koin-core:3.1.2")
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosArm64Main by getting {
             dependencies {
+                implementation("io.insert-koin:koin-core:3.1.2")
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosSimulatorArm64Main by getting {
             dependencies {
+                implementation("io.insert-koin:koin-core:3.1.2")
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }
         }
         val iosMain by getting {
             dependencies {
+                implementation("io.insert-koin:koin-core:3.1.2")
                 implementation(KTOR.clientiOS)
                 implementation(KTOR.clientDarwin)
             }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="CellStyleSixCollectionViewCell" customModule="BetterJobLanding" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="156" height="154"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="156" height="154"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="gbank" translatesAutoresizingMaskIntoConstraints="NO" id="JxG-jt-izk">
+                        <rect key="frame" x="0.0" y="0.0" width="156" height="154"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="156" id="EkN-QN-eC5"/>
+                            <constraint firstAttribute="height" constant="154" id="z6H-WN-6hl"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+            </view>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="JxG-jt-izk" secondAttribute="trailing" id="DHn-sQ-r9C"/>
+                <constraint firstItem="JxG-jt-izk" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="LI7-C7-d9n"/>
+                <constraint firstAttribute="bottom" secondItem="JxG-jt-izk" secondAttribute="bottom" id="t17-eH-dhg"/>
+                <constraint firstItem="JxG-jt-izk" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="u9N-Ih-O1u"/>
+            </constraints>
+            <size key="customSize" width="163" height="161"/>
+            <connections>
+                <outlet property="campaignImageView" destination="JxG-jt-izk" id="5Rx-bY-d0F"/>
+            </connections>
+            <point key="canvasLocation" x="122.90076335877862" y="35.563380281690144"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="gbank" width="48" height="48"/>
+    </resources>
+</document>
