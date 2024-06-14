@@ -3,7 +3,6 @@ package co.nexlabs.betterhr.joblanding.di
 import co.nexlabs.betterhr.joblanding.AssetProvider
 import co.nexlabs.betterhr.joblanding.FileHandler
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
-import co.nexlabs.betterhr.joblanding.local_storage.LocalStorageProvider
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
@@ -53,6 +52,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import io.ktor.serialization.kotlinx.json.json
 
+/*
 fun initKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider: AssetProvider) {
     startKoin {
         modules(
@@ -67,7 +67,7 @@ fun initKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider
                         install(Logging) {
                             logger = Logger.DEFAULT
                             level = LogLevel.ALL
-                            logger = object: Logger {
+                            logger = object : Logger {
                                 override fun log(message: String) {
                                     println("msg>>$message")
                                 }
@@ -83,7 +83,13 @@ fun initKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider
                         }
                     }
                 }
-                single<JobLandingService> {JobLandingServiceImpl(localStorage, fileHandler, get())}
+                single<JobLandingService> {
+                    JobLandingServiceImpl(
+                        localStorage,
+                        fileHandler,
+                        get()
+                    )
+                }
                 single { RegisterRepository(get()) }
                 single { ChooseCountryRepository(get()) }
                 single { HomeRepository(get()) }
@@ -122,4 +128,4 @@ fun initKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider
             }
         )
     }
-}
+}*/

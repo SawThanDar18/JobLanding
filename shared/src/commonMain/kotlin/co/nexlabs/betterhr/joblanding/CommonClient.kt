@@ -1,6 +1,27 @@
 package co.nexlabs.betterhr.joblanding
 
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
+import co.nexlabs.betterhr.joblanding.network.api.apply_job.ApplyJobViewModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CollectionJobsViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.HomeViewModel
+import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewModel
+import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
+import co.nexlabs.betterhr.joblanding.network.api.interview.InterviewViewModel
+import co.nexlabs.betterhr.joblanding.network.api.login.QRLogInViewModel
+import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
+import co.nexlabs.betterhr.joblanding.network.api.setting.SettingViewModel
+import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
+import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
+import co.nexlabs.betterhr.joblanding.network.register.ProfileRegisterViewModel
+import co.nexlabs.betterhr.joblanding.network.register.RegisterViewModel
 import co.nexlabs.betterhr.joblanding.util.API_KEY
 import co.nexlabs.betterhr.joblanding.util.API_VALUE_JOB
 import co.nexlabs.betterhr.joblanding.util.baseUrlForAuth
@@ -12,6 +33,31 @@ import com.apollographql.apollo3.cache.normalized.normalizedCache
 import com.apollographql.apollo3.network.http.HttpNetworkTransport
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.CoroutineDispatcher
+
+expect object DIHelperClient {
+    fun initialize(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider: AssetProvider)
+    fun getScreenPortalViewModel(): ScreenPortalViewModel
+    fun getRegisterViewModel(): RegisterViewModel
+    fun getChooseCountryViewModel(): ChooseCountryViewModel
+    fun getHomeViewModel(): HomeViewModel
+    fun getSharedViewModel(): SharedViewModel
+    fun getCollectionJobsViewModel(): CollectionJobsViewModel
+    fun getCollectionCompaniesViewModel(): CollectionCompaniesViewModel
+    fun getJobDetailViewModel(): JobDetailViewModel
+    fun getCompanyDetailViewModel(): CompanyDetailViewModel
+    fun getBottomNavigationViewModel(): BottomNavigationViewModel
+    fun getProfileRegisterViewModel(): ProfileRegisterViewModel
+    fun getApplyJobViewModel(): ApplyJobViewModel
+    fun getCompleteProfileViewModel(): CompleteProfileViewModel
+    fun getApplicationViewModel(): ApplicationViewModel
+    fun getInboxViewModel(): InboxViewModel
+    fun getInboxDetailViewModel(): InboxDetailViewModel
+    fun getSubmitAssignmentViewModel(): SubmitAssignmentViewModel
+    fun getSubmitOfferViewModel(): SubmitOfferViewModel
+    fun getInterviewViewModel(): InterviewViewModel
+    fun getQRLogInViewModel(): QRLogInViewModel
+    fun getSettingViewModel(): SettingViewModel
+}
 
 interface FileHandler {
     fun readFileBytes(fileUri: FileUri): ByteArray
@@ -85,3 +131,4 @@ fun createApolloClientWithAuthWithoutToken(): ApolloClient {
         .normalizedCache(MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024))
         .build()
 }
+
