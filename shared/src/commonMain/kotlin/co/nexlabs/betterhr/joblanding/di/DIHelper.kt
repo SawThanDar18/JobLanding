@@ -52,74 +52,83 @@ import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import io.ktor.serialization.kotlinx.json.json
+import org.koin.core.Koin
+import org.koin.core.KoinApplication
 
-fun initKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider: AssetProvider) {
-    startKoin {
-        modules(
-            module {
-                single {
-                    HttpClient() {
-                        install(HttpTimeout)
-                        install(HttpTimeout) {
-                            socketTimeoutMillis = 60_000
-                            requestTimeoutMillis = 60_000
-                        }
-                        install(Logging) {
-                            logger = Logger.DEFAULT
-                            level = LogLevel.ALL
-                            logger = object: Logger {
-                                override fun log(message: String) {
-                                    println("msg>>$message")
+object DIHelper {
+    private lateinit var koinApp: KoinApplication
+    fun initKoin(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider: AssetProvider) {
+        koinApp = startKoin {
+            modules(
+                module {
+                    single {
+                        HttpClient() {
+                            install(HttpTimeout)
+                            install(HttpTimeout) {
+                                socketTimeoutMillis = 60_000
+                                requestTimeoutMillis = 60_000
+                            }
+                            install(Logging) {
+                                logger = Logger.DEFAULT
+                                level = LogLevel.ALL
+                                logger = object: Logger {
+                                    override fun log(message: String) {
+                                        println("msg>>$message")
+                                    }
                                 }
                             }
-                        }
-                        install(ContentNegotiation) {
-                            json(Json {
-                                prettyPrint = true
-                                isLenient = true
-                                ignoreUnknownKeys = true
-                                explicitNulls = false
-                            })
+                            install(ContentNegotiation) {
+                                json(Json {
+                                    prettyPrint = true
+                                    isLenient = true
+                                    ignoreUnknownKeys = true
+                                    explicitNulls = false
+                                })
+                            }
                         }
                     }
+                    single<JobLandingService> {JobLandingServiceImpl(localStorage, fileHandler, get())}
+                    single { RegisterRepository(get()) }
+                    single { ChooseCountryRepository(get()) }
+                    single { HomeRepository(get()) }
+                    single { CollectionJobsRepository(get()) }
+                    single { CollectionCompaniesRepository(get()) }
+                    single { JobDetailRepository(get()) }
+                    single { CompanyDetailRepository(get()) }
+                    single { ProfileRegisterRepository(get()) }
+                    single { ApplyJobRepository(get()) }
+                    single { CompleteProfileRepository(get()) }
+                    single { ApplicationRepository(get()) }
+                    single { InboxRepository(get()) }
+                    single { InterviewsRepository(get()) }
+                    single { QRLogInRepository(get()) }
+                    factory { ScreenPortalViewModel(localStorage) }
+                    factory { RegisterViewModel(localStorage, get()) }
+                    factory { ChooseCountryViewModel(localStorage, get()) }
+                    factory { HomeViewModel(localStorage, get()) }
+                    factory { SharedViewModel() }
+                    factory { CollectionJobsViewModel(get()) }
+                    factory { CollectionCompaniesViewModel(get()) }
+                    factory { JobDetailViewModel(localStorage, get()) }
+                    factory { CompanyDetailViewModel(get()) }
+                    factory { BottomNavigationViewModel(localStorage) }
+                    factory { ProfileRegisterViewModel(localStorage, get()) }
+                    factory { ApplyJobViewModel(localStorage, get()) }
+                    factory { CompleteProfileViewModel(localStorage, get()) }
+                    factory { ApplicationViewModel(localStorage, get()) }
+                    factory { InboxViewModel(localStorage, get()) }
+                    factory { InboxDetailViewModel(get(), assetProvider) }
+                    factory { SubmitAssignmentViewModel(localStorage, get()) }
+                    factory { SubmitOfferViewModel(localStorage, get()) }
+                    factory { InterviewViewModel(localStorage, get()) }
+                    factory { QRLogInViewModel(localStorage, get()) }
+                    factory { SettingViewModel(localStorage) }
                 }
-                single<JobLandingService> {JobLandingServiceImpl(localStorage, fileHandler, get())}
-                single { RegisterRepository(get()) }
-                single { ChooseCountryRepository(get()) }
-                single { HomeRepository(get()) }
-                single { CollectionJobsRepository(get()) }
-                single { CollectionCompaniesRepository(get()) }
-                single { JobDetailRepository(get()) }
-                single { CompanyDetailRepository(get()) }
-                single { ProfileRegisterRepository(get()) }
-                single { ApplyJobRepository(get()) }
-                single { CompleteProfileRepository(get()) }
-                single { ApplicationRepository(get()) }
-                single { InboxRepository(get()) }
-                single { InterviewsRepository(get()) }
-                single { QRLogInRepository(get()) }
-                factory { ScreenPortalViewModel(localStorage) }
-                factory { RegisterViewModel(localStorage, get()) }
-                factory { ChooseCountryViewModel(localStorage, get()) }
-                factory { HomeViewModel(localStorage, get()) }
-                factory { SharedViewModel() }
-                factory { CollectionJobsViewModel(get()) }
-                factory { CollectionCompaniesViewModel(get()) }
-                factory { JobDetailViewModel(localStorage, get()) }
-                factory { CompanyDetailViewModel(get()) }
-                factory { BottomNavigationViewModel(localStorage) }
-                factory { ProfileRegisterViewModel(localStorage, get()) }
-                factory { ApplyJobViewModel(localStorage, get()) }
-                factory { CompleteProfileViewModel(localStorage, get()) }
-                factory { ApplicationViewModel(localStorage, get()) }
-                factory { InboxViewModel(localStorage, get()) }
-                factory { InboxDetailViewModel(get(), assetProvider) }
-                factory { SubmitAssignmentViewModel(localStorage, get()) }
-                factory { SubmitOfferViewModel(localStorage, get()) }
-                factory { InterviewViewModel(localStorage, get()) }
-                factory { QRLogInViewModel(localStorage, get()) }
-                factory { SettingViewModel(localStorage) }
-            }
-        )
+            )
+        }
+    }
+
+    fun getKoinInstance(): Koin {
+        return koinApp.koin
     }
 }
