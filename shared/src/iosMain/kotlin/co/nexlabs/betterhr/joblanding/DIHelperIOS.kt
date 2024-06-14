@@ -55,7 +55,7 @@ actual object DIHelperClient {
     private lateinit var koinApp: KoinApplication
 
     actual fun initialize(localStorage: LocalStorage, fileHandler: FileHandler, assetProvider: AssetProvider) {
-        startKoin {
+        koinApp = startKoin {
             modules(
                 module {
                     single {
@@ -131,7 +131,87 @@ actual object DIHelperClient {
         }
     }
 
+    actual fun getScreenPortalViewModel(): ScreenPortalViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getRegisterViewModel(): RegisterViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getChooseCountryViewModel(): ChooseCountryViewModel {
+        return koinApp.koin.get()
+    }
+
     actual fun getHomeViewModel(): HomeViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getSharedViewModel(): SharedViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getCollectionJobsViewModel(): CollectionJobsViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getCollectionCompaniesViewModel(): CollectionCompaniesViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getJobDetailViewModel(): JobDetailViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getCompanyDetailViewModel(): CompanyDetailViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getBottomNavigationViewModel(): BottomNavigationViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getProfileRegisterViewModel(): ProfileRegisterViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getApplyJobViewModel(): ApplyJobViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getCompleteProfileViewModel(): CompleteProfileViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getApplicationViewModel(): ApplicationViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getInboxViewModel(): InboxViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getInboxDetailViewModel(): InboxDetailViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getSubmitAssignmentViewModel(): SubmitAssignmentViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getSubmitOfferViewModel(): SubmitOfferViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getInterviewViewModel(): InterviewViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getQRLogInViewModel(): QRLogInViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getSettingViewModel(): SettingViewModel {
         return koinApp.koin.get()
     }
 }
