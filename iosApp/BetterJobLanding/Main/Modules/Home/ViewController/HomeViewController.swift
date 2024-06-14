@@ -19,8 +19,7 @@ class HomeViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
-//        let temp = Koin
-        DIHelperKt.doInitKoin(localStorage: IOSLocalStorage(), fileHandler: iOSFileHandler(), assetProvider: IosAssetProvider())
+//        DIHelperKt.doInitKoin(localStorage: IOSLocalStorage(), fileHandler: iOSFileHandler(), assetProvider: IosAssetProvider())
 //        let test = getKoin().get()
         
 //        let test = HomeViewModel(localStorage: IOSLocalStorage(), homeRepository: homere)
