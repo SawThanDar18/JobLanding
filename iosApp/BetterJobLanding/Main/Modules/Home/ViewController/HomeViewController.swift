@@ -7,7 +7,6 @@
 
 import UIKit
 import shared
-import Combine
 
 class HomeViewController: BaseViewController {
     @IBOutlet weak var homeTableView: UITableView!
@@ -18,7 +17,6 @@ class HomeViewController: BaseViewController {
     var router: HomeRouter?
     
     var chooseCountryViewModel: ChooseCountryViewModel!
-    var cancellables = Set<AnyCancellable>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,11 +25,14 @@ class HomeViewController: BaseViewController {
         
         chooseCountryViewModel.getCountriesList()
         chooseCountryViewModel.observeUiState { uiStateData in
-            let countriesList: [Item] = uiStateData.items as? [Item] ?? []
+            let countriesList: [CountryData] = uiStateData.countries as? [CountryData] ?? []
             countriesList.forEach { country in
                 print(country.id)
                 print(country.countryName)
             }
+            
+            let pageId = uiStateData.dynamicPageId
+            
         }
     
                 
