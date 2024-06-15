@@ -4,6 +4,7 @@ import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.data.ApplyJobRepository
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.data.ApplyJobUIState
+import co.nexlabs.betterhr.joblanding.network.register.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
@@ -25,6 +26,14 @@ private val applyJobRepository: ApplyJobRepository
 
     private val _uiState = MutableStateFlow(ApplyJobUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (ApplyJobUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun applyJob(
         referenceId: String, jobId: String, status: String, subDomain: String

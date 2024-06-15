@@ -43,6 +43,30 @@ class JobDetailViewModel(
     private val _uiStateForVerify = MutableStateFlow<UiState>(UiState.Loading)
     val uiStateForVerify: StateFlow<UiState> = _uiStateForVerify
 
+    fun observeUiStateForRequestOTP(onChange: (UiState) -> Unit) {
+        viewModelScope.launch {
+            uiStateRegister.collect { state ->
+                onChange(state)
+            }
+        }
+    }
+
+    fun observeUiStateForVerifyOTP(onChange: (UiState) -> Unit) {
+        viewModelScope.launch {
+            uiStateForVerify.collect { state ->
+                onChange(state)
+            }
+        }
+    }
+
+    fun observeUiStateForJobDetail(onChange: (JobDetailUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
+
     fun updateToken(token: String) {
         localStorage.token = token
     }

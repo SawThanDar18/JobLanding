@@ -3,6 +3,7 @@ package co.nexlabs.betterhr.joblanding.network.register
 import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
 import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileRepository
 import co.nexlabs.betterhr.joblanding.network.register.data.CompleteProfileUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -27,6 +28,14 @@ class CompleteProfileViewModel(
 
     private val _uiState = MutableStateFlow(CompleteProfileUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (CompleteProfileUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun updateCandidateId(candidateId: String) {
         localStorage.candidateId = candidateId

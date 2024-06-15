@@ -16,8 +16,26 @@ class HomeViewController: BaseViewController {
     var viewModel: HomeViewModels!
     var router: HomeRouter?
     
+    var chooseCountryViewModel: ChooseCountryViewModel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        chooseCountryViewModel = DIHelperClient.shared.getChooseCountryViewModel()
+        
+        chooseCountryViewModel.getCountriesList()
+        chooseCountryViewModel.observeUiState { uiStateData in
+            let countriesList: [CountryData] = uiStateData.countries as? [CountryData] ?? []
+            countriesList.forEach { country in
+                print(country.id)
+                print(country.countryName)
+            }
+            
+            let pageId = uiStateData.dynamicPageId
+            
+        }
+    
+                
     
 //        DIHelperKt.doInitKoin(localStorage: IOSLocalStorage(), fileHandler: iOSFileHandler(), assetProvider: IosAssetProvider())
 //        let test = getKoin().get()

@@ -3,6 +3,7 @@ package co.nexlabs.betterhr.joblanding.network.register
 import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
 import co.nexlabs.betterhr.joblanding.network.register.data.ProfileRegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.data.ProfileRegisterUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -26,6 +27,14 @@ class ProfileRegisterViewModel(
 
     private val _uiState = MutableStateFlow(ProfileRegisterUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (ProfileRegisterUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun getPageId(): String {
         return localStorage.pageId
