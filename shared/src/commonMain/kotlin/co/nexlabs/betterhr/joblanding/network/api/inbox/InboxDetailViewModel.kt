@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.network.api.inbox
 
 import co.nexlabs.betterhr.joblanding.AssetProvider
 import co.nexlabs.betterhr.joblanding.DispatcherProvider
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.JobDetailUIState
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIState
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -23,6 +24,14 @@ class InboxDetailViewModel(private val inboxRepository: InboxRepository, private
 
     private val _uiState = MutableStateFlow(InboxDetailUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (InboxDetailUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun fetchNotificationDetail(
         id: String

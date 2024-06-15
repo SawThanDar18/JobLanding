@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.network.register
 
 import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterRepository
 import co.nexlabs.betterhr.joblanding.network.register.data.RegisterUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -38,6 +39,30 @@ class RegisterViewModel(
 
     private val _uiStateForVerify = MutableStateFlow<UiState>(UiState.Loading)
     val uiStateForVerify: StateFlow<UiState> = _uiStateForVerify
+
+    fun observeUiStateForRequestOTP(onChange: (UiState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
+
+    fun observeUiStateForVerifyOTP(onChange: (UiState) -> Unit) {
+        viewModelScope.launch {
+            uiStateForVerify.collect { state ->
+                onChange(state)
+            }
+        }
+    }
+
+    fun observeUiStateForBearerToken(onChange: (RegisterUIState) -> Unit) {
+        viewModelScope.launch {
+            registerUiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun requestOTP(phoneNumber: String) {
         viewModelScope.launch(DispatcherProvider.io) {

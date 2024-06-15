@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
 import co.nexlabs.betterhr.joblanding.DispatcherProvider
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIState
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -22,6 +23,14 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailRepository): ViewModel() {
     private val _uiState = MutableStateFlow(CompanyDetailUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (CompanyDetailUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun getCompanyDetail(companyId: String) {
         viewModelScope.launch(DispatcherProvider.io) {

@@ -4,6 +4,7 @@ import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.data.HomeUIState
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.HomeViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
@@ -23,6 +24,14 @@ class HomeViewModel(private val localStorage: LocalStorage, private val homeRepo
 
     private val _uiState = MutableStateFlow(HomeUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (HomeUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun getJobLandingSections(pageId: String) {
         viewModelScope.launch(DispatcherProvider.io) {

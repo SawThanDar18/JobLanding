@@ -4,6 +4,7 @@ import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationRepository
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationUIState
+import co.nexlabs.betterhr.joblanding.network.register.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.ApplicationByIdViewModelMapper
 import co.nexlabs.betterhr.joblanding.viewmodel.ApplicationViewModelMapper
@@ -29,6 +30,14 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
 
     private val _uiState = MutableStateFlow(ApplicationUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (ApplicationUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun fetchApplication() {
         viewModelScope.launch(DispatcherProvider.io) {

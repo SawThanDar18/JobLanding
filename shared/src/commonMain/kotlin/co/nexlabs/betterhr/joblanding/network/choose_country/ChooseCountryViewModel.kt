@@ -49,7 +49,6 @@ class ChooseCountryViewModel(
                 )
             }
 
-
             var countriesList: MutableList<Data> = ArrayList()
             countriesList.addAll(
                 CountriesListViewModelMapper.mapResponseToViewModel(
