@@ -26,17 +26,11 @@ class HomeViewController: BaseViewController {
         chooseCountryViewModel = DIHelperClient.shared.getChooseCountryViewModel()
         
         chooseCountryViewModel.getCountriesList()
-        chooseCountryViewModel.observeUiState { state in
-            let countries = state.countries
-
-            // Loop through countries and print id and country name
-            for data in countries {
-                print("ID: \(data.id), Country Name: \(data.countryName)")
-            }
-
-            // Optionally update UI or perform other actions based on state
-            DispatchQueue.main.async {
-                // Update UI or perform other UI-related tasks
+        chooseCountryViewModel.observeUiState { uiStateData in
+            let countriesList: [Item] = uiStateData.items as? [Item] ?? []
+            countriesList.forEach { country in
+                print(country.id)
+                print(country.countryName)
             }
         }
     
