@@ -15,7 +15,7 @@ class CellStyleHeaderTableViewCell: UITableViewCell {
         // Initialization code
         self.titleLabel.text = "Suggested For You"
         self.titleLabel.font = .poppinsSemiBold(ofSize: 14)
-        self.titleLabel.textColor = .bhrGray6A
+        self.titleLabel.textColor = BetterJobLanding.BHRJobLandingColors.bhrBJGray6A
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
