@@ -3,6 +3,7 @@ package co.nexlabs.betterhr.joblanding.network.api.inbox
 import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIState
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxRepository
 import co.nexlabs.betterhr.joblanding.network.api.inbox.data.SubmitAssignmentUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -23,6 +24,14 @@ class SubmitAssignmentViewModel(private val localStorage: LocalStorage, private 
 
     private val _uiState = MutableStateFlow(SubmitAssignmentUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (SubmitAssignmentUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun uploadMultipleFiles(
         files: MutableList<FileUri?>,

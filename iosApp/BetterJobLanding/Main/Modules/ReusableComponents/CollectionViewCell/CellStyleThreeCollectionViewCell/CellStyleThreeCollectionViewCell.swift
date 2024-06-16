@@ -36,9 +36,9 @@ class CellStyleThreeCollectionViewCell: UICollectionViewCell {
         self.companyTitleLabel.textColor = BHRJobLandingColors.bhrBJGray6A
         self.positionLabel.textColor = BHRJobLandingColors.bhrBJGrayAA
         
-        self.timeLabel.textColor = .bhrGray75
-        self.salaryLabel.textColor = .bhrGray75
-        self.addressLabel.textColor = .bhrGray75
+        self.timeLabel.textColor = BHRJobLandingColors.bhrBJGray75
+        self.salaryLabel.textColor = BHRJobLandingColors.bhrBJGray75
+        self.addressLabel.textColor = BHRJobLandingColors.bhrBJGray75
         
         self.cellStyleTwoMainView.layer.borderWidth = 1
         self.cellStyleTwoMainView.layer.borderColor = BHRJobLandingColors.bhrBJBorderColor.cgColor

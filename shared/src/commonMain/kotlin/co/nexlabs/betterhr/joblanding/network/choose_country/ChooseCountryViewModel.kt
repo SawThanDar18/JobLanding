@@ -4,7 +4,7 @@ import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryUIState
-import co.nexlabs.betterhr.joblanding.network.choose_country.data.Data
+import co.nexlabs.betterhr.joblanding.network.choose_country.data.CountryData
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.Item
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CountriesListViewModelMapper
@@ -12,7 +12,6 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -31,6 +30,14 @@ class ChooseCountryViewModel(
     private val _uiState = MutableStateFlow(ChooseCountryUIState())
     val uiState = _uiState.asStateFlow()
 
+    fun observeUiState(onChange: (ChooseCountryUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
+
     fun getCountriesList() {
         viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
@@ -40,8 +47,7 @@ class ChooseCountryViewModel(
                 )
             }
 
-
-            var countriesList: MutableList<Data> = ArrayList()
+            var countriesList: MutableList<CountryData> = ArrayList()
             countriesList.addAll(
                 CountriesListViewModelMapper.mapResponseToViewModel(
                     chooseCountryRepository.getCountriesList()
