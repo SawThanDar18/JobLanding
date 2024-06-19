@@ -6,6 +6,6 @@ data class ChooseCountryUIState(
     val isLoading: Boolean = true,
     val error: UIErrorType = UIErrorType.Nothing,
     val dynamicPageId: String = "",
-    val countries: MutableList<Data> = ArrayList(),
+    val countries: MutableList<CountryData> = ArrayList(),
     val items: MutableList<Item> = ArrayList()
 )

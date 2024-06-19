@@ -1,8 +1,10 @@
 package co.nexlabs.betterhr.joblanding.network.api.home
 
+import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIState
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIState
+import co.nexlabs.betterhr.joblanding.network.register.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionJobsViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
@@ -25,6 +27,14 @@ class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJo
 
     private val _uiState = MutableStateFlow(CollectionJobsUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (CollectionJobsUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     private var currentPage = 1
 

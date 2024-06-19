@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.network.api.interview
 
 import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIState
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewUIState
 import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewsRepository
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -29,6 +30,14 @@ class InterviewViewModel(private val localStorage: LocalStorage, private val int
 
     private val _uiState = MutableStateFlow(InterviewUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (InterviewUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     fun fetchInterviews() {
         viewModelScope.launch(DispatcherProvider.io) {

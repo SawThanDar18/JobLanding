@@ -4,6 +4,7 @@ import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCo
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIState
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIModel
+import co.nexlabs.betterhr.joblanding.network.register.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionCompaniesViewModelMapper
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionJobsViewModelMapper
@@ -28,7 +29,13 @@ class CollectionCompaniesViewModel(private val collectionJobsRepository: Collect
     private val _uiState = MutableStateFlow(CollectionCompaniesUIState())
     val uiState = _uiState.asStateFlow()
 
-    //val collectionCompaniesList: MutableList<CollectionCompaniesUIModel> = ArrayList()
+    fun observeUiState(onChange: (CollectionCompaniesUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     private var currentPage = 1
 

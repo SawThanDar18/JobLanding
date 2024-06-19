@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding.network.api.login
 
 import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.inbox.data.InboxDetailUIState
 import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInRepository
 import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInUIState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
@@ -26,6 +27,14 @@ class QRLogInViewModel(private val localStorage: LocalStorage, private val qrLog
 
     private val _uiState = MutableStateFlow(QRLogInUIState())
     val uiState = _uiState.asStateFlow()
+
+    fun observeUiState(onChange: (QRLogInUIState) -> Unit) {
+        viewModelScope.launch {
+            uiState.collect { state ->
+                onChange(state)
+            }
+        }
+    }
 
     /*fun validateQRToken(qrToken: String): Observable<WebLoginQRData> {
         return Observable.create<WebLoginQRData> { emitter ->
