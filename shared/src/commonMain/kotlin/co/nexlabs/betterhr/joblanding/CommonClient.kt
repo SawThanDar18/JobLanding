@@ -2,6 +2,7 @@ package co.nexlabs.betterhr.joblanding
 
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationFilterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.ApplyJobViewModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.BottomNavigationViewModel
@@ -57,6 +58,7 @@ expect object DIHelperClient {
     fun getInterviewViewModel(): InterviewViewModel
     fun getQRLogInViewModel(): QRLogInViewModel
     fun getSettingViewModel(): SettingViewModel
+    fun getApplicationFilterViewModel(): ApplicationFilterViewModel
 }
 
 interface FileHandler {

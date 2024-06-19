@@ -144,7 +144,10 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                               navController.navigate("about-screen")
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
@@ -222,7 +225,10 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("privacy-screen")
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
@@ -232,7 +238,7 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
                     horizontalArrangement = Arrangement.Start,
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.language),
+                        painter = painterResource(id = R.drawable.country),
                         contentDescription = "Setting Country Icon",
                         modifier = Modifier
                             .size(24.dp)
@@ -261,7 +267,10 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("privacy-screen")
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
@@ -300,7 +309,8 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable { navController.navigate("terms-of-service-screen") },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(

@@ -146,6 +146,10 @@ class ChooseCountryViewModel(
         localStorage.countryId = countryId
     }
 
+    fun updateCountryName(countryName: String) {
+        localStorage.countryName = countryName
+    }
+
     fun getCountryId(): String {
         return localStorage.countryId
     }

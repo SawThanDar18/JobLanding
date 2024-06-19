@@ -21,12 +21,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.contentColorFor
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.TextButton
+import androidx.compose.material.contentColorFor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,25 +61,26 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
+import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationFilterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavController) {
 
     var refreshing by remember { mutableStateOf(false) }
+    var filterBottomBarVisible by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+    val filters by viewModel.filters.collectAsState()
 
     var jobIds by remember { mutableStateOf<List<String>>(emptyList()) }
 
@@ -180,7 +190,10 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                         painter = painterResource(id = R.drawable.filter),
                         contentDescription = "Filter Icon",
                         modifier = Modifier
-                            .size(20.dp, 18.dp),
+                            .size(20.dp, 18.dp)
+                            .clickable {
+                                filterBottomBarVisible = true
+                            },
                         alignment = Alignment.Center
                     )
                 }
@@ -351,7 +364,162 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
             }
         }
     }
+
+
+
+    if (filterBottomBarVisible) {
+        ModalBottomSheetLayout(
+            sheetContent = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 72.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = "Filter",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 16.sp
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Image(
+                            painter = painterResource(id = R.drawable.x),
+                            contentDescription = "X Icon",
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    filterBottomBarVisible = false
+                                    //update localstorage
+                                },
+                            alignment = Alignment.Center
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Text(
+                        text = "Status",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W700,
+                        color = Color(0xFF6A6A6A),
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(
+                            start = 8.dp
+                        ).fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    filters.forEach { (key, isChecked) ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = key,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W500,
+                                color = Color(0xFF6A6A6A),
+                                fontSize = 14.sp
+                            )
+
+                            Checkbox(
+                                    checked = isChecked,
+                                    onCheckedChange = { newChecked ->
+                                        scope.launch {
+                                            viewModel.updateFilter(key, newChecked)
+                                        }
+                                    },
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = Color(0xFF1ED292),
+                                        uncheckedColor = Color(0xFFA7BAC5),
+                                        checkmarkColor = Color.White
+                                    )
+                                )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Text(
+                        textAlign = TextAlign.Start,
+                        text = "Dismiss",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFF1ED292),
+                        fontSize = 14.sp,
+                        modifier = Modifier.clickable { filterBottomBarVisible = false }
+                    )
+                }
+            },
+            sheetState = rememberModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Expanded
+            ),
+            sheetShape = RoundedCornerShape(
+                bottomStart = 0.dp,
+                bottomEnd = 0.dp,
+                topStart = 24.dp,
+                topEnd = 24.dp
+            ),
+            sheetElevation = 16.dp,
+            sheetBackgroundColor = Color.White,
+            sheetContentColor = contentColorFor(Color.White),
+            modifier = Modifier.fillMaxWidth(),
+            scrimColor = Color.Transparent
+        ) {
+
+        }
+    }
+
 }
+
+@Composable
+fun FilterScreen(viewModel: ApplicationFilterViewModel) {
+    val filters = viewModel.filters.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Filter")
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        filters.value.forEach { (key, isChecked) ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(key)
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = { newChecked ->
+                        scope.launch {
+                            viewModel.updateFilter(key, newChecked)
+                        }
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        TextButton(onClick = { /* Dismiss or apply the filter */ }) {
+            Text("Dismiss")
+        }
+    }
+}
+
 
 
 fun DateConversion(originalDateTimeString: String): String {

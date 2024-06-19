@@ -4,6 +4,7 @@ import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingServiceImpl
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationFilterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationRepository
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.ApplyJobViewModel
@@ -126,6 +127,7 @@ actual object DIHelperClient {
                     factory { InterviewViewModel(localStorage, get()) }
                     factory { QRLogInViewModel(localStorage, get()) }
                     factory { SettingViewModel(localStorage) }
+                    factory { ApplicationFilterViewModel(localStorage) }
                 }
             )
         }
@@ -212,6 +214,10 @@ actual object DIHelperClient {
     }
 
     actual fun getSettingViewModel(): SettingViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getApplicationFilterViewModel(): ApplicationFilterViewModel {
         return koinApp.koin.get()
     }
 }

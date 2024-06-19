@@ -200,13 +200,13 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
 
                     }
 
-                    Image(
+                    /*Image(
                         painter = painterResource(id = R.drawable.filter),
                         contentDescription = "Filter Icon",
                         modifier = Modifier
                             .size(20.dp, 18.dp),
                         alignment = Alignment.Center
-                    )
+                    )*/
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

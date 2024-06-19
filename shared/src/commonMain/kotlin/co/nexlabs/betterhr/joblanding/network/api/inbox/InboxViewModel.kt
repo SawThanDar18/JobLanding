@@ -14,6 +14,7 @@ import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -174,6 +175,28 @@ class InboxViewModel(private val localStorage: LocalStorage, private val inboxRe
                         }
                     }
                 }
+        }
+    }
+
+    private val _filters = MutableStateFlow(
+        mapOf(
+            "Complete" to localStorage.applied,
+            "Pending" to localStorage.qualified,
+            "Rejected" to localStorage.interviewing,
+            "Pin" to localStorage.offered
+        )
+    )
+    val filters: StateFlow<Map<String, Boolean>> = _filters
+
+    fun updateFilter(key: String, value: Boolean) {
+        viewModelScope.launch {
+            when (key) {
+                "Complete" -> localStorage.complete = value
+                "Pending" -> localStorage.pending = value
+                "Rejected" -> localStorage.inboxRejected = value
+                "Pin" -> localStorage.pin = value
+            }
+            _filters.value = _filters.value.toMutableMap().apply { this[key] = value }
         }
     }
 }

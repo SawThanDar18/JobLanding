@@ -36,7 +36,11 @@ import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.Not
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.OfferResponseScreen
 import co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.inbox.SubmitAssignmentScreen
 import co.nexlabs.betterhr.joblanding.android.screen.login.LogInScreen
+import co.nexlabs.betterhr.joblanding.android.screen.setting.AboutScreen
+import co.nexlabs.betterhr.joblanding.android.screen.setting.CountryScreen
+import co.nexlabs.betterhr.joblanding.android.screen.setting.PrivacyScreen
 import co.nexlabs.betterhr.joblanding.android.screen.setting.SettingScreen
+import co.nexlabs.betterhr.joblanding.android.screen.setting.TermsOfServiceScreen
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewModel
@@ -176,6 +180,24 @@ fun MyApp() {
                 val viewModel: QRLogInViewModel = getKoin().get()
                 QRScannerScreen(viewModel, navController)
             }
+
+            composable("about-screen") {
+                AboutScreen(navController)
+            }
+
+            composable("terms-of-service-screen") {
+                TermsOfServiceScreen(navController)
+            }
+
+            composable("privacy-screen") {
+                PrivacyScreen(navController)
+            }
+
+            composable("country-screen") {
+                val viewModel: ChooseCountryViewModel = getKoin().get()
+                CountryScreen(viewModel, navController)
+            }
+
         }
     }
 }
