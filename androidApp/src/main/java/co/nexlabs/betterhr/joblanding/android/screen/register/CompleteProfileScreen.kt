@@ -1,10 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.register
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.net.Uri
-import android.provider.OpenableColumns
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -54,7 +51,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -76,7 +72,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -84,6 +79,10 @@ import co.nexlabs.betterhr.joblanding.AndroidFileUri
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CompaniesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.ExperienceUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.FilesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.PositionUIModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.compose.rememberImagePainter
@@ -99,6 +98,8 @@ import java.io.File
 fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: NavController) {
     var refreshing by remember { mutableStateOf(false) }
 
+    var companyName by remember { mutableStateOf("") }
+
     var profilePath by remember { mutableStateOf("") }
     var cvFileName by remember { mutableStateOf("") }
     var coverLetterName by remember { mutableStateOf("") }
@@ -108,13 +109,17 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var position by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var summary by remember { mutableStateOf("") }
+    var companiesList: MutableList<CompaniesUIModel> = ArrayList()
+    var experienceList: MutableList<ExperienceUIModel> = ArrayList()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
     var addSummaryVisible by remember { mutableStateOf(false) }
-    var addExperienceVisible by remember { mutableStateOf(false) }
+    var addExperienceCompanyVisible by remember { mutableStateOf(false) }
+    var addExperiencePositionVisible by remember { mutableStateOf(false) }
     var addEducationVisible by remember { mutableStateOf(false) }
     var addLanguageVisible by remember { mutableStateOf(false) }
     var addSkillVisible by remember { mutableStateOf(false) }
@@ -133,6 +138,31 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         viewModel.getCandidateData()
     }
 
+    LaunchedEffect(uiState.isSuccessUpdateSummary) {
+        addSummaryVisible = false
+        scope.launch {
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.getFileId) {
+        if (bottomBarVisible) {
+            bottomBarVisible = false
+        }
+
+        if (addExperienceCompanyVisible) {
+            if (uiState.fileId != "") {
+                scope.launch {
+                    viewModel.createCompany(companyName, uiState.fileId)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessCreateCompany) {
+        addExperienceCompanyVisible = false
+    }
+
     if (uiState.candidateData != null) {
         scope.launch {
             viewModel.updateCandidateId(uiState.candidateData.id)
@@ -142,6 +172,34 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         position = uiState.candidateData.desiredPosition
         phoneNumber = uiState.candidateData.phone
         email = uiState.candidateData.email
+        summary = uiState.candidateData.summary
+
+        if (uiState.candidateData.companies.isNotEmpty()) {
+            uiState.candidateData.companies.map {
+                companiesList.add(
+                    CompaniesUIModel(
+                        it.id,
+                        it.name,
+                        FilesUIModel(it.file.id, it.file.name, it.file.type, it.file.fullPath),
+                        it.experience
+                    )
+                )
+
+                if (it.experience.isNotEmpty()) {
+                    it.experience.map {
+                        experienceList.add(
+                            ExperienceUIModel(
+                                it.id, it.positionId, it.candidateId,
+                                it.title, it.location, it.experienceLevel,
+                                it.employmentType, it.startDate, it.endDate,
+                                it.isCurrentJob, it.description, it.companyId,
+                                PositionUIModel(it.position.id, it.position.name)
+                            )
+                        )
+                    }
+                }
+            }
+        }
 
         if (uiState.candidateData.profile != null) {
             profilePath = uiState.candidateData.profile.fullPath
@@ -179,8 +237,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
             fileToUpload = file
 
             selectedImageUri = uri
-            Log.d("imageFile>>", selectedImageUri.toString())
-            Log.d("imageFile>>", selectedFileName)
         }
     }
 
@@ -733,39 +789,88 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(bottom = 72.dp)
                                     .height(2.dp)
                                     .background(color = Color(0xFFE4E7ED))
                             )
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(72.dp)
-                                    .padding(horizontal = 16.dp)
-                                    .clickable {
-                                        addSummaryVisible = true
-                                    },
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Summary",
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W600,
-                                    color = Color(0xFF6A6A6A),
-                                    fontSize = 16.sp
-                                )
-
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                Image(
-                                    painter = painterResource(id = R.drawable.x),
-                                    contentDescription = "Plus Icon",
+                            if ((summary == "")) {
+                                Row(
                                     modifier = Modifier
-                                        .size(24.dp),
-                                )
+                                        .fillMaxWidth()
+                                        .height(72.dp)
+                                        .padding(horizontal = 16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Summary",
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W600,
+                                        color = Color(0xFF6A6A6A),
+                                        fontSize = 16.sp
+                                    )
 
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Image(
+                                        painter = painterResource(id = R.drawable.upload_icon),
+                                        contentDescription = "Plus Icon",
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clickable {
+                                                addSummaryVisible = true
+                                            },
+                                    )
+
+                                }
+                            } else {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(72.dp)
+                                            .padding(horizontal = 16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Summary",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFF6A6A6A),
+                                            fontSize = 16.sp
+                                        )
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        Image(
+                                            painter = painterResource(id = R.drawable.edit),
+                                            contentDescription = "Edit Icon",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .clickable {
+                                                    addSummaryVisible = true
+                                                },
+                                        )
+
+                                    }
+
+                                    Text(
+                                        text = summary,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W400,
+                                        color = Color(0xFF4A4A4A),
+                                        fontSize = 14.sp,
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                }
                             }
 
                             Box(
@@ -775,35 +880,188 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     .background(color = Color(0xFFE4E7ED))
                             )
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(72.dp)
-                                    .padding(horizontal = 16.dp)
-                                    .clickable {
-                                        addExperienceVisible = true
-                                    },
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Experience",
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W600,
-                                    color = Color(0xFF6A6A6A),
-                                    fontSize = 16.sp
-                                )
-
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                Image(
-                                    painter = painterResource(id = R.drawable.x),
-                                    contentDescription = "Plus Icon",
+                            if (companiesList.isEmpty()) {
+                                Row(
                                     modifier = Modifier
-                                        .size(24.dp),
-                                    alignment = Alignment.Center
-                                )
+                                        .fillMaxWidth()
+                                        .height(72.dp)
+                                        .padding(horizontal = 16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Experience",
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W600,
+                                        color = Color(0xFF6A6A6A),
+                                        fontSize = 16.sp
+                                    )
 
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Image(
+                                        painter = painterResource(id = R.drawable.x),
+                                        contentDescription = "Plus Icon",
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clickable {
+                                                addExperienceCompanyVisible = true
+                                            },
+                                        alignment = Alignment.Center
+                                    )
+                                }
+                            } else {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(72.dp)
+                                            .padding(horizontal = 16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Experience",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFF6A6A6A),
+                                            fontSize = 16.sp
+                                        )
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        Image(
+                                            painter = painterResource(id = R.drawable.x),
+                                            contentDescription = "Plus Icon",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .clickable {
+                                                    addExperienceCompanyVisible = true
+                                                },
+                                            alignment = Alignment.Center
+                                        )
+
+                                    }
+
+                                    FlowRow(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .fillMaxWidth(),
+                                        maxItemsInEachRow = 1,
+                                        horizontalArrangement = Arrangement.Start,
+                                    ) {
+
+                                        var lastItem by remember { mutableStateOf(0) }
+                                        lastItem = companiesList.size
+
+                                        repeat(companiesList.size) { index ->
+                                            var company = companiesList[index]
+
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                            ) {
+                                                if (company.file.fullPath != "") {
+                                                    val imageRequest =
+                                                        remember(company.file.fullPath) {
+                                                            ImageRequest.Builder(applicationContext)
+                                                                .data(company.file.fullPath).build()
+                                                        }
+
+                                                    Image(
+                                                        painter = rememberImagePainter(
+                                                            request = imageRequest,
+                                                        ),
+                                                        contentDescription = "Company Logo Icon",
+                                                        modifier = Modifier
+                                                            .size(32.dp)
+                                                            .clip(CircleShape)
+                                                            .graphicsLayer {
+                                                                shape = CircleShape
+                                                            },
+                                                        contentScale = ContentScale.Crop
+                                                    )
+                                                } else {
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.add_company_logo),
+                                                        contentDescription = "Profile Icon",
+                                                        modifier = Modifier
+                                                            .size(32.dp)
+                                                            .clip(CircleShape)
+                                                            .graphicsLayer {
+                                                                shape = CircleShape
+                                                            },
+                                                        contentScale = ContentScale.Crop
+                                                    )
+                                                }
+
+                                                Column(
+                                                    horizontalAlignment = Alignment.Start,
+                                                ) {
+                                                    Text(
+                                                        text = company.name,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        fontWeight = FontWeight.W500,
+                                                        color = Color(0xFF4A4A4A),
+                                                        fontSize = 14.sp,
+                                                    )
+
+                                                    if (experienceList.isEmpty()) {
+                                                        Text(
+                                                            text = "--",
+                                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                            fontWeight = FontWeight.W500,
+                                                            color = Color(0xFF757575),
+                                                            fontSize = 12.sp,
+                                                        )
+                                                    } else {
+                                                        Text(
+                                                            text = "8 mo",
+                                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                            fontWeight = FontWeight.W500,
+                                                            color = Color(0xFF757575),
+                                                            fontSize = 12.sp,
+                                                        )
+
+                                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                                        FlowRow(
+                                                            maxItemsInEachRow = 1,
+                                                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                                                        ) {
+                                                            repeat(experienceList.size) { index ->
+                                                                var experience = experienceList[index]
+
+                                                            }
+                                                        }
+                                                    }
+
+                                                    Text(
+                                                        text = "+ Add Position",
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        fontWeight = FontWeight.W500,
+                                                        color = Color(0xFF42A5F5),
+                                                        fontSize = 12.sp,
+                                                        modifier = Modifier.padding(
+                                                            top = 8.dp, bottom = 16.dp
+                                                        )
+                                                            .clickable {
+                                                                addExperiencePositionVisible = true
+                                                            }
+                                                    )
+
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                }
                             }
 
                             Box(
@@ -979,17 +1237,22 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
             .padding(top = 50.dp)
             .systemBarsPadding()
     ) {
-        var summary by remember { mutableStateOf("") }
+        var position by remember { mutableStateOf("") }
+        var experienceLevel by remember { mutableStateOf("") }
+        var jobType by remember { mutableStateOf("") }
+        var startDate by remember { mutableStateOf("") }
+        var endDate by remember { mutableStateOf("") }
+        var description by remember { mutableStateOf("") }
 
-        if (addSummaryVisible) {
+        if (addExperiencePositionVisible) {
             ModalBottomSheetLayout(
                 sheetContent = {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(16.dp),
+                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
                         verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.Start
                     ) {
                         Row(
                             modifier = Modifier
@@ -997,11 +1260,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Text(
-                                text = "Let’s add your summary",
+                                text = "Let’s add your experience",
                                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                 fontWeight = FontWeight.W600,
                                 color = Color(0xFF4A4A4A),
-                                fontSize = 16.sp
+                                fontSize = 16.sp,
                             )
                             Spacer(modifier = Modifier.width(8.dp))
 
@@ -1011,7 +1274,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 modifier = Modifier
                                     .size(24.dp)
                                     .clickable {
-                                        bottomBarVisible = false
+                                        addExperiencePositionVisible = false
                                     },
                                 alignment = Alignment.Center
                             )
@@ -1019,12 +1282,14 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-                        MultiStyleTextForCompleteProfile(
-                            text1 = "Indicates required",
-                            color1 = Color(0xFF6A6A6A),
+                        MultiStyleTextForInfo(
+                            text1 = "Position",
+                            color1 = Color(0xFF757575),
                             text2 = "*",
-                            color2 = Color(0xFFffa558)
+                            color2 = Color(0xFF757575)
                         )
+
+                        //position ui
 
                         Text(
                             text = "Tell employer about yourself",
@@ -1034,7 +1299,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             fontSize = 14.sp
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         OutlinedTextField(
                             modifier = Modifier
@@ -1042,21 +1307,21 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 .height(158.dp)
                                 .border(
                                     1.dp,
-                                    Color(0xFFAAAAAA),
+                                    Color(0xFFE4E7ED),
                                     RoundedCornerShape(4.dp)
                                 )
                                 .background(
                                     color = Color.Transparent,
                                     shape = MaterialTheme.shapes.medium
                                 ),
-                            value = summary,
+                            value = summaryUpdate,
                             onValueChange = {
-                                summary = it
+                                summaryUpdate = it
                             },
                             placeholder = {
                                 Text(
                                     "Type Something",
-                                    color = Color(0xFF6A6A6A),
+                                    color = Color(0xFFAAAAAA),
                                     fontWeight = FontWeight.W400,
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
@@ -1067,10 +1332,10 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 fontWeight = FontWeight.W400,
                                 fontSize = 14.sp,
                                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                color = Color(0xFF6A6A6A)
+                                color = Color(0xFF4A4A4A)
                             ),
                             colors = TextFieldDefaults.textFieldColors(
-                                textColor = Color(0xFF6A6A6A),
+                                textColor = Color(0xFF4A4A4A),
                                 backgroundColor = Color.Transparent,
                                 cursorColor = Color(0xFF1ED292),
                                 focusedIndicatorColor = Color.Transparent,
@@ -1087,40 +1352,486 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             ),
                         )
 
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 72.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(40.dp)
+                                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                                    .background(
+                                        color = Color(0xFF1ED292),
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        if (!summaryUpdate.isNullOrBlank()) {
+                                            scope.launch {
+                                                viewModel.updateSummary(summaryUpdate)
+                                            }
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    applicationContext,
+                                                    "Please add Summary!",
+                                                    Toast.LENGTH_LONG
+                                                )
+                                                .show()
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = "Update summary",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFFFFFFFF),
+                                    fontSize = 14.sp,
+                                )
+                            }
+                        }
+
 
                     }
+                },
+                sheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                ),
+                sheetElevation = 16.dp,
+                sheetBackgroundColor = Color.White,
+                sheetContentColor = contentColorFor(Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                scrimColor = Color.Transparent
+            ) {
 
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.Bottom,
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
+            .systemBarsPadding()
+    ) {
+        var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+        var imageFileName by remember { mutableStateOf("") }
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            uri?.let {
+                imageFileName = getFileName(applicationContext, it)
+                selectedImageUri = uri
+            }
+        }
+
+        if (addExperienceCompanyVisible) {
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
                     ) {
-                        Box(
+                        Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(40.dp)
-                                .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                                .background(
-                                    color = Color(0xFF1ED292),
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .clickable {
-                                    if (!summary.isNullOrBlank()) {
-
-                                    }
-                                },
-                            contentAlignment = Alignment.Center,
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Text(
-                                text = "Update summary",
+                                text = "Create Company",
                                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                 fontWeight = FontWeight.W600,
-                                color = Color(0xFFFFFFFF),
-                                fontSize = 14.sp,
+                                color = Color(0xFF4A4A4A),
+                                fontSize = 16.sp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        addExperienceCompanyVisible = false
+                                    },
+                                alignment = Alignment.Center
                             )
                         }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        Text(
+                            text = "Enter company name",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 14.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                                .border(
+                                    1.dp,
+                                    Color(0xFFE4E7ED),
+                                    RoundedCornerShape(4.dp)
+                                )
+                                .background(
+                                    color = Color.Transparent,
+                                    shape = MaterialTheme.shapes.medium
+                                ),
+                            value = companyName,
+                            onValueChange = {
+                                companyName = it
+                            },
+                            placeholder = {
+                                Text(
+                                    "Type Company",
+                                    color = Color(0xFFAAAAAA),
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                )
+                            },
+                            textStyle = TextStyle(
+                                textAlign = TextAlign.Start,
+                                fontWeight = FontWeight.W400,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                color = Color(0xFF4A4A4A)
+                            ),
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Color(0xFF4A4A4A),
+                                backgroundColor = Color.Transparent,
+                                cursorColor = Color(0xFF1ED292),
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboardController?.hide()
+                                }
+                            ),
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Text(
+                            text = "Company Logo",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF757575),
+                            fontSize = 14.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        if (selectedImageUri != null) {
+                            val imageRequest = remember(selectedImageUri) {
+                                ImageRequest.Builder(applicationContext)
+                                    .data(selectedImageUri).build()
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .size(80.dp)
+                            ) {
+                                Image(
+                                    painter = rememberImagePainter(
+                                        request = imageRequest,
+                                    ),
+                                    contentDescription = "Add Company Logo",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clickable {
+                                            launcher.launch("image/*")
+                                        },
+                                    contentScale = ContentScale.Crop
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .size(24.dp)
+                                        .padding(4.dp)
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.close_with_bg),
+                                        contentDescription = "Close Logo",
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clickable {
+                                                selectedImageUri = null
+                                            },
+                                    )
+                                }
+                            }
+                        } else {
+                            Image(
+                                painter = painterResource(id = R.drawable.add_company_logo),
+                                contentDescription = "Add Company Logo",
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clickable {
+                                        launcher.launch("image/*")
+                                    },
+                            )
+                        }
+
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 72.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(40.dp)
+                                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                                    .background(
+                                        color = Color(0xFF1ED292),
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        if (companyName == "") {
+                                            Toast
+                                                .makeText(
+                                                    applicationContext,
+                                                    "Please add Company name!",
+                                                    Toast.LENGTH_LONG
+                                                )
+                                                .show()
+                                        } else {
+                                            scope.launch {
+                                                if (selectedImageUri != null) {
+                                                    selectedImageUri?.let { uri ->
+                                                        val fileUri = AndroidFileUri(uri)
+                                                        viewModel.uploadFile(
+                                                            fileUri,
+                                                            imageFileName,
+                                                            "company_logo"
+                                                        )
+                                                    }
+                                                } else {
+                                                    viewModel.createCompany(companyName, "")
+                                                }
+                                            }
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = "Create",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFFFFFFFF),
+                                    fontSize = 14.sp,
+                                )
+                            }
+                        }
+
+
+                    }
+                },
+                sheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                ),
+                sheetElevation = 16.dp,
+                sheetBackgroundColor = Color.White,
+                sheetContentColor = contentColorFor(Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                scrimColor = Color.Transparent
+            ) {
+
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
+            .systemBarsPadding()
+    ) {
+        var summaryUpdate by remember { mutableStateOf("") }
+        if (summary != "") {
+            summaryUpdate = summary
+        }
+
+        if (addSummaryVisible) {
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "Let’s add your summary",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF4A4A4A),
+                                fontSize = 16.sp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        addSummaryVisible = false
+                                    },
+                                alignment = Alignment.Center
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        MultiStyleTextForInfo(
+                            text1 = "Indicates required",
+                            color1 = Color(0xFFAAAAAA),
+                            text2 = "*",
+                            color2 = Color(0xFFffa558)
+                        )
+
+                        Text(
+                            text = "Tell employer about yourself",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 14.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(158.dp)
+                                .border(
+                                    1.dp,
+                                    Color(0xFFE4E7ED),
+                                    RoundedCornerShape(4.dp)
+                                )
+                                .background(
+                                    color = Color.Transparent,
+                                    shape = MaterialTheme.shapes.medium
+                                ),
+                            value = summaryUpdate,
+                            onValueChange = {
+                                summaryUpdate = it
+                            },
+                            placeholder = {
+                                Text(
+                                    "Type Something",
+                                    color = Color(0xFFAAAAAA),
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                )
+                            },
+                            textStyle = TextStyle(
+                                textAlign = TextAlign.Start,
+                                fontWeight = FontWeight.W400,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                color = Color(0xFF4A4A4A)
+                            ),
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Color(0xFF4A4A4A),
+                                backgroundColor = Color.Transparent,
+                                cursorColor = Color(0xFF1ED292),
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboardController?.hide()
+                                }
+                            ),
+                        )
+
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 72.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(40.dp)
+                                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                                    .background(
+                                        color = Color(0xFF1ED292),
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        if (!summaryUpdate.isNullOrBlank()) {
+                                            scope.launch {
+                                                viewModel.updateSummary(summaryUpdate)
+                                            }
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    applicationContext,
+                                                    "Please add Summary!",
+                                                    Toast.LENGTH_LONG
+                                                )
+                                                .show()
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = "Update summary",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFFFFFFFF),
+                                    fontSize = 14.sp,
+                                )
+                            }
+                        }
+
+
                     }
                 },
                 sheetState = rememberModalBottomSheetState(
@@ -1181,7 +1892,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 modifier = Modifier
                                     .size(24.dp)
                                     .clickable {
-                                        bottomBarVisible = false
                                         if (uiState.candidateData != null) {
                                             if (uiState.candidateData.profile != null) {
                                                 selectedImageUri?.let { uri ->
@@ -1619,6 +2329,35 @@ fun MultiStyleTextForCompleteProfile(text1: String, color1: Color, text2: String
                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                     fontWeight = FontWeight.W600,
                     fontSize = 16.sp
+                )
+            ) {
+                append(text2)
+            }
+        }
+    )
+}
+
+
+@Composable
+fun MultiStyleTextForInfo(text1: String, color1: Color, text2: String, color2: Color) {
+    Text(
+        buildAnnotatedString {
+            withStyle(
+                style = SpanStyle(
+                    color = color1,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 12.sp
+                )
+            ) {
+                append(text1)
+            }
+            withStyle(
+                style = SpanStyle(
+                    color = color2,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 12.sp
                 )
             ) {
                 append(text2)

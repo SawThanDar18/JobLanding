@@ -1,8 +1,13 @@
 package co.nexlabs.betterhr.joblanding.viewmodel
 
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
+import co.nexlabs.betterhr.job.with_auth.type.File
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CandidateUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CompaniesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.ExperienceUIModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.FilesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.PositionUIModel
+import kotlin.math.exp
 
 object CandidateViewModelMapper {
     fun mapDataToViewModel(data: CandidateQuery.Me): CandidateUIModel {
@@ -103,6 +108,52 @@ object CandidateViewModelMapper {
             }
         }
 
+        var experienceList: MutableList<ExperienceUIModel> = ArrayList()
+
+        data.companies?.let { companies ->
+            companies.map { company ->
+                company.experiences?.let {  experiences ->
+                    experiences.map {
+                        experienceList.add(
+                            ExperienceUIModel(
+                                it!!.id,
+                                it.position_id ?: "",
+                                it.candidate_id ?: "",
+                                it.title ?: "",
+                                it.location ?: "",
+                                it.experience_level ?: "",
+                                "",
+                                it.start_date ?: "",
+                                it.end_date ?: "",
+                                it.is_current_job ?: false,
+                                it.description ?: "",
+                                it.company_id ?: "",
+                                PositionUIModel(
+                                    it.position!!.id ?: "",
+                                    it.position.name ?: ""
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        var companiesList = data.companies?.let {
+            it.map {
+                CompaniesUIModel(
+                    it.id ?: "",
+                    it.name,
+                    it.file?.let {
+                        FilesUIModel(
+                            it.id ?: "", it.name ?: "", "", it.full_path ?: ""
+                        )
+                    } ?: FilesUIModel("", "", "", ""),
+                    experienceList
+                )
+            }
+        }
+
         return CandidateUIModel(
             data.id ?: "",
             data.name,
@@ -118,7 +169,7 @@ object CandidateViewModelMapper {
             coverLetterFilePath,
             profile, cv, coverLetter,
             emptyList(),
-            emptyList(),
+            companiesList ?: emptyList()
         )
     }
 }

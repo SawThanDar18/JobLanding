@@ -5,6 +5,7 @@ import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CheckJobIsApplyQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.CreateCertificateMutation
+import co.nexlabs.betterhr.job.with_auth.CreateCompanyMutation
 import co.nexlabs.betterhr.job.with_auth.CreateEducationMutation
 import co.nexlabs.betterhr.job.with_auth.CreateExperienceMutation
 import co.nexlabs.betterhr.job.with_auth.CreateLanguageMutation
@@ -222,7 +223,7 @@ interface JobLandingService {
     suspend fun updateSummary(
         id: String,
         summary: String
-    ): ApolloCall<UpdateCandidateMutation.Data>
+    ): ApolloCall<UpdateSummaryMutation.Data>
 
     suspend fun createExperience(
         position: String,
@@ -329,5 +330,7 @@ interface JobLandingService {
     suspend fun getSavedJobsIds(): ApolloCall<FetchSavedJobsIdsQuery.Data>
 
     suspend fun getSavedJobs(jobsId: List<String>): ApolloCall<JobLandingSavedJobsQuery.Data>
+
+    suspend fun createCompany(companyName: String, candidateId: String, fileIds: String): ApolloCall<CreateCompanyMutation.Data>
 
 }

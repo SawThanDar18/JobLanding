@@ -5,6 +5,7 @@ import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CheckJobIsApplyQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.CreateCertificateMutation
+import co.nexlabs.betterhr.job.with_auth.CreateCompanyMutation
 import co.nexlabs.betterhr.job.with_auth.CreateEducationMutation
 import co.nexlabs.betterhr.job.with_auth.CreateExperienceMutation
 import co.nexlabs.betterhr.job.with_auth.CreateLanguageMutation
@@ -29,6 +30,7 @@ import co.nexlabs.betterhr.job.with_auth.UpdateExperienceMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateLanguageMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateNotificationMutation
 import co.nexlabs.betterhr.job.with_auth.UpdateSkillMutation
+import co.nexlabs.betterhr.job.with_auth.UpdateSummaryMutation
 import co.nexlabs.betterhr.job.with_auth.VerifySmsTokenAndAuthMutation
 import co.nexlabs.betterhr.job.without_auth.DynamicPagesQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCollectionCompaniesQuery
@@ -805,8 +807,8 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         )
     }
 
-    override suspend fun updateSummary(id: String, summary: String): ApolloCall<UpdateCandidateMutation.Data> {
-        return apolloClientWithAuth.mutation(UpdateCandidateMutation(id, Optional.present(summary)))
+    override suspend fun updateSummary(id: String, summary: String): ApolloCall<UpdateSummaryMutation.Data> {
+        return apolloClientWithAuth.mutation(UpdateSummaryMutation(id, Optional.present(summary)))
     }
 
     override suspend fun createExperience(
@@ -1015,6 +1017,14 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
 
     override suspend fun getSavedJobs(jobsId: List<String>): ApolloCall<JobLandingSavedJobsQuery.Data> {
         return apolloClient.query(JobLandingSavedJobsQuery(jobsId))
+    }
+
+    override suspend fun createCompany(
+        companyName: String,
+        candidateId: String,
+        fileIds: String
+    ): ApolloCall<CreateCompanyMutation.Data> {
+        return apolloClientWithAuth.mutation(CreateCompanyMutation(companyName, candidateId, Optional.present(fileIds)))
     }
 }
 

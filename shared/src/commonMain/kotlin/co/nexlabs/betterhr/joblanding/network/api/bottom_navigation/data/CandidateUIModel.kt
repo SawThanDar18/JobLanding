@@ -23,7 +23,29 @@ data class CandidateUIModel(
 data class CompaniesUIModel(
     val id: String,
     val name: String,
-    val file: CandidateCompanyUIModel
+    val file: FilesUIModel,
+    val experience: List<ExperienceUIModel>
+)
+
+data class ExperienceUIModel(
+    val id: String,
+    val positionId: String,
+    val candidateId: String,
+    val title: String,
+    val location: String,
+    val experienceLevel: String,
+    val employmentType: String,
+    val startDate: String,
+    val endDate: String,
+    val isCurrentJob: Boolean,
+    val description: String,
+    val companyId: String,
+    val position: PositionUIModel
+)
+
+data class PositionUIModel(
+    val id: String,
+    val name: String
 )
 
 data class CandidateCompanyUIModel(

@@ -109,16 +109,338 @@ class CompleteProfileViewModel(
         }
     }
 
+    fun updateSummary(summary: String) {
+        viewModelScope.launch(DispatcherProvider.io) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing
+                )
+            }
+
+            completeProfileRepository.updateSummary(localStorage.candidateId, summary).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                            isSuccessUpdateSummary = false
+                        )
+                    }
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing,
+                            isSuccessUpdateSummary = false
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                isSuccessUpdateSummary = true
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isSuccessUpdateSummary = false
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
     fun uploadFile(
         file: FileUri,
         fileName: String,
         type: String
     ) {
         viewModelScope.launch(DispatcherProvider.io) {
-            try {
-                completeProfileRepository.uploadFile(file, fileName, type, localStorage.candidateId)
-            } catch (e: Exception) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing
+                )
             }
+            try {
+                var response = completeProfileRepository.uploadFile(file, fileName, type, localStorage.candidateId)
+                if (response.id != "") {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = UIErrorType.Nothing,
+                            getFileId = true,
+                            fileId = response.id
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = UIErrorType.Nothing,
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString()),
+                    )
+                }
+            }
+        }
+    }
+
+    fun createCompany(companyName: String, fileId: String) {
+        viewModelScope.launch(DispatcherProvider.io) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    isSuccessCreateCompany = false
+                )
+            }
+
+            completeProfileRepository.createCompany(companyName, localStorage.candidateId, fileId).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                            isSuccessCreateCompany = false
+                        )
+                    }
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing,
+                            isSuccessCreateCompany = false
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                isSuccessCreateCompany = true
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isSuccessCreateCompany = false
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    fun createExperience(
+        position: String,
+        companyId: String,
+        title: String,
+        location: String,
+        experienceLevel: String,
+        employmentType: String,
+        startDate: String,
+        endDate: String,
+        isCurrentJob: Boolean,
+        description: String
+    ) {
+        viewModelScope.launch(DispatcherProvider.io) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    isSuccessCreateExperience = false
+                )
+            }
+
+            completeProfileRepository.createExperience(position, localStorage.candidateId, companyId, title, location, experienceLevel, employmentType, startDate, endDate, isCurrentJob, description).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                            isSuccessCreateExperience = false
+                        )
+                    }
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing,
+                            isSuccessCreateExperience = false
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                isSuccessCreateExperience = true
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isSuccessCreateExperience = false
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
+    fun updateExperience(
+        id: String,
+        companyId: String,
+        title: String,
+        location: String,
+        experienceLevel: String,
+        employmentType: String,
+        startDate: String,
+        endDate: String,
+        isCurrentJob: Boolean,
+        description: String
+    ) {
+        viewModelScope.launch(DispatcherProvider.io) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    isSuccessUpdateExperience = false
+                )
+            }
+
+            completeProfileRepository.updateExperience(id, localStorage.candidateId, companyId, title, location, experienceLevel, employmentType, startDate, endDate, isCurrentJob, description).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                            isSuccessUpdateExperience = false
+                        )
+                    }
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing,
+                            isSuccessUpdateExperience = false
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                isSuccessUpdateExperience = true
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isSuccessUpdateExperience = false
+                            )
+                        }
+                    }
+                }
         }
     }
 

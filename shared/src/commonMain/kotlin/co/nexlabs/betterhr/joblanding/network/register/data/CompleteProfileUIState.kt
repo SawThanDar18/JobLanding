@@ -11,5 +11,11 @@ data class CompleteProfileUIState(
         "", "", "", "", "", "", "", "", "", "", "", "",
         FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),
         emptyList(), emptyList()
-    )
+    ),
+    val isSuccessUpdateSummary: Boolean = false,
+    val isSuccessCreateCompany: Boolean = false,
+    val getFileId: Boolean = false,
+    val fileId: String = "",
+    val isSuccessCreateExperience: Boolean = false,
+    val isSuccessUpdateExperience: Boolean = false,
 )
