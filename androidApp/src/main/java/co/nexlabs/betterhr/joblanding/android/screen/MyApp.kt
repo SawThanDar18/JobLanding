@@ -39,6 +39,7 @@ import co.nexlabs.betterhr.joblanding.android.screen.login.LogInScreen
 import co.nexlabs.betterhr.joblanding.android.screen.setting.AboutScreen
 import co.nexlabs.betterhr.joblanding.android.screen.setting.CountryScreen
 import co.nexlabs.betterhr.joblanding.android.screen.setting.PrivacyScreen
+import co.nexlabs.betterhr.joblanding.android.screen.setting.SavedJobsScreen
 import co.nexlabs.betterhr.joblanding.android.screen.setting.SettingScreen
 import co.nexlabs.betterhr.joblanding.android.screen.setting.TermsOfServiceScreen
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
@@ -47,6 +48,7 @@ import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitAssignmentViewMode
 import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
 import co.nexlabs.betterhr.joblanding.network.api.login.QRLogInViewModel
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
+import co.nexlabs.betterhr.joblanding.network.api.setting.SavedJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.setting.SettingViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -196,6 +198,11 @@ fun MyApp() {
             composable("country-screen") {
                 val viewModel: ChooseCountryViewModel = getKoin().get()
                 CountryScreen(viewModel, navController)
+            }
+
+            composable("saved-jobs-screen") {
+                val viewModel: SavedJobsViewModel = getKoin().get()
+                SavedJobsScreen(navController, viewModel)
             }
 
         }

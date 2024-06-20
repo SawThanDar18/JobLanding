@@ -15,6 +15,7 @@ import co.nexlabs.betterhr.job.with_auth.FetchInterviewQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationsQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
+import co.nexlabs.betterhr.job.with_auth.FetchSavedJobsIdsQuery
 import co.nexlabs.betterhr.job.with_auth.ResponseAssignmentMutation
 import co.nexlabs.betterhr.job.with_auth.ResponseOfferMutation
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
@@ -36,6 +37,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingSavedJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.FileHandler
 import co.nexlabs.betterhr.joblanding.FileUri
@@ -1005,6 +1007,14 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
 
     override suspend fun scanWebLogIn(qrToken: String): ApolloCall<ScanWebLogInMutation.Data> {
         return apolloClientWithAuth.mutation(ScanWebLogInMutation(qrToken))
+    }
+
+    override suspend fun getSavedJobsIds(): ApolloCall<FetchSavedJobsIdsQuery.Data> {
+        return apolloClientWithAuth.query(FetchSavedJobsIdsQuery(1, 50, Optional.present(false), Optional.present(emptyList())))
+    }
+
+    override suspend fun getSavedJobs(jobsId: List<String>): ApolloCall<JobLandingSavedJobsQuery.Data> {
+        return apolloClient.query(JobLandingSavedJobsQuery(jobsId))
     }
 }
 

@@ -15,6 +15,7 @@ import co.nexlabs.betterhr.job.with_auth.FetchInterviewQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationsQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
+import co.nexlabs.betterhr.job.with_auth.FetchSavedJobsIdsQuery
 import co.nexlabs.betterhr.job.with_auth.ResponseAssignmentMutation
 import co.nexlabs.betterhr.job.with_auth.ResponseOfferMutation
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
@@ -38,6 +39,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingSavedJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
@@ -323,5 +325,9 @@ interface JobLandingService {
     ): ApolloCall<FetchInterviewQuery.Data>
 
     suspend fun scanWebLogIn(qrToken: String): ApolloCall<ScanWebLogInMutation.Data>
+
+    suspend fun getSavedJobsIds(): ApolloCall<FetchSavedJobsIdsQuery.Data>
+
+    suspend fun getSavedJobs(jobsId: List<String>): ApolloCall<JobLandingSavedJobsQuery.Data>
 
 }

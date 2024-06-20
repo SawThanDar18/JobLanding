@@ -83,7 +83,7 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
                 text = "hello",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W600,
-                color = Color(0xFF6A6A6A),
+                color = Color.Transparent,
                 fontSize = 14.sp,
             )
         }
@@ -105,7 +105,10 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("saved-jobs-screen")
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
@@ -227,7 +230,7 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        navController.navigate("privacy-screen")
+                        navController.navigate("country-screen")
                     },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {

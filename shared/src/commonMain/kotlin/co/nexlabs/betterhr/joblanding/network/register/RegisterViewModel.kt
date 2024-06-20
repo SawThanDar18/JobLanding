@@ -107,6 +107,10 @@ class RegisterViewModel(
         return localStorage.pageId
     }
 
+    fun getBearerToken(): String {
+        return localStorage.bearerToken
+    }
+
 
     fun getBearerToken(token: String) {
 

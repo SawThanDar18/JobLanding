@@ -144,7 +144,7 @@ fun LogInScreen(navController: NavController, viewModel: RegisterViewModel) {
             scope.launch {
                 viewModel.updateBearerToken(registerUiState.bearerToken)
 
-                if (viewModel.getPageId().isNotBlank()) {
+                if (viewModel.getPageId().isNotBlank() && viewModel.getBearerToken().isNotBlank()) {
                     navController.navigate("bottom-navigation-screen/${viewModel.getPageId()}/${"profile"}")
                 }
             }

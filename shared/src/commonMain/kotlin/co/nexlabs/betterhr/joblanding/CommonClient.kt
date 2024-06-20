@@ -18,6 +18,7 @@ import co.nexlabs.betterhr.joblanding.network.api.inbox.SubmitOfferViewModel
 import co.nexlabs.betterhr.joblanding.network.api.interview.InterviewViewModel
 import co.nexlabs.betterhr.joblanding.network.api.login.QRLogInViewModel
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
+import co.nexlabs.betterhr.joblanding.network.api.setting.SavedJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.setting.SettingViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -59,6 +60,7 @@ expect object DIHelperClient {
     fun getQRLogInViewModel(): QRLogInViewModel
     fun getSettingViewModel(): SettingViewModel
     fun getApplicationFilterViewModel(): ApplicationFilterViewModel
+    fun getSavedJobsViewModel(): SavedJobsViewModel
 }
 
 interface FileHandler {

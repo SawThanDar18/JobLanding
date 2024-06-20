@@ -485,42 +485,6 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
 
 }
 
-@Composable
-fun FilterScreen(viewModel: ApplicationFilterViewModel) {
-    val filters = viewModel.filters.collectAsState()
-    val scope = rememberCoroutineScope()
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Filter")
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        filters.value.forEach { (key, isChecked) ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(key)
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = { newChecked ->
-                        scope.launch {
-                            viewModel.updateFilter(key, newChecked)
-                        }
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        TextButton(onClick = { /* Dismiss or apply the filter */ }) {
-            Text("Dismiss")
-        }
-    }
-}
-
-
 
 fun DateConversion(originalDateTimeString: String): String {
 //    val originalDateTimeString = "2024-05-09 21:16:50"
