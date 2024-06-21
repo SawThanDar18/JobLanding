@@ -6,12 +6,16 @@
 //
 
 import UIKit
+import shared
 
 class CellStyleOneTableViewCell: UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var seeAllButton: UIButton!
     @IBOutlet weak var cellStyleOneCollectionView: UICollectionView!
-    
+    var homeUIViewModel: [HomeUIModel] = []
+    var jobsListUIModel : [JobsListUIModel] = []
+    var companyListModel: [CollectionCompaniesUIModel] = []
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

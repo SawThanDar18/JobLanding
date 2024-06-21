@@ -40,9 +40,9 @@ class ScreenPortal: UIViewController {
     }
     
     func showCustomTabbar(){
-        let vc = CustomTabBarController()
-        UIApplication.shared.windows.first?.rootViewController = vc
-        UIApplication.shared.windows.first?.makeKeyAndVisible()
+                let vc = CustomTabBarController()
+                UIApplication.shared.windows.first?.rootViewController = vc
+                UIApplication.shared.windows.first?.makeKeyAndVisible()
     }
     
     func showHome(){

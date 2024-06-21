@@ -16,7 +16,7 @@ enum LandingCountryScene {
         let router = LandingCountryRouter()
         //destination.title = "GetStarted"
         //destination.interactor = interactor
-        //destination.viewModel = viewModel
+//        destination.viewModel = viewModel
         destination.router = router
         router.viewController = destination
         destination.modalPresentationStyle = .fullScreen

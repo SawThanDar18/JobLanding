@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import shared
 
 class CellStyleOneCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var cellStyleOneMainView: UIView!
@@ -14,7 +15,6 @@ class CellStyleOneCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var positionLabel: UILabel!
     @IBOutlet weak var salaryLabel: UILabel!
     @IBOutlet weak var addressLabel: UILabel!
-    
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -41,14 +41,10 @@ class CellStyleOneCollectionViewCell: UICollectionViewCell {
         self.cellStyleOneMainView.layer.borderColor = BHRJobLandingColors.bhrBJBorderColor.cgColor
         self.cellStyleOneMainView.layer.cornerRadius = 8
     }
-
-    func render(image:UIImage?,urlString:String,companyName:String,positionName:String,salary:String,township:String){
-        if let image = image{
-            companyLogoImageView.image = image
-            
-        }else{
-//            companyLogoImageView.setImage(with: URL(string: urlString))
-        }
-        
+    
+    func renderOfJobsList(jobUIModel: JobsListUIModel){
+        self.positionLabel.text = jobUIModel.position
+        self.companyNameLabel.text = jobUIModel.company.name
+        self.salaryLabel.text = "\(jobUIModel.miniSalary) - \(jobUIModel.maxiSalary) \(jobUIModel.stateName)"
     }
 }

@@ -6,6 +6,14 @@
 //
 
 import UIKit
+import shared
+
+struct FlagButtonData {
+    //    let cityButton: UIButton!
+    let countryData: CountryData
+    let titleFlag: String
+}
+
 
 class LandingCountry: UIViewController {
     @IBOutlet weak var selectCountryTitleLabel: UILabel!
@@ -19,15 +27,19 @@ class LandingCountry: UIViewController {
     @IBOutlet weak var countryDropDownImageView: UIImageView!
     var router: LandingCountryRouting?
     var deviceLocationPopup: DeviceLocation = DeviceLocation()
-  
+    var viewModel: ChooseCountryViewModel!
+    var countriesList: [CountryData] = []
+    var flagButtonData: [FlagButtonData] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupFormStyle()
         self.tappedAction()
+        self.fetchLandingCountry()
         self.selectCountryTitleLabel.text = "Select your country"
         self.selectCountryLabel.text = "Select your country"
         self.getStartedButton.setTitle("Get Started", for: .normal)
-        }
+    }
     
     func setupFormStyle(){
         countryDropDownImageView.isHidden = false
@@ -42,60 +54,83 @@ class LandingCountry: UIViewController {
         self.getStartedButton.layer.cornerRadius = 8
         self.getStartedButton.layer.masksToBounds = true
     }
-
+    
+    func fetchLandingCountry(){
+        viewModel = DIHelperClient.shared.getChooseCountryViewModel()
+        viewModel.getCountriesList()
+        viewModel.observeUiState { uiStateData in
+            let countriesList: [CountryData] = uiStateData.countries as? [CountryData] ?? []
+            self.countriesList = countriesList
+            countriesList.forEach { country in
+                print(country.id)
+                print(country.countryName)
+                var currentFlag: String = ""
+                if country.countryName.uppercased() == "myanmar".uppercased(){
+                    currentFlag = "myanmar_flag"
+                }else if country.countryName.uppercased() == "Singapore".uppercased(){
+                    currentFlag = "myanmar_flag"
+                }
+                else if country.countryName.uppercased() == "Sri Lanka".uppercased(){
+                    currentFlag = "srilanka_flag"
+                }
+                else if country.countryName.uppercased() == "Cambodia".uppercased(){
+                    currentFlag = "myanmar_flag"
+                }
+                else if country.countryName.uppercased() == "vietnam".uppercased(){
+                    currentFlag = "vietnam_flag"
+                }
+                else if country.countryName.uppercased() == "thailand".uppercased(){
+                    currentFlag = "thailand_flag"
+                }
+                else{
+                    currentFlag = "myanmar_flag"
+                }
+                self.flagButtonData.append(
+                    FlagButtonData(countryData: country, titleFlag: currentFlag))
+            }
+        }
+    }
+    
+    func fetchSelectedCountryDynamicID(selectedId: String){
+        viewModel.getDynamicPagesId(countryId: selectedId)
+        viewModel.observeUiState { uiStateData in
+            let dynamicPageID: String = uiStateData.dynamicPageId
+            print(dynamicPageID)
+            if dynamicPageID != nil{
+                self.viewModel.updateCountryId(countryId: dynamicPageID)
+                self.viewModel.observeUiState { uiStateData in
+                    print(self.viewModel.getCountryId())
+                }
+            }else{
+                print("Dynamic Page ID Required")
+            }
+        }
+    }
     
     @IBAction func handleSelection(_ sender: UIButton) {
         cityButtons.forEach { (button) in
             UIView.animate(withDuration: 0.3, animations: {
                 button.isHidden = !button.isHidden
+                button.setTitle(self.flagButtonData[button.tag].countryData.countryName, for: .normal)
+                button.setImage(UIImage(named: self.flagButtonData[button.tag].titleFlag), for: .normal)
                 self.view.layoutIfNeeded()
             })
         }
-    }
-    
-    enum Citys: String {
-        case myanmar = "Myanmar"
-        case srilanka = "Sri lanka"
-        case vietnam = "Vietnam"
-        case thailand = "Thailand"
+        
     }
     
     @IBAction func cityTapped(_ sender: UIButton) {
-        guard let title = sender.currentTitle, let city = Citys(rawValue: title) else {
-            return
-        }
-        switch city {
-        case .myanmar:
-            selectCountryLabel.text = ""
-            selectedCountry.setImage(UIImage(named: "myanmar_flag"), for: .normal)
-            selectedCountry.setTitle(Citys.myanmar.rawValue, for: .normal)
-        case .srilanka:
-            selectCountryLabel.text = ""
-            selectedCountry.setImage(UIImage(named: "srilanka_flag"), for: .normal)
-            selectedCountry.setTitle(Citys.srilanka.rawValue, for: .normal)
-        case .vietnam:
-            selectCountryLabel.text = ""
-            selectedCountry.setImage(UIImage(named: "vietnam_flag"), for: .normal)
-            selectedCountry.setTitle(Citys.vietnam.rawValue, for: .normal)
-//            selectCountryLabel.text = Citys.vietnam.rawValue
-        case .thailand:
-            selectCountryLabel.text = ""
-            selectedCountry.setImage(UIImage(named: "thailand_flag"), for: .normal)
-            selectedCountry.setTitle(Citys.thailand.rawValue, for: .normal)
-//            selectCountryLabel.text = Citys.thailand.rawValue
-        default:
-            selectCountryLabel.text = ""
-            selectedCountry.setImage(UIImage(named: "myanmar_flag"), for: .normal)
-            selectedCountry.setTitle("Select your country", for: .normal)
-//            self.selectCountryLabel.text = "Select your country"
-        }
-        
         cityButtons.forEach { (button) in
             UIView.animate(withDuration: 0.3, animations: {
                 button.isHidden = true
+                self.selectCountryLabel.text = ""
+                self.selectedCountry.setTitle(self.flagButtonData[sender.tag].countryData.countryName, for: .normal)
+                self.selectedCountry.setImage(UIImage(named: self.flagButtonData[sender.tag].titleFlag), for: .normal)
                 self.view.layoutIfNeeded()
             })
         }
+        //Get dynamic page id
+        fetchSelectedCountryDynamicID(selectedId: self.flagButtonData[sender.tag].countryData.id)
     }
     
     @IBAction func useMyCurrentLocationAction(_ sender: Any) {
@@ -103,10 +138,19 @@ class LandingCountry: UIViewController {
     }
     
     @IBAction func getStartedAction(_ sender: Any) {
-        BHRJobLandingConstants.shared.getStarted = true
-        let screenPortal = ScreenPortalScene.create()
-        UIApplication.shared.windows.first?.rootViewController = screenPortal
-        UIApplication.shared.windows.first?.makeKeyAndVisible()
+       
+        if self.viewModel.getCountryId() != nil && self.viewModel.getCountryId() != ""{
+            BHRJobLandingConstants.shared.getStarted = true
+            SettingInfo.shared.selectedCountryID = self.viewModel.getCountryId()
+            
+            let screenPortal = ScreenPortalScene.create()
+            UIApplication.shared.windows.first?.rootViewController = screenPortal
+            UIApplication.shared.windows.first?.makeKeyAndVisible()
+        }else{
+            //Choose Country
+            self.showToast(message: "Choose Country")
+        }
+       
     }
 }
 

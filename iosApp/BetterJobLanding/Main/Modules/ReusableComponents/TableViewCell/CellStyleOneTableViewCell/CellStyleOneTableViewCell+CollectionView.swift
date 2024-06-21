@@ -10,14 +10,20 @@ import UIKit
 
 extension CellStyleOneTableViewCell:UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        if self.homeUIViewModel[section].collectionType == HomeCollectionType.jobCollection.rawValue{
+            return jobsListUIModel.count
+        }else if self.homeUIViewModel[section].collectionType == HomeCollectionType.companyCollection.rawValue{
+            return companyListModel.count
+        }
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: CellStyleOneCollectionViewCell.self), for: indexPath) as? CellStyleOneCollectionViewCell else {
-                    return UICollectionViewCell()
-                }
-                return cell
+            return UICollectionViewCell()
+        }
+        cell.renderOfJobsList(jobUIModel: jobsListUIModel[indexPath.row])
+        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

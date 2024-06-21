@@ -7,17 +7,26 @@
 
 import Foundation
 import UIKit
+import shared
 
 extension CellStyleFourTableViewCell: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 4
+//        if self.homeUIViewModel[section].collectionType == HomeCollectionType.jobCollection.rawValue{
+//            return jobsListUIModel.count
+//        }else if self.homeUIViewModel[section].collectionType == HomeCollectionType.companyCollection.rawValue{
+//            return companyListModel.count
+//        }
+//        return 1
+        
+        return companyListModel.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: CellStyleFourCollectionViewCell.self), for: indexPath) as? CellStyleFourCollectionViewCell else {
-                    return UICollectionViewCell()
-                }
-                return cell
+            return UICollectionViewCell()
+        }
+        cell.renderOfCompanyList(companyUIModel: companyListModel[indexPath.row])
+        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -33,7 +42,7 @@ extension CellStyleFourTableViewCell:UICollectionViewDelegateFlowLayout{
         let spacingBetweenCells:CGFloat = 16
         // 2 is the value of sectionInset value
         
- 
+        
         if let collection = self.cellStyleFourCollectionView{
             let width = (collection.bounds.width - spacingBetweenCells)/numberOfItemsPerRow
             
@@ -46,13 +55,13 @@ extension CellStyleFourTableViewCell:UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 16
     }
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat
-//    {
-//        return 15
-//    }
-
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets
-//    {
-//        return UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
-//    }
+    //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat
+    //    {
+    //        return 15
+    //    }
+    
+    //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets
+    //    {
+    //        return UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+    //    }
 }

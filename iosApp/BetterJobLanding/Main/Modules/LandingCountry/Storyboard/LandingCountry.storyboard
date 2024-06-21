@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -43,18 +44,6 @@
                                 <buttonConfiguration key="configuration" style="plain" title="Get Started"/>
                                 <connections>
                                     <action selector="getStartedAction:" destination="gzd-os-gHP" eventType="touchUpInside" id="n2o-8M-oi4"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yyK-Jx-0M6">
-                                <rect key="frame" x="97" y="722" width="199" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="Xli-HI-LWC"/>
-                                    <constraint firstAttribute="width" constant="199" id="YzV-kV-HRj"/>
-                                </constraints>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" image="usemycurrentlocation"/>
-                                <connections>
-                                    <action selector="useMyCurrentLocationAction:" destination="gzd-os-gHP" eventType="touchUpInside" id="imW-Ts-GkM"/>
                                 </connections>
                             </button>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="zT3-PO-TMU">
@@ -105,7 +94,7 @@
                                             <constraint firstItem="BR0-qD-uM8" firstAttribute="top" secondItem="bXc-CV-yE8" secondAttribute="top" id="qWx-L5-iXE"/>
                                         </constraints>
                                     </view>
-                                    <button hidden="YES" opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hXj-Wh-Pau">
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hXj-Wh-Pau">
                                         <rect key="frame" x="0.0" y="60" width="361" height="50"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
@@ -113,7 +102,7 @@
                                         </constraints>
                                         <inset key="titleEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                        <state key="normal" title="Myanmar" image="myanmar_flag">
+                                        <state key="normal">
                                             <color key="titleColor" name="gray"/>
                                         </state>
                                         <connections>
@@ -128,7 +117,7 @@
                                         </constraints>
                                         <inset key="titleEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                        <state key="normal" title="Sri lanka" image="srilanka_flag">
+                                        <state key="normal">
                                             <color key="titleColor" name="gray"/>
                                         </state>
                                         <connections>
@@ -143,7 +132,7 @@
                                         </constraints>
                                         <inset key="titleEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                        <state key="normal" title="Vietnam" image="vietnam_flag">
+                                        <state key="normal">
                                             <color key="titleColor" name="gray"/>
                                         </state>
                                         <connections>
@@ -158,7 +147,7 @@
                                         </constraints>
                                         <inset key="titleEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                        <state key="normal" title="Thailand" image="thailand_flag">
+                                        <state key="normal">
                                             <color key="titleColor" name="gray"/>
                                         </state>
                                         <connections>
@@ -180,6 +169,18 @@
                                     <constraint firstItem="bXc-CV-yE8" firstAttribute="leading" secondItem="zT3-PO-TMU" secondAttribute="leading" id="yUk-QN-YC9"/>
                                 </constraints>
                             </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w4v-Qi-kTQ">
+                                <rect key="frame" x="97" y="717" width="199" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="dJK-Fb-TL0"/>
+                                    <constraint firstAttribute="width" constant="199" id="m24-ch-2sb"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="usemycurrentlocation"/>
+                                <connections>
+                                    <action selector="useMyCurrentLocationAction:" destination="gzd-os-gHP" eventType="touchUpInside" id="ylH-6P-3IF"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Pqe-XK-Pbk"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -187,14 +188,14 @@
                             <constraint firstItem="7ZZ-2q-3Id" firstAttribute="top" secondItem="Pqe-XK-Pbk" secondAttribute="top" constant="48" id="0tC-Gs-K0k"/>
                             <constraint firstItem="zT3-PO-TMU" firstAttribute="leading" secondItem="Pqe-XK-Pbk" secondAttribute="leading" constant="16" id="1gB-NU-IOV"/>
                             <constraint firstItem="vD5-du-1jJ" firstAttribute="centerX" secondItem="mCL-Aa-oMC" secondAttribute="centerX" id="GMQ-ES-lGq"/>
+                            <constraint firstItem="w4v-Qi-kTQ" firstAttribute="centerX" secondItem="mCL-Aa-oMC" secondAttribute="centerX" id="IhU-m4-2C8"/>
                             <constraint firstItem="7ZZ-2q-3Id" firstAttribute="centerX" secondItem="mCL-Aa-oMC" secondAttribute="centerX" id="NTa-wD-B70"/>
-                            <constraint firstItem="yyK-Jx-0M6" firstAttribute="centerX" secondItem="mCL-Aa-oMC" secondAttribute="centerX" id="Usx-r0-8Cf"/>
+                            <constraint firstItem="qFM-Ac-cPD" firstAttribute="top" secondItem="w4v-Qi-kTQ" secondAttribute="bottom" constant="20" id="YjI-A0-9rb"/>
                             <constraint firstItem="vD5-du-1jJ" firstAttribute="top" secondItem="7ZZ-2q-3Id" secondAttribute="bottom" constant="48" id="a8b-CN-3FG"/>
                             <constraint firstItem="qFM-Ac-cPD" firstAttribute="centerX" secondItem="mCL-Aa-oMC" secondAttribute="centerX" id="iIl-mC-Qz1"/>
                             <constraint firstItem="Pqe-XK-Pbk" firstAttribute="trailing" secondItem="vD5-du-1jJ" secondAttribute="trailing" constant="16" id="inb-1g-LFZ"/>
                             <constraint firstItem="vD5-du-1jJ" firstAttribute="leading" secondItem="Pqe-XK-Pbk" secondAttribute="leading" constant="16" id="kp8-Hc-l66"/>
                             <constraint firstItem="Pqe-XK-Pbk" firstAttribute="bottom" secondItem="qFM-Ac-cPD" secondAttribute="bottom" constant="16" id="mnu-6J-g6H"/>
-                            <constraint firstItem="qFM-Ac-cPD" firstAttribute="top" secondItem="yyK-Jx-0M6" secondAttribute="bottom" constant="16" id="pld-WB-T5E"/>
                             <constraint firstItem="zT3-PO-TMU" firstAttribute="top" secondItem="vD5-du-1jJ" secondAttribute="bottom" constant="16" id="sLl-x3-zS1"/>
                             <constraint firstItem="Pqe-XK-Pbk" firstAttribute="trailing" secondItem="zT3-PO-TMU" secondAttribute="trailing" constant="16" id="tiq-Q7-Rdj"/>
                         </constraints>
@@ -207,7 +208,7 @@
                         <outlet property="selectCountryView" destination="bXc-CV-yE8" id="KZa-tt-211"/>
                         <outlet property="selectedCountry" destination="BR0-qD-uM8" id="nk2-Q2-HPE"/>
                         <outlet property="selectingCountryStackView" destination="zT3-PO-TMU" id="l7H-qm-zb0"/>
-                        <outlet property="usemycurrentlocationButton" destination="yyK-Jx-0M6" id="bgJ-dn-Qn1"/>
+                        <outlet property="usemycurrentlocationButton" destination="w4v-Qi-kTQ" id="nfN-2j-w2s"/>
                         <outletCollection property="cityButtons" destination="hXj-Wh-Pau" collectionClass="NSMutableArray" id="zKJ-8H-NIK"/>
                         <outletCollection property="cityButtons" destination="U6u-TN-Yx6" collectionClass="NSMutableArray" id="Wd4-Ax-CSa"/>
                         <outletCollection property="cityButtons" destination="3RN-Z4-hv6" collectionClass="NSMutableArray" id="6R9-sK-5QL"/>
@@ -222,11 +223,7 @@
     <resources>
         <image name="betterhrjob_landing_country" width="125" height="121"/>
         <image name="countrysetter_dropdown" width="16" height="16"/>
-        <image name="myanmar_flag" width="20" height="20.333333969116211"/>
-        <image name="srilanka_flag" width="20" height="20.333333969116211"/>
-        <image name="thailand_flag" width="20" height="20.333333969116211"/>
         <image name="usemycurrentlocation" width="199" height="24"/>
-        <image name="vietnam_flag" width="20" height="20.333333969116211"/>
         <namedColor name="color">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

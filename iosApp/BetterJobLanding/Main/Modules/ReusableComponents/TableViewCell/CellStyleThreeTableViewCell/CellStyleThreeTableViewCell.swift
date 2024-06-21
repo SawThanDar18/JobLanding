@@ -6,11 +6,15 @@
 //
 
 import UIKit
+import shared
 
 class CellStyleThreeTableViewCell: UITableViewCell {
     @IBOutlet weak var cellStyleThreeCollectionView: UICollectionView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var seeAllButton: UIButton!
+    var homeUIViewModel: [HomeUIModel] = []
+    var jobsListUIModel : [JobsListUIModel] = []
+    var companyListModel: [CollectionCompaniesUIModel] = []
     
     override func awakeFromNib() {
         super.awakeFromNib()

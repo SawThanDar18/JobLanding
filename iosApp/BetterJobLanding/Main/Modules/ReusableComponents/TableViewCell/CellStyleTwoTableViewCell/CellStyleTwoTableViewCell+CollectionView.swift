@@ -10,13 +10,19 @@ import UIKit
 
 extension CellStyleTwoTableViewCell:UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 4
+        if self.homeUIViewModel[section].collectionType == HomeCollectionType.jobCollection.rawValue{
+            return jobsListUIModel.count
+        }else if self.homeUIViewModel[section].collectionType == HomeCollectionType.companyCollection.rawValue{
+            return companyListModel.count
+        }
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: CellStyleTwoCollectionViewCell.self), for: indexPath) as? CellStyleTwoCollectionViewCell else {
             return UICollectionViewCell()
         }
+        cell.renderOfJobsList(jobUIModel: jobsListUIModel[indexPath.row])
         return cell
     }
     
@@ -45,13 +51,4 @@ extension CellStyleTwoTableViewCell:UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 16
     }
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat
-//    {
-//        return 15
-//    }
-
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets
-//    {
-//        return UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
-//    }
 }

@@ -8,37 +8,33 @@
 import Foundation
 import SwiftUI
 
-enum HomeFields {
-    case searchTextBar,recentJobs,topJobsShortcut,topJobsOneDetail,topCompanies,topJobsTwoDetail,popularJobs,campaigns,suggestedHeader,suggestedForYou
+enum JobPostFields {
+    case style_1,style_2,style_3
+    
     var info: (name:String,cellType:FormCellType) {
         switch self {
-        case .searchTextBar:
-            return ("",.searchTextBar)
-        case .recentJobs:
-            return ("",.cellStyleOne)
-        case .topJobsShortcut:
-            return ("",.cellStyleTwo)
-        case .topJobsOneDetail:
-            return ("",.cellStyleThree)
-        case .topCompanies:
-            return ("",.cellStyleFour)
-        case .topJobsTwoDetail:
-            return ("",.cellStyleFive)
-        case .popularJobs:
-            return ("",.cellStyleOne)
-        case .campaigns:
-            return ("",.cellStyleSix)
-        case .suggestedHeader:
-            return ("",.cellStyleHeader)
-        case .suggestedForYou:
-            return ("",.cellStyleSeven)
+        case .style_1:
+            return ("", .cellStyleThree)
+        case .style_2:
+            return ("", .cellStyleTwo)
+        case .style_3:
+            return ("", .cellStyleOne)
+        }
+    }
+}
+
+enum CompanyPostFields {
+    case style_1
+    
+    var info: (name:String,cellType:FormCellType) {
+        switch self {
+        case .style_1:
+            return ("", .cellStyleFour)
         }
     }
 }
 
 struct HomeViewModels {
-    let formFields:[HomeFields] =
-    [.searchTextBar,.recentJobs,.topJobsShortcut,.topJobsOneDetail,.topCompanies,.topJobsTwoDetail,.popularJobs,.campaigns,.suggestedHeader,.suggestedForYou]
-   
+    var jobPostsFormFields: [JobPostFields] = []
+    var companyPostsFormFields: [CompanyPostFields] = []
 }
-

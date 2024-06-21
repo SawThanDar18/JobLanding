@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import shared
 
 class CellStyleFourCollectionViewCell: UICollectionViewCell {
 
@@ -33,13 +34,8 @@ class CellStyleFourCollectionViewCell: UICollectionViewCell {
         self.cellStyleFourMainView.layer.cornerRadius = 8
     }
 
-    func render(image:UIImage?,urlString:String,companyName:String,positionName:String,salary:String,township:String){
-        if let image = image{
-            companyLogoImageView.image = image
-            
-        }else{
-//            companyLogoImageView.setImage(with: URL(string: urlString))
-        }
-        
+    func renderOfCompanyList(companyUIModel: CollectionCompaniesUIModel){
+        self.openingLabel.text = "\(companyUIModel.jobOpeningCount) openings"
+        self.companyTitleLabel.text = companyUIModel.company.name
     }
 }

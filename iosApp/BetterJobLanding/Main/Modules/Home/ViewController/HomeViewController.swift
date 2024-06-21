@@ -15,40 +15,24 @@ class HomeViewController: BaseViewController {
     @IBOutlet weak var signUpButton: UIButton!
     var viewModel: HomeViewModels!
     var router: HomeRouter?
-    
-    var chooseCountryViewModel: ChooseCountryViewModel!
+    var homeViewModel : HomeViewModel!
+    var homeUIViewModel: [HomeUIModel] = []
+    var jobsListUIModel : [JobsListUIModel] = []
+    var companyListModel: [CollectionCompaniesUIModel] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        chooseCountryViewModel = DIHelperClient.shared.getChooseCountryViewModel()
-        
-        chooseCountryViewModel.getCountriesList()
-        chooseCountryViewModel.observeUiState { uiStateData in
-            let countriesList: [CountryData] = uiStateData.countries as? [CountryData] ?? []
-            countriesList.forEach { country in
-                print(country.id)
-                print(country.countryName)
-            }
-            
-            let pageId = uiStateData.dynamicPageId
-            
-        }
-    
-                
-    
-//        DIHelperKt.doInitKoin(localStorage: IOSLocalStorage(), fileHandler: iOSFileHandler(), assetProvider: IosAssetProvider())
-//        let test = getKoin().get()
-        
-//        let test = HomeViewModel(localStorage: IOSLocalStorage(), homeRepository: homere)
-//        print(
-//        let viewModel: HomeViewModels = DIHelperKt.getko
-//        KoinKt.getKoin().get()
-//        let test = HomeRepository.getJobLandingSections(<#T##self: HomeRepository##HomeRepository#>)
-      
         setupHomeStyle()
         configureTableView()
         self.homeTableView.addSubview(signUpMainView)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        jobsListUIModel.removeAll()
+        companyListModel.removeAll()
+        fetchHomeData()
     }
     
     func setupHomeStyle(){
@@ -56,10 +40,28 @@ class HomeViewController: BaseViewController {
         self.signUpButton.layer.cornerRadius = 8
         self.signUpButton.backgroundColor = UIColor.white
         self.signUpButton.titleLabel?.font = .poppinsMedium(ofSize: 12)
-      
+        
         self.signUpLabel.font = .poppinsRegular(ofSize: 12)
         self.signUpLabel.textColor = UIColor.white
         self.signUpLabel.text = "Sign up with email or phone number!"
+    }
+    
+    func fetchHomeData(){
+        homeViewModel = DIHelperClient.shared.getHomeViewModel()
+        homeViewModel.getJobLandingSections(pageId: SettingInfo.shared.selectedCountryID)
+        homeViewModel.observeUiState{
+            uiStateData in
+            let homeUIlist : [HomeUIModel] = uiStateData.jobLandingSectionsList as [HomeUIModel] ?? []
+            self.homeUIViewModel = homeUIlist
+            homeUIlist.forEach{homelist in
+                if homelist.collectionType == HomeCollectionType.jobCollection.rawValue{
+                    self.jobsListUIModel = homelist.jobs ?? []
+                }else if homelist.collectionType == HomeCollectionType.companyCollection.rawValue{
+                    self.companyListModel = homelist.collectionCompanies
+                }
+            }
+            self.homeTableView.reloadData()
+        }
     }
     
     func configureTableView(){
@@ -82,7 +84,7 @@ class HomeViewController: BaseViewController {
         homeTableView.estimatedRowHeight = 84
         
         view.addSubview(homeTableView)
-       
+        
         if #available(iOS 15.0, *) {
             homeTableView.sectionHeaderTopPadding = 0
         } else {
@@ -94,5 +96,5 @@ class HomeViewController: BaseViewController {
         router?.goToRegister()
     }
     
-
+    
 }

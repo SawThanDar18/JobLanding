@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import shared
 
 class CellStyleThreeCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var cellStyleTwoMainView: UIView!
@@ -45,14 +46,12 @@ class CellStyleThreeCollectionViewCell: UICollectionViewCell {
         self.cellStyleTwoMainView.layer.cornerRadius = 8
         self.companyLogoImageView.layer.cornerRadius = 8
     }
-
-    func render(image:UIImage?,urlString:String,companyName:String,positionName:String,salary:String,township:String){
-        if let image = image{
-            companyLogoImageView.image = image
-            
-        }else{
-//            companyLogoImageView.setImage(with: URL(string: urlString))
-        }
-        
+    
+    func renderOfJobsList(jobUIModel: JobsListUIModel){
+        self.companyTitleLabel.text = jobUIModel.company.name
+        self.positionLabel.text = jobUIModel.position
+        self.timeLabel.text = jobUIModel.employmentType
+        self.salaryLabel.text = "\(jobUIModel.currencyCode) \(jobUIModel.miniSalary) \(jobUIModel.maxiSalary) "
+        self.addressLabel.text = jobUIModel.stateName
     }
 }

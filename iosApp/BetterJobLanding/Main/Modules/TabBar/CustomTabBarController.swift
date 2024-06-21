@@ -9,21 +9,26 @@ import Foundation
 import UIKit
 
 class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
-  
+    var upperLineView: UIView!
+    let spacing: CGFloat = 12
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         generateTabBar()
         setTabBarAppearance()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+            self.addTabbarIndicatorView(index: 0, isFirstTime: true)
+        }
         delegate = self
     }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if ((touch.view?.isDescendant(of: self.view)) != nil){
-              return false
-          }
-          return true
-      }
-
+            return false
+        }
+        return true
+    }
+    
     private func generateTabBar() {
         viewControllers = [
             generateVC(
@@ -87,9 +92,9 @@ class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
         
         roundLayer.path = bezierPath.cgPath
         
-        tabBar.selectionIndicatorImage = UIImage().createSelectionIndicator(color: BHRJobLandingColors.bhrBJPrimary, size: CGSize(width: tabBar.frame.width/CGFloat(tabBar.items!.count), height:  tabBar.frame.height), lineWidth: 1.0)
-      
-        tabBar.backgroundColor = .white
+        //        tabBar.selectionIndicatorImage = UIImage().createSelectionIndicator(color: BHRJobLandingColors.bhrBJPrimary, size: CGSize(width: tabBar.frame.width/CGFloat(tabBar.items!.count), height:  tabBar.frame.height), lineWidth: 1)
+        //
+        
         tabBar.layer.insertSublayer(roundLayer, at: 0)
         tabBar.itemWidth = width / 5
         tabBar.itemPositioning = .centered
@@ -103,6 +108,7 @@ class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
             self.tabBar.standardAppearance = appearance
         } else {
             // For normal state, the color is clear color, so you will not see any title until your tab is selected.
+            
             UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: #colorLiteral(red: 0.6, green: 0.6, blue: 0.6, alpha: 1),NSAttributedString.Key.font:UIFont.poppinsRegular(ofSize: 12)], for: .normal)
             // Set any color for selected state
             UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: BHRJobLandingColors.bhrBJPrimary,NSAttributedString.Key.font:UIFont.poppinsRegular(ofSize: 12)], for: .selected)
@@ -118,6 +124,23 @@ extension CustomTabBarController: UITabBarControllerDelegate {
         }
         
         return true
+    }
+    
+    ///Add tabbar item indicator uper line
+    func addTabbarIndicatorView(index: Int, isFirstTime: Bool = false){
+        guard let tabView = tabBar.items?[index].value(forKey: "view") as? UIView else {
+            return
+        }
+        if !isFirstTime{
+            upperLineView.removeFromSuperview()
+        }
+        upperLineView = UIView(frame: CGRect(x: tabView.frame.minX + spacing, y: tabView.frame.minY, width: tabView.frame.size.width - spacing * 2, height: 1))
+        upperLineView.backgroundColor = BHRJobLandingColors.bhrBJPrimary
+        tabBar.addSubview(upperLineView)
+    }
+    
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        addTabbarIndicatorView(index: self.selectedIndex)
     }
 }
 

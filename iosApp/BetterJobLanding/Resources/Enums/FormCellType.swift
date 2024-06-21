@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 enum FormCellType{
     case searchTextBar,cellStyleOne,cellStyleTwo,cellStyleThree,cellStyleFour,cellStyleFive,cellStyleSix,cellStyleSeven,cellStyleHeader
 }
