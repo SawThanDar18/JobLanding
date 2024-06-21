@@ -286,8 +286,97 @@ class CompleteProfileViewModel(
         }
     }
 
+    fun createPosition(positionName: String) {
+        viewModelScope.launch(DispatcherProvider.io) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    getPositionId = false
+                )
+            }
+
+            completeProfileRepository.createPosition(positionName).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                            getPositionId = false
+                        )
+                    }
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing,
+                            getPositionId = false
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        if (data.data != null) {
+                            if (data.data!!.createPosition != null) {
+                                _uiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                        positionId = data.data!!.createPosition!!.id ?: "",
+                                        getPositionId = true
+                                    )
+                                }
+                            } else {
+                                _uiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        error = if (data.data!!.createPosition == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                        getPositionId = false
+                                    )
+                                }
+                            }
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                    getPositionId = false
+                                )
+                            }
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString()),
+                                getPositionId = false
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
     fun createExperience(
-        position: String,
+        positionId: String,
         companyId: String,
         title: String,
         location: String,
@@ -307,7 +396,7 @@ class CompleteProfileViewModel(
                 )
             }
 
-            completeProfileRepository.createExperience(position, localStorage.candidateId, companyId, title, location, experienceLevel, employmentType, startDate, endDate, isCurrentJob, description).toFlow()
+            completeProfileRepository.createExperience(positionId, localStorage.candidateId, companyId, title, location, experienceLevel, employmentType, startDate, endDate, isCurrentJob, description).toFlow()
                 .catch { e ->
                     _uiState.update {
                         it.copy(

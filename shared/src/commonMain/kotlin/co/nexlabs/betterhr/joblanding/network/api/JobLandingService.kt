@@ -9,6 +9,7 @@ import co.nexlabs.betterhr.job.with_auth.CreateCompanyMutation
 import co.nexlabs.betterhr.job.with_auth.CreateEducationMutation
 import co.nexlabs.betterhr.job.with_auth.CreateExperienceMutation
 import co.nexlabs.betterhr.job.with_auth.CreateLanguageMutation
+import co.nexlabs.betterhr.job.with_auth.CreatePositionMutation
 import co.nexlabs.betterhr.job.with_auth.CreateSkillMutation
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
@@ -225,8 +226,10 @@ interface JobLandingService {
         summary: String
     ): ApolloCall<UpdateSummaryMutation.Data>
 
+    suspend fun createPosition(positionName: String): ApolloCall<CreatePositionMutation.Data>
+
     suspend fun createExperience(
-        position: String,
+        positionId: String,
         candidateId: String,
         companyId: String,
         title: String,

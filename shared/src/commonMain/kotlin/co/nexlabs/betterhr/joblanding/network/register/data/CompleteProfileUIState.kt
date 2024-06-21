@@ -18,4 +18,6 @@ data class CompleteProfileUIState(
     val fileId: String = "",
     val isSuccessCreateExperience: Boolean = false,
     val isSuccessUpdateExperience: Boolean = false,
+    val getPositionId: Boolean = false,
+    val positionId: String = ""
 )

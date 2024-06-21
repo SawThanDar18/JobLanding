@@ -9,6 +9,7 @@ import co.nexlabs.betterhr.job.with_auth.CreateCompanyMutation
 import co.nexlabs.betterhr.job.with_auth.CreateEducationMutation
 import co.nexlabs.betterhr.job.with_auth.CreateExperienceMutation
 import co.nexlabs.betterhr.job.with_auth.CreateLanguageMutation
+import co.nexlabs.betterhr.job.with_auth.CreatePositionMutation
 import co.nexlabs.betterhr.job.with_auth.CreateSkillMutation
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
@@ -811,8 +812,12 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         return apolloClientWithAuth.mutation(UpdateSummaryMutation(id, Optional.present(summary)))
     }
 
+    override suspend fun createPosition(positionName: String): ApolloCall<CreatePositionMutation.Data> {
+        return apolloClientWithAuth.mutation(CreatePositionMutation(positionName))
+    }
+
     override suspend fun createExperience(
-        position: String,
+        positionId: String,
         candidateId: String,
         companyId: String,
         title: String,
@@ -825,7 +830,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         description: String
     ): ApolloCall<CreateExperienceMutation.Data> {
         return apolloClientWithAuth.mutation(CreateExperienceMutation(
-            Optional.present(position),
+            Optional.present(positionId),
             Optional.present(candidateId),
             Optional.present(companyId),
             Optional.present(title),

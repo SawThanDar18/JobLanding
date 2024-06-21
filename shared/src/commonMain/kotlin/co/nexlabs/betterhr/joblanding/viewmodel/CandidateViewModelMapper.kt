@@ -108,7 +108,7 @@ object CandidateViewModelMapper {
             }
         }
 
-        var experienceList: MutableList<ExperienceUIModel> = ArrayList()
+        /*var experienceList: MutableList<ExperienceUIModel> = ArrayList()
 
         data.companies?.let { companies ->
             companies.map { company ->
@@ -152,6 +152,43 @@ object CandidateViewModelMapper {
                     experienceList
                 )
             }
+        }*/
+
+        var experienceList: MutableList<ExperienceUIModel> = ArrayList()
+        var companiesList = data.companies?.map { company ->
+            company.experiences?.map { experience ->
+                experienceList.add(
+                    ExperienceUIModel(
+                        experience!!.id,
+                        experience.position_id ?: "",
+                        experience.candidate_id ?: "",
+                        experience.title ?: "",
+                        experience.location ?: "",
+                        experience.experience_level ?: "",
+                        "",
+                        experience.start_date ?: "",
+                        experience.end_date ?: "",
+                        experience.is_current_job ?: false,
+                        experience.description ?: "",
+                        experience.company_id ?: "",
+                        PositionUIModel(
+                            experience.position!!.id ?: "",
+                            experience.position.name ?: ""
+                        )
+                    )
+                )
+            }
+
+            CompaniesUIModel(
+                company.id ?: "",
+                company.name,
+                company.file?.let {
+                    FilesUIModel(
+                        it.id ?: "", it.name ?: "", "", it.full_path ?: ""
+                    )
+                } ?: FilesUIModel("", "", "", ""),
+                experienceList.toList()
+            )
         }
 
         return CandidateUIModel(

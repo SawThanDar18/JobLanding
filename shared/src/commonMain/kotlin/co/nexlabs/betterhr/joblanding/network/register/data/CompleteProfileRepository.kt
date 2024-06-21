@@ -25,8 +25,10 @@ class CompleteProfileRepository(private val jobLandingService: JobLandingService
 
     suspend fun createCompany(companyName: String, candidateId: String, fileId: String) = jobLandingService.createCompany(companyName, candidateId, fileId)
 
+    suspend fun createPosition(positionName: String) = jobLandingService.createPosition(positionName)
+
     suspend fun createExperience(
-        position: String,
+        positionId: String,
         candidateId: String,
         companyId: String,
         title: String,
@@ -38,7 +40,7 @@ class CompleteProfileRepository(private val jobLandingService: JobLandingService
         isCurrentJob: Boolean,
         description: String
     ) = jobLandingService.createExperience(
-        position, candidateId, companyId, title, location, experienceLevel, employmentType, startDate, endDate, isCurrentJob, description
+        positionId, candidateId, companyId, title, location, experienceLevel, employmentType, startDate, endDate, isCurrentJob, description
     )
 
     suspend fun updateExperience(

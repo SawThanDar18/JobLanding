@@ -1,12 +1,17 @@
 package co.nexlabs.betterhr.joblanding.android.screen.register
 
+import android.app.DatePickerDialog
+import android.content.Context
 import android.net.Uri
+import android.util.Log
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,13 +33,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.contentColorFor
@@ -92,6 +100,10 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -106,7 +118,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var bottomBarVisible by remember { mutableStateOf(false) }
 
     var name by remember { mutableStateOf("") }
-    var position by remember { mutableStateOf("") }
+    var candidatePosition by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var summary by remember { mutableStateOf("") }
@@ -120,10 +132,25 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var addSummaryVisible by remember { mutableStateOf(false) }
     var addExperienceCompanyVisible by remember { mutableStateOf(false) }
     var addExperiencePositionVisible by remember { mutableStateOf(false) }
+    var updateExperiencePositionVisible by remember { mutableStateOf(false) }
     var addEducationVisible by remember { mutableStateOf(false) }
     var addLanguageVisible by remember { mutableStateOf(false) }
     var addSkillVisible by remember { mutableStateOf(false) }
     var addCertificationVisible by remember { mutableStateOf(false) }
+
+    var companyIdForAddExperience by remember { mutableStateOf("") }
+
+    var position by remember { mutableStateOf("") }
+    var experienceLevel by remember { mutableStateOf("") }
+
+    val jobTypes = listOf("Full-time", "Part-time", "Internship", "Remote")
+    var selectedJobType by remember { mutableStateOf(jobTypes[0]) }
+
+    var startDate by remember { mutableStateOf("") }
+    var endDate by remember { mutableStateOf("") }
+    var startDateInYMD by remember { mutableStateOf("") }
+    var endDateInYMD by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
 
     LaunchedEffect(refreshing) {
         if (refreshing) {
@@ -143,6 +170,30 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         scope.launch {
             viewModel.getCandidateData()
         }
+    }
+
+    LaunchedEffect(uiState.getPositionId) {
+        if (uiState.positionId != "") {
+            viewModel.createExperience(
+                uiState.positionId,
+                companyIdForAddExperience,
+                position,
+                "",
+                experienceLevel,
+                selectedJobType,
+                startDateInYMD, endDateInYMD,
+                if (endDate == "") true else false,
+                description
+            )
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessCreateExperience) {
+        addExperiencePositionVisible = false
+    }
+
+    LaunchedEffect(uiState.isSuccessUpdateExperience) {
+        updateExperiencePositionVisible = false
     }
 
     LaunchedEffect(uiState.getFileId) {
@@ -169,7 +220,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
             viewModel.updatePhone(uiState.candidateData.phone)
         }
         name = uiState.candidateData.name
-        position = uiState.candidateData.desiredPosition
+        candidatePosition = uiState.candidateData.desiredPosition
         phoneNumber = uiState.candidateData.phone
         email = uiState.candidateData.email
         summary = uiState.candidateData.summary
@@ -185,7 +236,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                     )
                 )
 
-                if (it.experience.isNotEmpty()) {
+                /*if (it.experience.isNotEmpty()) {
                     it.experience.map {
                         experienceList.add(
                             ExperienceUIModel(
@@ -197,7 +248,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             )
                         )
                     }
-                }
+                }*/
             }
         }
 
@@ -1010,7 +1061,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                         fontSize = 14.sp,
                                                     )
 
-                                                    if (experienceList.isEmpty()) {
+                                                    if (company.experience.isEmpty()) {
                                                         Text(
                                                             text = "--",
                                                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
@@ -1019,22 +1070,106 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             fontSize = 12.sp,
                                                         )
                                                     } else {
-                                                        Text(
-                                                            text = "8 mo",
-                                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                            fontWeight = FontWeight.W500,
-                                                            color = Color(0xFF757575),
-                                                            fontSize = 12.sp,
-                                                        )
 
-                                                        Spacer(modifier = Modifier.height(8.dp))
+                                                        experienceList.clear()
+                                                        company.experience.map {
+                                                            experienceList.add(
+                                                                ExperienceUIModel(
+                                                                    it.id,
+                                                                    it.positionId,
+                                                                    it.candidateId,
+                                                                    it.title,
+                                                                    it.location,
+                                                                    it.experienceLevel,
+                                                                    it.employmentType,
+                                                                    it.startDate,
+                                                                    it.endDate,
+                                                                    it.isCurrentJob,
+                                                                    it.description,
+                                                                    it.companyId,
+                                                                    PositionUIModel(
+                                                                        it.position.id,
+                                                                        it.position.name
+                                                                    )
+                                                                )
+                                                            )
+                                                        }
 
                                                         FlowRow(
                                                             maxItemsInEachRow = 1,
-                                                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                                                            verticalArrangement = Arrangement.spacedBy(
+                                                                16.dp
+                                                            )
                                                         ) {
                                                             repeat(experienceList.size) { index ->
-                                                                var experience = experienceList[index]
+                                                                var experience =
+                                                                    experienceList[index]
+
+                                                                var years by remember {
+                                                                    mutableStateOf(
+                                                                        0
+                                                                    )
+                                                                }
+                                                                var months by remember {
+                                                                    mutableStateOf(
+                                                                        0
+                                                                    )
+                                                                }
+
+                                                                if (experience.startDate == "0000-00-00 00:00:00" && experience.endDate == "0000-00-00 00:00:00") {
+                                                                    years = 0
+                                                                    months = 0
+                                                                } else if (experience.startDate == "0000-00-00 00:00:00" && experience.endDate == "") {
+                                                                    years = 0
+                                                                    months = 0
+                                                                } else if (experience.startDate != "0000-00-00 00:00:00" && experience.endDate != "0000-00-00 00:00:00"){
+                                                                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                                                                    val startDate = sdf.parse(experience.startDate)
+                                                                    val endDate = sdf.parse(experience.endDate)
+
+                                                                    calculateDateDifference(
+                                                                        startDate,
+                                                                        endDate
+                                                                    ) { calculatedYears, calculatedMonths ->
+                                                                        years = calculatedYears
+                                                                        months = calculatedMonths
+                                                                    }
+                                                                } else if ((experience.startDate != "0000-00-00 00:00:00" && experience.endDate == "")) {
+                                                                    years = 1
+                                                                    months = 1
+                                                                }
+
+                                                                var dateDiff = if (years != 0 && months == 0) {
+                                                                    "$years yr"
+                                                                } else if (months != 0 && years == 0) {
+                                                                    "$months mo"
+                                                                } else if (years != 0 && months != 0) {
+                                                                    "$years yr $months mo"
+                                                                } else if (years == 1 && months == 1) {
+                                                                    "current working"
+                                                                } else {
+                                                                    "--"
+                                                                }
+
+                                                                Column() {
+                                                                    Text(
+                                                                        text = dateDiff,
+                                                                        fontFamily = FontFamily(
+                                                                            Font(
+                                                                                R.font.poppins_regular
+                                                                            )
+                                                                        ),
+                                                                        fontWeight = FontWeight.W500,
+                                                                        color = Color(0xFF757575),
+                                                                        fontSize = 12.sp,
+                                                                    )
+
+                                                                    Spacer(
+                                                                        modifier = Modifier.height(
+                                                                            8.dp
+                                                                        )
+                                                                    )
+                                                                }
 
                                                             }
                                                         }
@@ -1046,11 +1181,14 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                         fontWeight = FontWeight.W500,
                                                         color = Color(0xFF42A5F5),
                                                         fontSize = 12.sp,
-                                                        modifier = Modifier.padding(
-                                                            top = 8.dp, bottom = 16.dp
-                                                        )
+                                                        modifier = Modifier
+                                                            .padding(
+                                                                top = 8.dp, bottom = 16.dp
+                                                            )
                                                             .clickable {
                                                                 addExperiencePositionVisible = true
+                                                                companyIdForAddExperience =
+                                                                    company.id
                                                             }
                                                     )
 
@@ -1237,12 +1375,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
             .padding(top = 50.dp)
             .systemBarsPadding()
     ) {
-        var position by remember { mutableStateOf("") }
-        var experienceLevel by remember { mutableStateOf("") }
-        var jobType by remember { mutableStateOf("") }
-        var startDate by remember { mutableStateOf("") }
-        var endDate by remember { mutableStateOf("") }
-        var description by remember { mutableStateOf("") }
 
         if (addExperiencePositionVisible) {
             ModalBottomSheetLayout(
@@ -1280,120 +1412,369 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(32.dp))
+                        LazyColumn {
+                            item {
+                                Spacer(modifier = Modifier.height(32.dp))
 
-                        MultiStyleTextForInfo(
-                            text1 = "Position",
-                            color1 = Color(0xFF757575),
-                            text2 = "*",
-                            color2 = Color(0xFF757575)
-                        )
-
-                        //position ui
-
-                        Text(
-                            text = "Tell employer about yourself",
-                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                            fontWeight = FontWeight.W400,
-                            color = Color(0xFF6A6A6A),
-                            fontSize = 14.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(158.dp)
-                                .border(
-                                    1.dp,
-                                    Color(0xFFE4E7ED),
-                                    RoundedCornerShape(4.dp)
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Position",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "*",
+                                    color2 = Color(0xFF757575)
                                 )
-                                .background(
-                                    color = Color.Transparent,
-                                    shape = MaterialTheme.shapes.medium
-                                ),
-                            value = summaryUpdate,
-                            onValueChange = {
-                                summaryUpdate = it
-                            },
-                            placeholder = {
-                                Text(
-                                    "Type Something",
-                                    color = Color(0xFFAAAAAA),
-                                    fontWeight = FontWeight.W400,
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                )
-                            },
-                            textStyle = TextStyle(
-                                textAlign = TextAlign.Start,
-                                fontWeight = FontWeight.W400,
-                                fontSize = 14.sp,
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                color = Color(0xFF4A4A4A)
-                            ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                textColor = Color(0xFF4A4A4A),
-                                backgroundColor = Color.Transparent,
-                                cursorColor = Color(0xFF1ED292),
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboardController?.hide()
-                                }
-                            ),
-                        )
 
-                        Row(
-                            verticalAlignment = Alignment.Bottom,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(bottom = 72.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(40.dp)
-                                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
-                                    .background(
-                                        color = Color(0xFF1ED292),
-                                        shape = MaterialTheme.shapes.medium
-                                    )
-                                    .clickable {
-                                        if (!summaryUpdate.isNullOrBlank()) {
-                                            scope.launch {
-                                                viewModel.updateSummary(summaryUpdate)
-                                            }
-                                        } else {
-                                            Toast
-                                                .makeText(
-                                                    applicationContext,
-                                                    "Please add Summary!",
-                                                    Toast.LENGTH_LONG
-                                                )
-                                                .show()
-                                        }
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(45.dp)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFE4E7ED),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
+                                        ),
+                                    value = position,
+                                    onValueChange = {
+                                        position = it
                                     },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text(
-                                    text = "Update summary",
-                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                    fontWeight = FontWeight.W600,
-                                    color = Color(0xFFFFFFFF),
-                                    fontSize = 14.sp,
+                                    placeholder = {
+                                        Text(
+                                            "Enter Position",
+                                            color = Color(0xFFBDBDBD),
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        )
+                                    },
+                                    textStyle = TextStyle(
+                                        textAlign = TextAlign.Start,
+                                        fontWeight = FontWeight.W400,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFF4A4A4A)
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        textColor = Color(0xFF4A4A4A),
+                                        backgroundColor = Color.Transparent,
+                                        cursorColor = Color(0xFF1ED292),
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboardController?.hide()
+                                        }
+                                    ),
                                 )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Experience Level",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(45.dp)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFE4E7ED),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
+                                        ),
+                                    value = experienceLevel,
+                                    onValueChange = {
+                                        experienceLevel = it
+                                    },
+                                    placeholder = {
+                                        Text(
+                                            "Enter Level",
+                                            color = Color(0xFFBDBDBD),
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        )
+                                    },
+                                    textStyle = TextStyle(
+                                        textAlign = TextAlign.Start,
+                                        fontWeight = FontWeight.W400,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFF4A4A4A)
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        textColor = Color(0xFF4A4A4A),
+                                        backgroundColor = Color.Transparent,
+                                        cursorColor = Color(0xFF1ED292),
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboardController?.hide()
+                                        }
+                                    ),
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Job Type",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    items(jobTypes.size) { index ->
+                                        var jobType = jobTypes[index]
+
+                                        OutlinedButton(
+                                            onClick = { selectedJobType = jobType },
+                                            colors = ButtonDefaults.outlinedButtonColors(
+                                                backgroundColor = Color.Transparent,
+                                                contentColor = if (selectedJobType == jobType) Color(
+                                                    0xFF1ED292
+                                                ) else Color(0xFFE1E1E1)
+                                            ),
+                                            border = if (selectedJobType == jobType) {
+                                                BorderStroke(2.dp, Color(0xFF1ED292))
+                                            } else {
+                                                BorderStroke(1.dp, Color(0xFFE1E1E1))
+                                            },
+                                            shape = RoundedCornerShape(4.dp),
+                                            modifier = Modifier.height(29.dp)
+                                        ) {
+                                            Text(
+                                                text = jobType,
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.W400,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                color = if (selectedJobType == jobType) Color(
+                                                    0xFF1ED292
+                                                ) else Color(0xFF757575),
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Enter year",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    DateButton(
+                                        LocalContext.current,
+                                        "Start Date",
+                                        startDate,
+                                        onDateSelected = { date ->
+                                            startDate = date
+                                        },
+                                        onDateSelectedInYMD = { dateInYMD ->
+                                            startDateInYMD = dateInYMD
+                                        })
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Text(
+                                        modifier = Modifier.weight(1f),
+                                        text = "To",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.W400,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFF757575),
+                                        textAlign = TextAlign.Center
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    DateButton(
+                                        LocalContext.current,
+                                        "End Date",
+                                        endDate,
+                                        onDateSelected = { date ->
+                                            endDate = date
+                                        },
+                                        onDateSelectedInYMD = { dateInYMD ->
+                                            endDateInYMD = dateInYMD
+                                        })
+                                }
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Description",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(158.dp)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFE4E7ED),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
+                                        ),
+                                    value = description,
+                                    onValueChange = {
+                                        description = it
+                                    },
+                                    placeholder = {
+                                        Text(
+                                            "Enter Description",
+                                            color = Color(0xFFBDBDBD),
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        )
+                                    },
+                                    textStyle = TextStyle(
+                                        textAlign = TextAlign.Start,
+                                        fontWeight = FontWeight.W400,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFF4A4A4A)
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        textColor = Color(0xFF4A4A4A),
+                                        backgroundColor = Color.Transparent,
+                                        cursorColor = Color(0xFF1ED292),
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboardController?.hide()
+                                        }
+                                    ),
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                Row(
+                                    verticalAlignment = Alignment.Bottom,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(bottom = 72.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(40.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFF1ED292),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                            .background(
+                                                color = Color(0xFF1ED292),
+                                                shape = MaterialTheme.shapes.medium
+                                            )
+                                            .clickable {
+                                                var validate =
+                                                    (position != "" && experienceLevel != "" && selectedJobType != "" && startDate != "")
+                                                if (validate) {
+                                                    scope.launch {
+                                                        viewModel.createPosition(position)
+                                                    }
+                                                } else {
+                                                    if (position == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please add Position!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    } else if (experienceLevel == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please add Experience Level!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    } else if (selectedJobType == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please choose Job Type!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    } else if (startDate == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please select Start Date!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            text = "Confirm",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFFFFFFFF),
+                                            fontSize = 14.sp,
+                                        )
+                                    }
+                                }
                             }
                         }
-
 
                     }
                 },
@@ -2310,6 +2691,34 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 }
 
 @Composable
+fun MultiStyleTextForAddExperience(text1: String, color1: Color, text2: String, color2: Color) {
+    Text(
+        buildAnnotatedString {
+            withStyle(
+                style = SpanStyle(
+                    color = color1,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp
+                )
+            ) {
+                append(text1)
+            }
+            withStyle(
+                style = SpanStyle(
+                    color = color2,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp
+                )
+            ) {
+                append(text2)
+            }
+        }
+    )
+}
+
+@Composable
 fun MultiStyleTextForCompleteProfile(text1: String, color1: Color, text2: String, color2: Color) {
     Text(
         buildAnnotatedString {
@@ -2397,4 +2806,120 @@ fun Overlap(
             )
         }
     }
+}
+
+@Composable
+fun DateButton(
+    context: Context,
+    label: String,
+    date: String,
+    onDateSelected: (String) -> Unit,
+    onDateSelectedInYMD: (String) -> Unit
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    OutlinedButton(
+        onClick = {
+            showDatePicker = true
+        },
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier
+            .height(40.dp)
+            .background(Color.Transparent)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.calendar),
+                contentDescription = "Calendar Icon",
+                modifier = Modifier
+                    .size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = if (date.isEmpty()) label else date,
+                color = if (date.isEmpty()) Color(0xFFBDBDBD) else Color(0xFF4A4A4A),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W400,
+                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+            )
+        }
+    }
+
+    if (showDatePicker) {
+        showDatePickerDialog(
+            context = context,
+            onDateSelected = { selectedDate ->
+                onDateSelected(selectedDate)
+                showDatePicker = false
+            },
+            onDateSelectedInYMD = { selectedDateInYMD ->
+                onDateSelectedInYMD(selectedDateInYMD)
+                showDatePicker = false
+            },
+            onDismissRequest = { showDatePicker = false }
+        )
+    }
+}
+
+@Composable
+fun showDatePickerDialog(
+    context: Context,
+    onDateSelected: (String) -> Unit,
+    onDateSelectedInYMD: (String) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    LaunchedEffect(Unit) {
+        val datePickerDialog = DatePickerDialog(
+            context,
+            { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
+                val selectedCalendar = Calendar.getInstance().apply {
+                    set(selectedYear, selectedMonth, selectedDayOfMonth)
+                }
+                val dateFormat = SimpleDateFormat("MMM yyyy", Locale.getDefault())
+                val formattedDate = dateFormat.format(selectedCalendar.time)
+                onDateSelected(formattedDate)
+
+                val dateFormatInYMD = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val formattedDateInYMD = dateFormatInYMD.format(selectedCalendar.time)
+                onDateSelectedInYMD(formattedDateInYMD)
+            },
+            year,
+            month,
+            day
+        )
+        datePickerDialog.setOnDismissListener { onDismissRequest() }
+        datePickerDialog.show()
+    }
+}
+
+fun calculateDateDifference(
+    startDateInput: Date,
+    endDateInput: Date,
+    callback: (Int, Int) -> Unit
+) {
+    val startCalendar = Calendar.getInstance()
+    startCalendar.time = startDateInput
+
+    val endCalendar = Calendar.getInstance()
+    endCalendar.time = endDateInput
+
+    var years = endCalendar[Calendar.YEAR] - startCalendar[Calendar.YEAR]
+    var months = endCalendar[Calendar.MONTH] - startCalendar[Calendar.MONTH]
+
+    if (months < 0) {
+        years--
+        months += 12
+    }
+
+    callback(years, months)
+
 }
