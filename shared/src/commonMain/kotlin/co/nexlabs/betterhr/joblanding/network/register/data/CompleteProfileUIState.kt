@@ -10,7 +10,7 @@ data class CompleteProfileUIState(
     val candidateData: CandidateUIModel = CandidateUIModel(
         "", "", "", "", "", "", "", "", "", "", "", "",
         FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),
-        emptyList(), emptyList()
+        emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList()
     ),
     val isSuccessUpdateSummary: Boolean = false,
     val isSuccessCreateCompany: Boolean = false,
@@ -19,5 +19,13 @@ data class CompleteProfileUIState(
     val isSuccessCreateExperience: Boolean = false,
     val isSuccessUpdateExperience: Boolean = false,
     val getPositionId: Boolean = false,
-    val positionId: String = ""
+    val positionId: String = "",
+    val isSuccessCreateEducation: Boolean = false,
+    val isSuccessUpdateEducation: Boolean = false,
+    val isSuccessCreateLanguage: Boolean = false,
+    val isSuccessUpdateLanguage: Boolean = false,
+    val isSuccessCreateSkill: Boolean = false,
+    val isSuccessUpdateSkill: Boolean = false,
+    val isSuccessCreateCertificate: Boolean = false,
+    val isSuccessUpdateCertificate: Boolean = false
 )

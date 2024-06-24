@@ -3,10 +3,14 @@ package co.nexlabs.betterhr.joblanding.viewmodel
 import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.type.File
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CandidateUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CertificateUIModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CompaniesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.EducationUIModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.ExperienceUIModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.FilesUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.LanguageUIModel
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.PositionUIModel
+import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.SkillUIModel
 import kotlin.math.exp
 
 object CandidateViewModelMapper {
@@ -191,6 +195,49 @@ object CandidateViewModelMapper {
             )
         }
 
+        var educationList = data.educations?.map { education ->
+            EducationUIModel(
+                education.id ?: "",
+                education.country_name,
+                education.institution ?: "",
+                education.education_level ?: "",
+                education.degree ?: "",
+                education.field_of_study ?: "",
+                education.start_date ?: "",
+                education.end_date ?: "",
+                education.is_current_study ?: false,
+                education.description ?: ""
+            )
+        }
+
+        var languageList = data.languages?.map { language ->
+            LanguageUIModel(
+                language.id ?: "",
+                language.name ?: "",
+                language.proficiency_level ?: ""
+            )
+        }
+
+        var skillList = data.skills?.map { skill ->
+            SkillUIModel(
+                skill.id ?: "",
+                skill.name ?: ""
+            )
+        }
+
+        var certificateList = data.certificates?.map { certificate ->
+            CertificateUIModel(
+                certificate.id ?: "",
+                certificate.candidate_id ?: "",
+                certificate.course_name ?: "",
+                certificate.issuing_organization ?: "",
+                certificate.issue_date ?: "",
+                certificate.expire_date ?: "",
+                certificate.is_expire ?: false,
+                certificate.credential_url ?: ""
+            )
+        }
+
         return CandidateUIModel(
             data.id ?: "",
             data.name,
@@ -206,7 +253,11 @@ object CandidateViewModelMapper {
             coverLetterFilePath,
             profile, cv, coverLetter,
             emptyList(),
-            companiesList ?: emptyList()
+            companiesList ?: emptyList(),
+            educationList ?: emptyList(),
+            languageList ?: emptyList(),
+            skillList ?: emptyList(),
+            certificateList ?: emptyList()
         )
     }
 }

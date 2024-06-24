@@ -17,7 +17,46 @@ data class CandidateUIModel(
     val cv: FilesUIModel,
     val coverLetter: FilesUIModel,
     val applications: List<ApplicationsUIModel>,
-    val companies: List<CompaniesUIModel>
+    val companies: List<CompaniesUIModel>,
+    val education: List<EducationUIModel>,
+    val language: List<LanguageUIModel>,
+    val skill: List<SkillUIModel>,
+    val certificate: List<CertificateUIModel>
+)
+
+data class CertificateUIModel(
+    val id: String,
+    val candidateId: String,
+    val courseName: String,
+    val issuingOrganization: String,
+    val issueDate: String,
+    val expireDate: String,
+    val isExpire: Boolean,
+    val credentialUrl: String
+)
+
+data class SkillUIModel(
+    val id: String,
+    val skillName: String
+)
+
+data class LanguageUIModel(
+    val id: String,
+    val languageName: String,
+    val proficiencyLevel: String
+)
+
+data class EducationUIModel(
+    val id: String,
+    val countryName: String,
+    val university: String,
+    val educationLevel: String,
+    val degree: String,
+    val fieldOfStudy: String,
+    val startDate: String,
+    val endDate: String,
+    val isCurrentStudying: Boolean,
+    val description: String
 )
 
 data class CompaniesUIModel(

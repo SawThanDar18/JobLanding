@@ -34,7 +34,7 @@ data class JobDetailUIState(
     val candidateData: CandidateUIModel = CandidateUIModel(
         "", "", "", "", "", "", "", "", "", "", "", "",
         FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),
-        emptyList(), emptyList()
+        emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList()
     ),
     val idFromProfileUpload: String = "",
     val idFromCreateApplication: String = "",
