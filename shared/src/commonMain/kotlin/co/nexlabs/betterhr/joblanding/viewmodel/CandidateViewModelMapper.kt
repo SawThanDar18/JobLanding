@@ -165,7 +165,7 @@ object CandidateViewModelMapper {
                         experience.title ?: "",
                         experience.location ?: "",
                         experience.experience_level ?: "",
-                        "",
+                        experience.employment_type ?: "",
                         experience.start_date ?: "",
                         experience.end_date ?: "",
                         experience.is_current_job ?: false,

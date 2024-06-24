@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -85,6 +86,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.AndroidFileUri
 import co.nexlabs.betterhr.joblanding.android.R
+import co.nexlabs.betterhr.joblanding.android.data.ConvertYMDToMY
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.CompaniesUIModel
@@ -93,6 +95,7 @@ import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.FilesUI
 import co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data.PositionUIModel
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.google.accompanist.glide.rememberGlidePainter
@@ -104,6 +107,15 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+
+data class UpdateExperienceData(
+    var position: String,
+    var experienceLevel: String,
+    var jobType: String,
+    var startDate: String,
+    var endDate: String,
+    var description: String
+)
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -125,6 +137,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var companiesList: MutableList<CompaniesUIModel> = ArrayList()
     var experienceList: MutableList<ExperienceUIModel> = ArrayList()
     val keyboardController = LocalSoftwareKeyboardController.current
+    var updateExperienceData by remember {
+        mutableStateOf(
+            UpdateExperienceData("", "", "", "", "", "")
+        )
+    }
+    var startDateData by remember { mutableStateOf("") }
+    var endDateData by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
@@ -138,6 +157,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var addSkillVisible by remember { mutableStateOf(false) }
     var addCertificationVisible by remember { mutableStateOf(false) }
 
+    var experienceIdForUpdateExperience by remember { mutableStateOf("") }
     var companyIdForAddExperience by remember { mutableStateOf("") }
 
     var position by remember { mutableStateOf("") }
@@ -151,6 +171,17 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var startDateInYMD by remember { mutableStateOf("") }
     var endDateInYMD by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+
+
+    var updatePosition by remember { mutableStateOf("") }
+    var updateExperienceLevel by remember { mutableStateOf("") }
+    var updateSelectedJobType by remember { mutableStateOf(jobTypes[0]) }
+
+    var updateStartDate by remember { mutableStateOf("") }
+    var updateEndDate by remember { mutableStateOf("") }
+    var updateStartDateInYMD by remember { mutableStateOf("") }
+    var updateEndDateInYMD by remember { mutableStateOf("") }
+    var updateDescription by remember { mutableStateOf("") }
 
     LaunchedEffect(refreshing) {
         if (refreshing) {
@@ -1002,7 +1033,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp)
                                             .fillMaxWidth(),
-                                        maxItemsInEachRow = 1,
+                                        maxItemsInEachRow = 3,
                                         horizontalArrangement = Arrangement.Start,
                                     ) {
 
@@ -1017,23 +1048,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                                             ) {
                                                 if (company.file.fullPath != "") {
-                                                    val imageRequest =
-                                                        remember(company.file.fullPath) {
-                                                            ImageRequest.Builder(applicationContext)
-                                                                .data(company.file.fullPath).build()
-                                                        }
 
-                                                    Image(
-                                                        painter = rememberImagePainter(
-                                                            request = imageRequest,
-                                                        ),
-                                                        contentDescription = "Company Logo Icon",
+                                                    AsyncImage(
+                                                        model = company.file.fullPath,
+                                                        contentDescription = "Profile Icon",
                                                         modifier = Modifier
                                                             .size(32.dp)
-                                                            .clip(CircleShape)
-                                                            .graphicsLayer {
-                                                                shape = CircleShape
-                                                            },
+                                                            .clip(CircleShape),
                                                         contentScale = ContentScale.Crop
                                                     )
                                                 } else {
@@ -1042,16 +1063,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                         contentDescription = "Profile Icon",
                                                         modifier = Modifier
                                                             .size(32.dp)
-                                                            .clip(CircleShape)
-                                                            .graphicsLayer {
-                                                                shape = CircleShape
-                                                            },
+                                                            .clip(CircleShape),
                                                         contentScale = ContentScale.Crop
                                                     )
                                                 }
 
                                                 Column(
-                                                    horizontalAlignment = Alignment.Start,
+                                                    verticalArrangement = Arrangement.spacedBy(4.dp)
                                                 ) {
                                                     Text(
                                                         text = company.name,
@@ -1070,7 +1088,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             fontSize = 12.sp,
                                                         )
                                                     } else {
-
                                                         experienceList.clear()
                                                         company.experience.map {
                                                             experienceList.add(
@@ -1095,65 +1112,280 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             )
                                                         }
 
-                                                        FlowRow(
-                                                            maxItemsInEachRow = 1,
-                                                            verticalArrangement = Arrangement.spacedBy(
-                                                                16.dp
+                                                        var experience = experienceList[index]
+
+                                                        var years by remember {
+                                                            mutableStateOf(
+                                                                0
                                                             )
-                                                        ) {
-                                                            repeat(experienceList.size) { index ->
-                                                                var experience =
-                                                                    experienceList[index]
+                                                        }
+                                                        var months by remember {
+                                                            mutableStateOf(
+                                                                0
+                                                            )
+                                                        }
 
-                                                                var years by remember {
-                                                                    mutableStateOf(
-                                                                        0
+                                                        if (experience.startDate != "0000:00:00 00:00:00") {
+                                                            if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate != "") {
+                                                                val sdf = SimpleDateFormat(
+                                                                    "yyyy-MM-dd",
+                                                                    Locale.US
+                                                                )
+                                                                val startDate =
+                                                                    sdf.parse(experience.startDate)
+                                                                val endDate =
+                                                                    sdf.parse(experience.endDate)
+
+                                                                calculateDateDifference(
+                                                                    startDate,
+                                                                    endDate
+                                                                ) { calculatedYears, calculatedMonths ->
+                                                                    years = calculatedYears
+                                                                    months = calculatedMonths
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (experience.startDate != "0000:00:00 00:00:00") {
+                                                            if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate != "") {
+                                                                val sdf = SimpleDateFormat(
+                                                                    "yyyy-MM-dd",
+                                                                    Locale.US
+                                                                )
+                                                                val startDate =
+                                                                    sdf.parse(experience.startDate)
+                                                                val endDate =
+                                                                    sdf.parse(experience.endDate)
+
+                                                                calculateDateDifference(
+                                                                    startDate,
+                                                                    endDate
+                                                                ) { calculatedYears, calculatedMonths ->
+                                                                    years = calculatedYears
+                                                                    months = calculatedMonths
+                                                                }
+                                                            }
+                                                        } else {
+                                                            years = 0
+                                                            months = 0
+                                                        }
+
+                                                        if (experience.startDate != "0000:00:00 00:00:00") {
+                                                            if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate == "") {
+                                                                years = 1
+                                                                months = 1
+                                                            }
+                                                        } else {
+                                                            years = 0
+                                                            months = 0
+                                                        }
+
+                                                        var dateDiff =
+                                                            if (years != 0 && months == 0) {
+                                                                "$years yr"
+                                                            } else if (months != 0 && years == 0) {
+                                                                "$months mo"
+                                                            } else if (years != 0 && months != 0) {
+                                                                "$years yr $months mo"
+                                                            } else if (years == 1 && months == 1) {
+                                                                "current working"
+                                                            } else {
+                                                                "--"
+                                                            }
+
+                                                        Text(
+                                                            text = dateDiff,
+                                                            fontFamily = FontFamily(
+                                                                Font(
+                                                                    R.font.poppins_regular
+                                                                )
+                                                            ),
+                                                            fontWeight = FontWeight.W500,
+                                                            color = Color(0xFF757575),
+                                                            fontSize = 12.sp,
+                                                        )
+                                                    }
+                                                }
+                                            }
+
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+
+                                                if (experienceList.isNotEmpty()) {
+                                                    FlowRow(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        maxItemsInEachRow = 1
+                                                    ) {
+                                                        repeat(experienceList.size) { index ->
+                                                            var experience = experienceList[index]
+
+                                                            Row(
+                                                                modifier = Modifier.fillMaxWidth(),
+                                                                horizontalArrangement = Arrangement.spacedBy(
+                                                                    16.dp
+                                                                )
+                                                            ) {
+
+                                                                Column {
+
+                                                                    Spacer(
+                                                                        modifier = Modifier.height(
+                                                                            16.dp
+                                                                        )
+                                                                    )
+
+                                                                    Box(
+                                                                        modifier = Modifier
+                                                                            .padding(start = 20.dp)
+                                                                            .size(8.dp)
+                                                                            .clip(CircleShape)
+                                                                            .background(
+                                                                                Color(
+                                                                                    0xFF1ED292
+                                                                                )
+                                                                            )
+                                                                    )
+
+                                                                    Box(
+                                                                        modifier = Modifier
+                                                                            .padding(start = 23.dp)
+                                                                            .width(1.dp)
+                                                                            .height(100.dp)
+                                                                            .background(
+                                                                                Color(
+                                                                                    0xFFE4E7ED
+                                                                                )
+                                                                            )
                                                                     )
                                                                 }
-                                                                var months by remember {
-                                                                    mutableStateOf(
-                                                                        0
-                                                                    )
-                                                                }
 
-                                                                if (experience.startDate == "0000-00-00 00:00:00" && experience.endDate == "0000-00-00 00:00:00") {
-                                                                    years = 0
-                                                                    months = 0
-                                                                } else if (experience.startDate == "0000-00-00 00:00:00" && experience.endDate == "") {
-                                                                    years = 0
-                                                                    months = 0
-                                                                } else if (experience.startDate != "0000-00-00 00:00:00" && experience.endDate != "0000-00-00 00:00:00"){
-                                                                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-                                                                    val startDate = sdf.parse(experience.startDate)
-                                                                    val endDate = sdf.parse(experience.endDate)
+                                                                Column {
 
-                                                                    calculateDateDifference(
-                                                                        startDate,
-                                                                        endDate
-                                                                    ) { calculatedYears, calculatedMonths ->
-                                                                        years = calculatedYears
-                                                                        months = calculatedMonths
+                                                                    var date by remember {
+                                                                        mutableStateOf(
+                                                                            ""
+                                                                        )
                                                                     }
-                                                                } else if ((experience.startDate != "0000-00-00 00:00:00" && experience.endDate == "")) {
-                                                                    years = 1
-                                                                    months = 1
-                                                                }
+                                                                    if (experience.startDate != "") {
+                                                                        if (experience.startDate != "0000-00-00 00:00:00") {
+                                                                            if (experience.endDate != "0000-00-00 00:00:00" && experience.endDate != "") {
+                                                                                date = "${
+                                                                                    ConvertYMDToMY(
+                                                                                        experience.startDate
+                                                                                    )
+                                                                                } - ${
+                                                                                    ConvertYMDToMY(
+                                                                                        experience.endDate
+                                                                                    )
+                                                                                }"
+                                                                            }
+                                                                        } else {
+                                                                            date = "--"
+                                                                        }
+                                                                    } else {
+                                                                        date = "--"
+                                                                    }
 
-                                                                var dateDiff = if (years != 0 && months == 0) {
-                                                                    "$years yr"
-                                                                } else if (months != 0 && years == 0) {
-                                                                    "$months mo"
-                                                                } else if (years != 0 && months != 0) {
-                                                                    "$years yr $months mo"
-                                                                } else if (years == 1 && months == 1) {
-                                                                    "current working"
-                                                                } else {
-                                                                    "--"
-                                                                }
+                                                                    if (experience.startDate != "") {
+                                                                        if (experience.startDate != "0000-00-00 00:00:00") {
+                                                                            if (experience.endDate != "0000-00-00 00:00:00" && experience.endDate == "") {
+                                                                                date = "${
+                                                                                    ConvertYMDToMY(
+                                                                                        experience.startDate
+                                                                                    )
+                                                                                } - Current"
+                                                                            }
+                                                                        } else {
+                                                                            date = "--"
+                                                                        }
+                                                                    } else {
+                                                                        date = "--"
+                                                                    }
 
-                                                                Column() {
+                                                                    Spacer(
+                                                                        modifier = Modifier.height(
+                                                                            14.dp
+                                                                        )
+                                                                    )
+
+                                                                    Row(
+                                                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                                                        modifier = Modifier.fillMaxWidth()
+                                                                    ) {
+                                                                        Text(
+                                                                            text = experience.title,
+                                                                            fontFamily = FontFamily(
+                                                                                Font(R.font.poppins_regular)
+                                                                            ),
+                                                                            fontWeight = FontWeight.W500,
+                                                                            color = Color(0xFF4A4A4A),
+                                                                            fontSize = 14.sp
+                                                                        )
+                                                                        Spacer(
+                                                                            modifier = Modifier.width(
+                                                                                8.dp
+                                                                            )
+                                                                        )
+                                                                        Image(
+                                                                            painter = painterResource(
+                                                                                id = R.drawable.edit
+                                                                            ),
+                                                                            contentDescription = "Edit Icon",
+                                                                            modifier = Modifier
+                                                                                .size(24.dp)
+                                                                                .clickable {
+                                                                                    updateExperiencePositionVisible =
+                                                                                        true
+
+                                                                                    if (experience.startDate != "") {
+                                                                                        if (experience.startDate != "0000-00-00 00:00:00" && experience.endDate != "0000-00-00 00:00:00") {
+                                                                                            startDateData =
+                                                                                                ConvertYMDToMY(
+                                                                                                    experience.startDate
+                                                                                                )
+                                                                                            endDateData =
+                                                                                                ConvertYMDToMY(
+                                                                                                    experience.endDate
+                                                                                                )
+                                                                                        }
+                                                                                    }
+
+                                                                                    if (experience.startDate != "") {
+                                                                                        if (experience.startDate != "0000-00-00 00:00:00" && experience.endDate == "") {
+                                                                                            startDateData =
+                                                                                                ConvertYMDToMY(
+                                                                                                    experience.startDate
+                                                                                                )
+                                                                                            endDateData =
+                                                                                                ""
+                                                                                        }
+                                                                                    }
+
+                                                                                    companyIdForAddExperience =
+                                                                                        company.id
+                                                                                    experienceIdForUpdateExperience =
+                                                                                        experience.id
+                                                                                    updatePosition =
+                                                                                        experience.title
+                                                                                    updateExperienceLevel =
+                                                                                        experience.experienceLevel
+                                                                                    updateSelectedJobType =
+                                                                                        experience.employmentType
+                                                                                    updateStartDate =
+                                                                                        startDateData
+                                                                                    updateEndDate =
+                                                                                        endDateData
+                                                                                    updateDescription =
+                                                                                        experience.description
+                                                                                },
+                                                                        )
+
+                                                                    }
+
                                                                     Text(
-                                                                        text = dateDiff,
+                                                                        modifier = Modifier.fillMaxWidth(),
+                                                                        text = experience.employmentType,
                                                                         fontFamily = FontFamily(
                                                                             Font(
                                                                                 R.font.poppins_regular
@@ -1161,38 +1393,102 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                                         ),
                                                                         fontWeight = FontWeight.W500,
                                                                         color = Color(0xFF757575),
-                                                                        fontSize = 12.sp,
+                                                                        fontSize = 12.sp
+                                                                    )
+
+                                                                    Text(
+                                                                        modifier = Modifier.fillMaxWidth(),
+                                                                        text = "Yangon, Myanmar",
+                                                                        fontFamily = FontFamily(
+                                                                            Font(
+                                                                                R.font.poppins_regular
+                                                                            )
+                                                                        ),
+                                                                        fontWeight = FontWeight.W500,
+                                                                        color = Color(0xFF757575),
+                                                                        fontSize = 12.sp
+                                                                    )
+
+                                                                    Text(
+                                                                        modifier = Modifier.fillMaxWidth(),
+                                                                        text = date,
+                                                                        fontFamily = FontFamily(
+                                                                            Font(
+                                                                                R.font.poppins_regular
+                                                                            )
+                                                                        ),
+                                                                        fontWeight = FontWeight.W500,
+                                                                        color = Color(0xFF757575),
+                                                                        fontSize = 12.sp
                                                                     )
 
                                                                     Spacer(
                                                                         modifier = Modifier.height(
-                                                                            8.dp
+                                                                            4.dp
                                                                         )
                                                                     )
-                                                                }
 
+                                                                    Row {
+                                                                        Text(
+                                                                            text = "Description : ",
+                                                                            fontFamily = FontFamily(
+                                                                                Font(
+                                                                                    R.font.poppins_regular
+                                                                                )
+                                                                            ),
+                                                                            fontWeight = FontWeight.W500,
+                                                                            color = Color(0xFF4A4A4A),
+                                                                            fontSize = 12.sp
+                                                                        )
+
+                                                                        Text(
+                                                                            text = experience.description,
+                                                                            fontFamily = FontFamily(
+                                                                                Font(
+                                                                                    R.font.poppins_regular
+                                                                                )
+                                                                            ),
+                                                                            fontWeight = FontWeight.W500,
+                                                                            color = Color(0xFF4A4A4A),
+                                                                            fontSize = 12.sp
+                                                                        )
+                                                                    }
+
+                                                                    Spacer(
+                                                                        modifier = Modifier.height(
+                                                                            16.dp
+                                                                        )
+                                                                    )
+
+                                                                }
                                                             }
+
                                                         }
                                                     }
-
-                                                    Text(
-                                                        text = "+ Add Position",
-                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                        fontWeight = FontWeight.W500,
-                                                        color = Color(0xFF42A5F5),
-                                                        fontSize = 12.sp,
-                                                        modifier = Modifier
-                                                            .padding(
-                                                                top = 8.dp, bottom = 16.dp
-                                                            )
-                                                            .clickable {
-                                                                addExperiencePositionVisible = true
-                                                                companyIdForAddExperience =
-                                                                    company.id
-                                                            }
-                                                    )
-
                                                 }
+                                            }
+
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "+ Add Position",
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W500,
+                                                    color = Color(0xFF42A5F5),
+                                                    fontSize = 12.sp,
+                                                    modifier = Modifier
+                                                        .padding(
+                                                            start = 48.dp,
+                                                            top = 8.dp,
+                                                            bottom = 16.dp
+                                                        )
+                                                        .clickable {
+                                                            addExperiencePositionVisible = true
+                                                            companyIdForAddExperience =
+                                                                company.id
+                                                        }
+                                                )
                                             }
                                         }
                                     }
@@ -1365,6 +1661,466 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                         }
                     }
                 }
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
+            .systemBarsPadding()
+    ) {
+
+        if (updateExperiencePositionVisible) {
+
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "Let’s add your experience",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF4A4A4A),
+                                fontSize = 16.sp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        updateExperiencePositionVisible = false
+                                    },
+                                alignment = Alignment.Center
+                            )
+                        }
+
+                        LazyColumn {
+                            item {
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Position",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "*",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(45.dp)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFE4E7ED),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
+                                        ),
+                                    value = updatePosition,
+                                    onValueChange = {
+                                        updatePosition = it
+                                    },
+                                    placeholder = {
+                                        Text(
+                                            "Enter Position",
+                                            color = Color(0xFFBDBDBD),
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        )
+                                    },
+                                    textStyle = TextStyle(
+                                        textAlign = TextAlign.Start,
+                                        fontWeight = FontWeight.W400,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFF4A4A4A)
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        textColor = Color(0xFF4A4A4A),
+                                        backgroundColor = Color.Transparent,
+                                        cursorColor = Color(0xFF1ED292),
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboardController?.hide()
+                                        }
+                                    ),
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Experience Level",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(45.dp)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFE4E7ED),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
+                                        ),
+                                    value = updateExperienceLevel,
+                                    onValueChange = {
+                                        updateExperienceLevel = it
+                                    },
+                                    placeholder = {
+                                        Text(
+                                            "Enter Level",
+                                            color = Color(0xFFBDBDBD),
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        )
+                                    },
+                                    textStyle = TextStyle(
+                                        textAlign = TextAlign.Start,
+                                        fontWeight = FontWeight.W400,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFF4A4A4A)
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        textColor = Color(0xFF4A4A4A),
+                                        backgroundColor = Color.Transparent,
+                                        cursorColor = Color(0xFF1ED292),
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboardController?.hide()
+                                        }
+                                    ),
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Job Type",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    items(jobTypes.size) { index ->
+                                        var jobType = jobTypes[index]
+
+                                        OutlinedButton(
+                                            onClick = { updateSelectedJobType = jobType },
+                                            colors = ButtonDefaults.outlinedButtonColors(
+                                                backgroundColor = Color.Transparent,
+                                                contentColor = if (updateSelectedJobType == jobType) Color(
+                                                    0xFF1ED292
+                                                ) else Color(0xFFE1E1E1)
+                                            ),
+                                            border = if (updateSelectedJobType == jobType) {
+                                                BorderStroke(2.dp, Color(0xFF1ED292))
+                                            } else {
+                                                BorderStroke(1.dp, Color(0xFFE1E1E1))
+                                            },
+                                            shape = RoundedCornerShape(4.dp),
+                                            modifier = Modifier.height(29.dp)
+                                        ) {
+                                            Text(
+                                                text = jobType,
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.W400,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                color = if (updateSelectedJobType == jobType) Color(
+                                                    0xFF1ED292
+                                                ) else Color(0xFF757575),
+                                            )
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Enter year",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    DateButton(
+                                        LocalContext.current,
+                                        "Start Date",
+                                        updateStartDate,
+                                        onDateSelected = { date ->
+                                            updateStartDate = date
+                                        },
+                                        onDateSelectedInYMD = { dateInYMD ->
+                                            updateStartDateInYMD = dateInYMD
+                                        })
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Text(
+                                        modifier = Modifier.weight(1f),
+                                        text = "To",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.W400,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFF757575),
+                                        textAlign = TextAlign.Center
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    DateButton(
+                                        LocalContext.current,
+                                        "End Date",
+                                        updateEndDate,
+                                        onDateSelected = { date ->
+                                            updateEndDate = date
+                                        },
+                                        onDateSelectedInYMD = { dateInYMD ->
+                                            updateEndDateInYMD = dateInYMD
+                                        })
+                                }
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Description",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                OutlinedTextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(158.dp)
+                                        .border(
+                                            1.dp,
+                                            Color(0xFFE4E7ED),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .background(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium
+                                        ),
+                                    value = updateDescription,
+                                    onValueChange = {
+                                        updateDescription = it
+                                    },
+                                    placeholder = {
+                                        Text(
+                                            "Enter Description",
+                                            color = Color(0xFFBDBDBD),
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        )
+                                    },
+                                    textStyle = TextStyle(
+                                        textAlign = TextAlign.Start,
+                                        fontWeight = FontWeight.W400,
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        color = Color(0xFF4A4A4A)
+                                    ),
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        textColor = Color(0xFF4A4A4A),
+                                        backgroundColor = Color.Transparent,
+                                        cursorColor = Color(0xFF1ED292),
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            keyboardController?.hide()
+                                        }
+                                    ),
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                Row(
+                                    verticalAlignment = Alignment.Bottom,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(bottom = 72.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(40.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFF1ED292),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                            .background(
+                                                color = Color(0xFF1ED292),
+                                                shape = MaterialTheme.shapes.medium
+                                            )
+                                            .clickable {
+
+                                                val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                                val inputFormat = SimpleDateFormat("MMM yyyy", Locale.getDefault())
+
+                                                if (updateStartDate != "") {
+                                                    if (updateStartDateInYMD == "") {
+                                                        val date: Date = inputFormat.parse(updateStartDate)
+                                                        updateStartDateInYMD =
+                                                            outputFormat.format(date)
+                                                    }
+                                                }
+
+                                                if (updateEndDate != "") {
+                                                    if (updateEndDateInYMD == "") {
+                                                        val date: Date = inputFormat.parse(updateEndDate)
+                                                        updateEndDateInYMD = outputFormat.format(date)
+                                                    }
+                                                }
+
+                                                var validate =
+                                                    (updatePosition != "" && updateExperienceLevel != "" && updateSelectedJobType != "" && updateStartDateInYMD != "")
+                                                if (validate) {
+                                                    scope.launch {
+                                                        viewModel.updateExperience(
+                                                            experienceIdForUpdateExperience,
+                                                            companyIdForAddExperience,
+                                                            updatePosition,
+                                                            "",
+                                                            updateExperienceLevel,
+                                                            updateSelectedJobType,
+                                                            updateStartDateInYMD,
+                                                            updateEndDateInYMD,
+                                                            if (updateEndDate == "") true else false,
+                                                            updateDescription
+                                                        )
+                                                    }
+                                                } else {
+                                                    if (updatePosition == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please add Position!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    } else if (updateExperienceLevel == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please add Experience Level!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    } else if (updateSelectedJobType == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please choose Job Type!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    } else if (updateStartDateInYMD == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please select Start Date!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            text = "Confirm",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFFFFFFFF),
+                                            fontSize = 14.sp,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                },
+                sheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                ),
+                sheetElevation = 16.dp,
+                sheetBackgroundColor = Color.White,
+                sheetContentColor = contentColorFor(Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                scrimColor = Color.Transparent
+            ) {
+
             }
         }
     }
