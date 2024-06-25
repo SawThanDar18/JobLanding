@@ -82,6 +82,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -249,10 +250,22 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var expireDate by remember { mutableStateOf("") }
     var issueDateInYMD by remember { mutableStateOf("") }
     var expireDateInYMD by remember { mutableStateOf("") }
-    var issueStartDateData by remember { mutableStateOf("") }
-    var expireEndDateData by remember { mutableStateOf("") }
+    var issueDateData by remember { mutableStateOf("") }
+    var expireDateData by remember { mutableStateOf("") }
     var isCredentialExpire by remember { mutableStateOf(false) }
     var credentialUrl by remember { mutableStateOf("") }
+
+    var certificateId by remember { mutableStateOf("") }
+    var updateCertificateName by remember { mutableStateOf("") }
+    var updateIssuingOrganization by remember { mutableStateOf("") }
+    var updateIssueDate by remember { mutableStateOf("") }
+    var updateExpireDate by remember { mutableStateOf("") }
+    var updateIssueDateInYMD by remember { mutableStateOf("") }
+    var updateExpireDateInYMD by remember { mutableStateOf("") }
+    var updateIsCredentialExpire by remember { mutableStateOf(false) }
+    var updateCredentialUrl by remember { mutableStateOf("") }
+
+    var uriHandler = LocalUriHandler.current
 
     LaunchedEffect(refreshing) {
         if (refreshing) {
@@ -1057,7 +1070,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     Spacer(modifier = Modifier.width(8.dp))
 
                                     Image(
-                                        painter = painterResource(id = R.drawable.upload_icon),
+                                        painter = painterResource(id = R.drawable.plus),
                                         contentDescription = "Plus Icon",
                                         modifier = Modifier
                                             .size(24.dp)
@@ -1147,7 +1160,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     Spacer(modifier = Modifier.width(8.dp))
 
                                     Image(
-                                        painter = painterResource(id = R.drawable.x),
+                                        painter = painterResource(id = R.drawable.plus),
                                         contentDescription = "Plus Icon",
                                         modifier = Modifier
                                             .size(24.dp),
@@ -1180,7 +1193,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         Spacer(modifier = Modifier.width(8.dp))
 
                                         Image(
-                                            painter = painterResource(id = R.drawable.x),
+                                            painter = painterResource(id = R.drawable.plus),
                                             contentDescription = "Plus Icon",
                                             modifier = Modifier
                                                 .size(24.dp)
@@ -1225,28 +1238,23 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             .clickable {
                                                                 updateEducationVisible = true
 
-                                                                if (education.startDate != "") {
-                                                                    if (education.startDate != "0000-00-00 00:00:00" && education.endDate != "0000-00-00 00:00:00") {
-                                                                        eduStartDateData =
-                                                                            ConvertYMDToMY(
-                                                                                education.startDate
-                                                                            )
-                                                                        eduEndDateData =
-                                                                            ConvertYMDToMY(
-                                                                                education.endDate
-                                                                            )
-                                                                    }
+                                                                if (education.startDate != "0000-00-00 00:00:00" && (education.endDate != "0000-00-00 00:00:00" && education.endDate != "")) {
+                                                                    eduStartDateData =
+                                                                        ConvertYMDToMY(
+                                                                            education.startDate
+                                                                        )
+                                                                    eduEndDateData =
+                                                                        ConvertYMDToMY(
+                                                                            education.endDate
+                                                                        )
                                                                 }
 
-                                                                if (education.startDate != "") {
-                                                                    if (education.startDate != "0000-00-00 00:00:00" && education.endDate == "") {
-                                                                        eduStartDateData =
-                                                                            ConvertYMDToMY(
-                                                                                education.startDate
-                                                                            )
-                                                                        eduEndDateData =
-                                                                            ""
-                                                                    }
+                                                                if (education.startDate != "0000-00-00 00:00:00" && education.endDate == "") {
+                                                                    eduStartDateData =
+                                                                        ConvertYMDToMY(
+                                                                            education.startDate
+                                                                        )
+                                                                    eduEndDateData = ""
                                                                 }
 
                                                                 educationId = education.id
@@ -1402,7 +1410,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     Spacer(modifier = Modifier.width(8.dp))
 
                                     Image(
-                                        painter = painterResource(id = R.drawable.x),
+                                        painter = painterResource(id = R.drawable.plus),
                                         contentDescription = "Plus Icon",
                                         modifier = Modifier
                                             .size(24.dp)
@@ -1437,7 +1445,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         Spacer(modifier = Modifier.width(8.dp))
 
                                         Image(
-                                            painter = painterResource(id = R.drawable.x),
+                                            painter = painterResource(id = R.drawable.plus),
                                             contentDescription = "Plus Icon",
                                             modifier = Modifier
                                                 .size(24.dp)
@@ -1759,7 +1767,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                                                         true
 
                                                                                     if (experience.startDate != "") {
-                                                                                        if (experience.startDate != "0000-00-00 00:00:00" && experience.endDate != "0000-00-00 00:00:00") {
+                                                                                        if (experience.startDate != "0000-00-00 00:00:00" && (experience.endDate != "0000-00-00 00:00:00" && experience.endDate != "")) {
                                                                                             startDateData =
                                                                                                 ConvertYMDToMY(
                                                                                                     experience.startDate
@@ -1948,7 +1956,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     Spacer(modifier = Modifier.width(8.dp))
 
                                     Image(
-                                        painter = painterResource(id = R.drawable.x),
+                                        painter = painterResource(id = R.drawable.plus),
                                         contentDescription = "Plus Icon",
                                         modifier = Modifier
                                             .size(24.dp),
@@ -1994,7 +2002,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             )
 
                                             Image(
-                                                painter = painterResource(id = R.drawable.x),
+                                                painter = painterResource(id = R.drawable.plus),
                                                 contentDescription = "Plus Icon",
                                                 modifier = Modifier
                                                     .size(24.dp)
@@ -2091,7 +2099,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     Spacer(modifier = Modifier.width(8.dp))
 
                                     Image(
-                                        painter = painterResource(id = R.drawable.x),
+                                        painter = painterResource(id = R.drawable.plus),
                                         contentDescription = "Plus Icon",
                                         modifier = Modifier
                                             .size(24.dp),
@@ -2137,7 +2145,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             )
 
                                             Image(
-                                                painter = painterResource(id = R.drawable.x),
+                                                painter = painterResource(id = R.drawable.plus),
                                                 contentDescription = "Plus Icon",
                                                 modifier = Modifier
                                                     .size(24.dp)
@@ -2163,7 +2171,9 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             ) {
 
                                                 Row(
-                                                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(start = 16.dp),
                                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                                 ) {
                                                     Box(
@@ -2220,7 +2230,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "Certificates",
+                                        text = "Certifications",
                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                         fontWeight = FontWeight.W600,
                                         color = Color(0xFF6A6A6A),
@@ -2230,7 +2240,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     Spacer(modifier = Modifier.width(8.dp))
 
                                     Image(
-                                        painter = painterResource(id = R.drawable.x),
+                                        painter = painterResource(id = R.drawable.plus),
                                         contentDescription = "Plus Icon",
                                         modifier = Modifier
                                             .size(24.dp),
@@ -2253,7 +2263,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "Certificates",
+                                            text = "Certifications",
                                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             fontWeight = FontWeight.W600,
                                             color = Color(0xFF6A6A6A),
@@ -2263,7 +2273,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         Spacer(modifier = Modifier.width(8.dp))
 
                                         Image(
-                                            painter = painterResource(id = R.drawable.x),
+                                            painter = painterResource(id = R.drawable.plus),
                                             contentDescription = "Plus Icon",
                                             modifier = Modifier
                                                 .size(24.dp)
@@ -2288,22 +2298,28 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             ) {
 
                                                 if (index != 0) {
+
+                                                    Spacer (modifier = Modifier.height(16.dp))
+
                                                     Box(
                                                         modifier = Modifier
                                                             .height(1.dp)
                                                             .fillMaxWidth()
-                                                            .background(color = Color(0xFF4A4A4A))
-                                                            .padding(bottom = 16.dp)
+                                                            .background(color = Color(0xFFE4E7ED))
                                                     )
+
+                                                    Spacer (modifier = Modifier.height(16.dp))
                                                 }
 
-                                                Row(modifier = Modifier.fillMaxWidth(),
-                                                    horizontalArrangement = Arrangement.SpaceBetween) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                ) {
                                                     Text(
                                                         text = certificate.courseName,
                                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                        fontWeight = FontWeight.W500,
-                                                        color = Color(0xFF4A4A4A),
+                                                        fontWeight = FontWeight.W400,
+                                                        color = Color(0xFF6A6A6A),
                                                         fontSize = 14.sp
                                                     )
                                                     Spacer(modifier = Modifier.width(8.dp))
@@ -2314,6 +2330,33 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             .size(24.dp)
                                                             .clickable {
                                                                 updateCertificateVisible = true
+
+                                                                if (certificate.issueDate != "0000-00-00 00:00:00" && (certificate.expireDate != "0000-00-00 00:00:00" && certificate.expireDate != "")) {
+                                                                    issueDateData =
+                                                                        ConvertYMDToMY(
+                                                                            certificate.issueDate
+                                                                        )
+                                                                    expireDateData =
+                                                                        ConvertYMDToMY(
+                                                                            certificate.expireDate
+                                                                        )
+                                                                }
+
+                                                                if (certificate.issueDate != "0000-00-00 00:00:00" && certificate.expireDate == "") {
+                                                                    issueDateData =
+                                                                        ConvertYMDToMY(
+                                                                            certificate.issueDate
+                                                                        )
+                                                                    expireDateData = ""
+                                                                }
+
+                                                                certificateId = certificate.id
+                                                                updateCertificateName = certificate.courseName
+                                                                updateIssuingOrganization = certificate.issuingOrganization
+                                                                updateIssueDate = issueDateData
+                                                                updateExpireDate = expireDateData
+                                                                updateIsCredentialExpire = certificate.isExpire
+                                                                updateCredentialUrl = certificate.credentialUrl
                                                             },
                                                     )
                                                 }
@@ -2323,21 +2366,52 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                 Text(
                                                     text = certificate.issuingOrganization,
                                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W500,
-                                                    color = Color(0xFF4A4A4A),
+                                                    fontWeight = FontWeight.W400,
+                                                    color = Color(0xFF757575),
                                                     fontSize = 14.sp
                                                 )
 
-                                                Spacer(modifier = Modifier.width(8.dp))
+                                                var issueDateInMY by remember {
+                                                    mutableStateOf(
+                                                        ""
+                                                    )
+                                                }
+                                                var expireDateInMY by remember {
+                                                    mutableStateOf(
+                                                        ""
+                                                    )
+                                                }
 
-                                                //fix date
-                                                Row(modifier = Modifier.fillMaxWidth(),
-                                                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                if (certificate.issueDate != "0000-00-00 00:00:00") {
+                                                    if (certificate.expireDate != "0000-00-00 00:00:00" && certificate.expireDate != "") {
+                                                        issueDateInMY = ConvertYMDToMY(certificate.issueDate)
+                                                        expireDateInMY = ConvertYMDToMY(certificate.expireDate)
+                                                    }
+                                                } else {
+                                                    issueDateInMY = "--"
+                                                    expireDateInMY = "--"
+                                                }
+
+                                                if (certificate.issueDate != "0000-00-00 00:00:00") {
+                                                    if (certificate.expireDate != "0000-00-00 00:00:00" && certificate.expireDate == "") {
+                                                        issueDateInMY = ConvertYMDToMY(certificate.issueDate)
+                                                        expireDateInMY = "No Expiration Date"
+                                                    }
+                                                } else {
+                                                    issueDateInMY = "--"
+                                                    expireDateInMY = "--"
+                                                }
+
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
                                                     Text(
-                                                        text = "Issued ${certificate.issueDate}",
+                                                        text = "Issued $issueDateInMY",
                                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                        fontWeight = FontWeight.W500,
-                                                        color = Color(0xFF4A4A4A),
+                                                        fontWeight = FontWeight.W400,
+                                                        color = Color(0xFF757575),
                                                         fontSize = 14.sp
                                                     )
                                                     Box(
@@ -2351,50 +2425,49 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             )
                                                     )
                                                     Text(
-                                                        text = "${certificate.expireDate}",
+                                                        text = "$expireDateInMY",
                                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                        fontWeight = FontWeight.W500,
-                                                        color = Color(0xFF4A4A4A),
+                                                        fontWeight = FontWeight.W400,
+                                                        color = Color(0xFF757575),
                                                         fontSize = 14.sp
                                                     )
                                                 }
-
-                                                Spacer(
-                                                    modifier = Modifier.height(
-                                                        16.dp
-                                                    )
-                                                )
 
                                                 if (certificate.credentialUrl != "") {
-                                                Row(modifier = Modifier.fillMaxWidth(),
-                                                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                                    Text(
-                                                        text = "Show credential",
-                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                        fontWeight = FontWeight.W500,
-                                                        color = Color(0xFF1690F3),
-                                                        fontSize = 14.sp
+
+                                                    Spacer(
+                                                        modifier = Modifier.height(
+                                                            16.dp
+                                                        )
                                                     )
 
-                                                    Image(
-                                                        painter = painterResource(id = R.drawable.arrow_right_up),
-                                                        contentDescription = "URL Link Icon",
-                                                        modifier = Modifier
-                                                            .size(24.dp)
+                                                    Row(
+                                                        modifier = Modifier.fillMaxWidth()
                                                             .clickable {
-                                                                //go to browser
+                                                                uriHandler.openUri(certificate.credentialUrl)
                                                             },
-                                                    )
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        ),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Text(
+                                                            text = "Show credential",
+                                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                            fontWeight = FontWeight.W400,
+                                                            color = Color(0xFF1082DE),
+                                                            fontSize = 14.sp
+                                                        )
 
+                                                        Image(
+                                                            painter = painterResource(id = R.drawable.link_url),
+                                                            contentDescription = "URL Link Icon",
+                                                            modifier = Modifier
+                                                                .size(16.dp),
+                                                        )
+
+                                                    }
                                                 }
-                                             }
-
-                                                Spacer(
-                                                    modifier = Modifier.height(
-                                                        24.dp
-                                                    )
-                                                )
-
                                             }
                                         }
                                     }
@@ -2414,6 +2487,491 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                         }
                     }
                 }
+            }
+        }
+    }
+
+    //update certificate
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
+            .systemBarsPadding()
+    ) {
+
+        if (updateCertificateVisible) {
+
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "Let’s add your certifications",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF4A4A4A),
+                                fontSize = 16.sp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        updateCertificateVisible = false
+                                    },
+                                alignment = Alignment.Center
+                            )
+                        }
+
+                        LazyColumn {
+                            item {
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Indicated required",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "*",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                Text(
+                                    text = "Tell employer about your certifications",
+                                    color = Color(0xFF6A6A6A),
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                )
+
+                                Column {
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Name",
+                                        color1 = Color(0xFF6A6A6A),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    OutlinedTextField(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(45.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFE4E7ED),
+                                                RoundedCornerShape(4.dp)
+                                            )
+                                            .background(
+                                                color = Color.Transparent,
+                                                shape = MaterialTheme.shapes.medium
+                                            ),
+                                        value = updateCertificateName,
+                                        onValueChange = {
+                                            updateCertificateName = it
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                "Enter certificate name",
+                                                color = Color(0xFFBDBDBD),
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            )
+                                        },
+                                        textStyle = TextStyle(
+                                            textAlign = TextAlign.Start,
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            color = Color(0xFF4A4A4A)
+                                        ),
+                                        colors = TextFieldDefaults.textFieldColors(
+                                            textColor = Color(0xFF4A4A4A),
+                                            backgroundColor = Color.Transparent,
+                                            cursorColor = Color(0xFF1ED292),
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        ),
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Text,
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
+                                            }
+                                        ),
+                                    )
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Issuing organization",
+                                        color1 = Color(0xFF6A6A6A),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    OutlinedTextField(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(45.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFE4E7ED),
+                                                RoundedCornerShape(4.dp)
+                                            )
+                                            .background(
+                                                color = Color.Transparent,
+                                                shape = MaterialTheme.shapes.medium
+                                            ),
+                                        value = updateIssuingOrganization,
+                                        onValueChange = {
+                                            updateIssuingOrganization = it
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                "Enter issuing organization",
+                                                color = Color(0xFFBDBDBD),
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            )
+                                        },
+                                        textStyle = TextStyle(
+                                            textAlign = TextAlign.Start,
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            color = Color(0xFF4A4A4A)
+                                        ),
+                                        colors = TextFieldDefaults.textFieldColors(
+                                            textColor = Color(0xFF4A4A4A),
+                                            backgroundColor = Color.Transparent,
+                                            cursorColor = Color(0xFF1ED292),
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        ),
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Text,
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
+                                            }
+                                        ),
+                                    )
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Issue date",
+                                        color1 = Color(0xFF6A6A6A),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    DateButtonWithTrailingIcon(
+                                        LocalContext.current,
+                                        "Issue Date",
+                                        updateIssueDate,
+                                        onDateSelected = { date ->
+                                            updateIssueDate = date
+                                        },
+                                        onDateSelectedInYMD = { dateInYMD ->
+                                            updateIssueDateInYMD = dateInYMD
+                                        }, false
+                                    )
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Expiration date",
+                                        color1 = if (isCredentialExpire) Color(0xFFD9D9D9) else Color(
+                                            0xFF6A6A6A
+                                        ),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    DateButtonWithTrailingIcon(
+                                        LocalContext.current,
+                                        "Expiration Date",
+                                        updateExpireDate,
+                                        onDateSelected = { date ->
+                                            updateExpireDate =
+                                                if (updateIsCredentialExpire) "" else date
+                                        },
+                                        onDateSelectedInYMD = { dateInYMD ->
+                                            updateExpireDateInYMD =
+                                                if (updateIsCredentialExpire) "" else dateInYMD
+                                        }, false
+                                    )
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Row(
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(start = 4.dp)
+                                    ) {
+                                        Checkbox(
+                                            checked = updateIsCredentialExpire,
+                                            onCheckedChange = { updateIsCredentialExpire = it },
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = Color(0xFF1ED292),
+                                                uncheckedColor = Color(0xFFE4E7ED),
+                                                checkmarkColor = Color.White
+                                            ),
+                                            modifier = Modifier.padding(end = 4.dp)
+                                        )
+
+                                        Text(
+                                            text = "This credential does not expire",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFFA7BAC5),
+                                            fontSize = 12.sp
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Credential URL",
+                                        color1 = Color(0xFF6A6A6A),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    OutlinedTextField(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(45.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFE4E7ED),
+                                                RoundedCornerShape(4.dp)
+                                            )
+                                            .background(
+                                                color = Color.Transparent,
+                                                shape = MaterialTheme.shapes.medium
+                                            ),
+                                        value = updateCredentialUrl,
+                                        onValueChange = {
+                                            updateCredentialUrl = it
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                "Enter credential URL",
+                                                color = Color(0xFFBDBDBD),
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            )
+                                        },
+                                        textStyle = TextStyle(
+                                            textAlign = TextAlign.Start,
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            color = Color(0xFF4A4A4A)
+                                        ),
+                                        colors = TextFieldDefaults.textFieldColors(
+                                            textColor = Color(0xFF4A4A4A),
+                                            backgroundColor = Color.Transparent,
+                                            cursorColor = Color(0xFF1ED292),
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        ),
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Text,
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
+                                            }
+                                        ),
+                                        trailingIcon = {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.profile_name),
+                                                contentDescription = "URL Icon",
+                                                modifier = Modifier
+                                                    .size(16.dp)
+                                            )
+                                        },
+                                    )
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                }
+
+                                /*Text(
+                                    text = "+ Add more certifications",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFF1ED292),
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.fillMaxWidth().clickable {
+                                        addMoreSkillItem += 1
+                                    }
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))*/
+
+                                Row(
+                                    verticalAlignment = Alignment.Bottom,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(bottom = 72.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(40.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFF1ED292),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                            .background(
+                                                color = Color(0xFF1ED292),
+                                                shape = MaterialTheme.shapes.medium
+                                            )
+                                            .clickable {
+
+                                                var validate =
+                                                    (updateCertificateName != "" && updateIssuingOrganization != "" && updateIssueDate != "")
+
+                                                if (validate) {
+                                                    val outputFormat = SimpleDateFormat(
+                                                        "yyyy-MM-dd",
+                                                        Locale.getDefault()
+                                                    )
+                                                    val inputFormat = SimpleDateFormat(
+                                                        "MMM yyyy",
+                                                        Locale.getDefault()
+                                                    )
+
+                                                    if (updateIssueDate != "") {
+                                                        if (updateIssueDateInYMD == "") {
+                                                            val date: Date =
+                                                                inputFormat.parse(
+                                                                    updateIssueDate
+                                                                )
+                                                            updateIssueDateInYMD =
+                                                                outputFormat.format(date)
+                                                        }
+                                                    }
+
+                                                    if (updateExpireDate != "") {
+                                                        if (updateExpireDateInYMD == "") {
+                                                            val date: Date =
+                                                                inputFormat.parse(
+                                                                    updateExpireDate
+                                                                )
+                                                            updateExpireDateInYMD =
+                                                                outputFormat.format(date)
+                                                        }
+                                                    }
+
+                                                    scope.launch {
+                                                        viewModel.updateCertificate(
+                                                            certificateId,
+                                                            updateCertificateName,
+                                                            updateIssuingOrganization,
+                                                            updateIssueDateInYMD,
+                                                            updateExpireDateInYMD,
+                                                            updateIsCredentialExpire,
+                                                            updateCredentialUrl
+                                                        )
+                                                    }
+                                                } else {
+                                                    if (updateCertificateName == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please add Certificate Name!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    } else if (updateIssuingOrganization == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please add Issuing organization!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    } else if (updateIssueDate == "") {
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Please select issue date!",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+                                                    }
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            text = "Update certifications",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFFFFFFFF),
+                                            fontSize = 14.sp,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                },
+                sheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                ),
+                sheetElevation = 16.dp,
+                sheetBackgroundColor = Color.White,
+                sheetContentColor = contentColorFor(Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                scrimColor = Color.Transparent
+            ) {
+
             }
         }
     }
@@ -2484,282 +3042,279 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                 )
 
-                                FlowRow(
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    repeat(addMoreLanguageItem) { index ->
+                                Column {
+                                    Spacer(modifier = Modifier.height(24.dp))
 
-                                        Column {
-                                            Spacer(modifier = Modifier.height(24.dp))
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Name",
+                                        color1 = Color(0xFF6A6A6A),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
 
-                                            MultiStyleTextForAddExperience(
-                                                text1 = "Name",
-                                                color1 = Color(0xFF6A6A6A),
-                                                text2 = "",
-                                                color2 = Color(0xFF6A6A6A)
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    OutlinedTextField(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(45.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFE4E7ED),
+                                                RoundedCornerShape(4.dp)
                                             )
-
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            OutlinedTextField(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(45.dp)
-                                                    .border(
-                                                        1.dp,
-                                                        Color(0xFFE4E7ED),
-                                                        RoundedCornerShape(4.dp)
-                                                    )
-                                                    .background(
-                                                        color = Color.Transparent,
-                                                        shape = MaterialTheme.shapes.medium
-                                                    ),
-                                                value = certificateName,
-                                                onValueChange = {
-                                                    certificateName = it
-                                                },
-                                                placeholder = {
-                                                    Text(
-                                                        "Enter certificate name",
-                                                        color = Color(0xFFBDBDBD),
-                                                        fontWeight = FontWeight.W400,
-                                                        fontSize = 14.sp,
-                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    )
-                                                },
-                                                textStyle = TextStyle(
-                                                    textAlign = TextAlign.Start,
-                                                    fontWeight = FontWeight.W400,
-                                                    fontSize = 14.sp,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    color = Color(0xFF4A4A4A)
-                                                ),
-                                                colors = TextFieldDefaults.textFieldColors(
-                                                    textColor = Color(0xFF4A4A4A),
-                                                    backgroundColor = Color.Transparent,
-                                                    cursorColor = Color(0xFF1ED292),
-                                                    focusedIndicatorColor = Color.Transparent,
-                                                    unfocusedIndicatorColor = Color.Transparent
-                                                ),
-                                                keyboardOptions = KeyboardOptions(
-                                                    keyboardType = KeyboardType.Text,
-                                                    imeAction = ImeAction.Done
-                                                ),
-                                                keyboardActions = KeyboardActions(
-                                                    onDone = {
-                                                        keyboardController?.hide()
-                                                    }
-                                                ),
+                                            .background(
+                                                color = Color.Transparent,
+                                                shape = MaterialTheme.shapes.medium
+                                            ),
+                                        value = certificateName,
+                                        onValueChange = {
+                                            certificateName = it
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                "Enter certificate name",
+                                                color = Color(0xFFBDBDBD),
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             )
-
-                                            Spacer(modifier = Modifier.height(24.dp))
-
-                                            MultiStyleTextForAddExperience(
-                                                text1 = "Issuing organization",
-                                                color1 = Color(0xFF6A6A6A),
-                                                text2 = "",
-                                                color2 = Color(0xFF6A6A6A)
-                                            )
-
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            OutlinedTextField(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(45.dp)
-                                                    .border(
-                                                        1.dp,
-                                                        Color(0xFFE4E7ED),
-                                                        RoundedCornerShape(4.dp)
-                                                    )
-                                                    .background(
-                                                        color = Color.Transparent,
-                                                        shape = MaterialTheme.shapes.medium
-                                                    ),
-                                                value = issuingOrganization,
-                                                onValueChange = {
-                                                    issuingOrganization = it
-                                                },
-                                                placeholder = {
-                                                    Text(
-                                                        "Enter issuing organization",
-                                                        color = Color(0xFFBDBDBD),
-                                                        fontWeight = FontWeight.W400,
-                                                        fontSize = 14.sp,
-                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    )
-                                                },
-                                                textStyle = TextStyle(
-                                                    textAlign = TextAlign.Start,
-                                                    fontWeight = FontWeight.W400,
-                                                    fontSize = 14.sp,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    color = Color(0xFF4A4A4A)
-                                                ),
-                                                colors = TextFieldDefaults.textFieldColors(
-                                                    textColor = Color(0xFF4A4A4A),
-                                                    backgroundColor = Color.Transparent,
-                                                    cursorColor = Color(0xFF1ED292),
-                                                    focusedIndicatorColor = Color.Transparent,
-                                                    unfocusedIndicatorColor = Color.Transparent
-                                                ),
-                                                keyboardOptions = KeyboardOptions(
-                                                    keyboardType = KeyboardType.Text,
-                                                    imeAction = ImeAction.Done
-                                                ),
-                                                keyboardActions = KeyboardActions(
-                                                    onDone = {
-                                                        keyboardController?.hide()
-                                                    }
-                                                ),
-                                            )
-
-                                            Spacer(modifier = Modifier.height(24.dp))
-
-                                            MultiStyleTextForAddExperience(
-                                                text1 = "Issue date",
-                                                color1 = Color(0xFF6A6A6A),
-                                                text2 = "",
-                                                color2 = Color(0xFF6A6A6A)
-                                            )
-
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            DateButton(
-                                                LocalContext.current,
-                                                "Issue Date",
-                                                issueDate,
-                                                onDateSelected = { date ->
-                                                    issueDate = date
-                                                },
-                                                onDateSelectedInYMD = { dateInYMD ->
-                                                    issueDateInYMD = dateInYMD
-                                                }, false
-                                            )
-
-                                            Spacer(modifier = Modifier.height(24.dp))
-
-                                            MultiStyleTextForAddExperience(
-                                                text1 = "Expiration date",
-                                                color1 = if(isCredentialExpire) Color(0xFFD9D9D9) else Color(0xFF6A6A6A),
-                                                text2 = "",
-                                                color2 = Color(0xFF6A6A6A)
-                                            )
-
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            DateButton(
-                                                LocalContext.current,
-                                                "Expiration Date",
-                                                expireDate,
-                                                onDateSelected = { date ->
-                                                    expireDate = if (isCredentialExpire) "" else date
-                                                },
-                                                onDateSelectedInYMD = { dateInYMD ->
-                                                    expireDateInYMD = if (isCredentialExpire) "" else dateInYMD
-                                                }, false
-                                            )
-
-                                            Spacer(modifier = Modifier.height(24.dp))
-
-                                            Row(
-                                                horizontalArrangement = Arrangement.Start,
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                modifier = Modifier.padding(start = 4.dp)
-                                            ) {
-                                                Checkbox(
-                                                    checked = isCredentialExpire,
-                                                    onCheckedChange = { isCredentialExpire = it },
-                                                    colors = CheckboxDefaults.colors(
-                                                        checkedColor = Color(0xFF1ED292),
-                                                        uncheckedColor = Color(0xFFE4E7ED),
-                                                        checkmarkColor = Color.White
-                                                    ),
-                                                    modifier = Modifier.padding(end = 4.dp)
-                                                )
-
-                                                Text(
-                                                    text = "This credential does not expire",
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W400,
-                                                    color = Color(0xFFA7BAC5),
-                                                    fontSize = 12.sp
-                                                )
+                                        },
+                                        textStyle = TextStyle(
+                                            textAlign = TextAlign.Start,
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            color = Color(0xFF4A4A4A)
+                                        ),
+                                        colors = TextFieldDefaults.textFieldColors(
+                                            textColor = Color(0xFF4A4A4A),
+                                            backgroundColor = Color.Transparent,
+                                            cursorColor = Color(0xFF1ED292),
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        ),
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Text,
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
                                             }
+                                        ),
+                                    )
 
-                                            Spacer(modifier = Modifier.height(24.dp))
+                                    Spacer(modifier = Modifier.height(24.dp))
 
-                                            MultiStyleTextForAddExperience(
-                                                text1 = "Credential URL",
-                                                color1 = Color(0xFF6A6A6A),
-                                                text2 = "",
-                                                color2 = Color(0xFF6A6A6A)
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Issuing organization",
+                                        color1 = Color(0xFF6A6A6A),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    OutlinedTextField(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(45.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFE4E7ED),
+                                                RoundedCornerShape(4.dp)
                                             )
-
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            OutlinedTextField(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(45.dp)
-                                                    .border(
-                                                        1.dp,
-                                                        Color(0xFFE4E7ED),
-                                                        RoundedCornerShape(4.dp)
-                                                    )
-                                                    .background(
-                                                        color = Color.Transparent,
-                                                        shape = MaterialTheme.shapes.medium
-                                                    ),
-                                                value = credentialUrl,
-                                                onValueChange = {
-                                                    credentialUrl = it
-                                                },
-                                                placeholder = {
-                                                    Text(
-                                                        "Enter credential URL",
-                                                        color = Color(0xFFBDBDBD),
-                                                        fontWeight = FontWeight.W400,
-                                                        fontSize = 14.sp,
-                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    )
-                                                },
-                                                textStyle = TextStyle(
-                                                    textAlign = TextAlign.Start,
-                                                    fontWeight = FontWeight.W400,
-                                                    fontSize = 14.sp,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    color = Color(0xFF4A4A4A)
-                                                ),
-                                                colors = TextFieldDefaults.textFieldColors(
-                                                    textColor = Color(0xFF4A4A4A),
-                                                    backgroundColor = Color.Transparent,
-                                                    cursorColor = Color(0xFF1ED292),
-                                                    focusedIndicatorColor = Color.Transparent,
-                                                    unfocusedIndicatorColor = Color.Transparent
-                                                ),
-                                                keyboardOptions = KeyboardOptions(
-                                                    keyboardType = KeyboardType.Text,
-                                                    imeAction = ImeAction.Done
-                                                ),
-                                                keyboardActions = KeyboardActions(
-                                                    onDone = {
-                                                        keyboardController?.hide()
-                                                    }
-                                                ),
-                                                trailingIcon = {
-                                                    Image(
-                                                        painter = painterResource(id = R.drawable.profile_name),
-                                                        contentDescription = "URL Icon",
-                                                        modifier = Modifier
-                                                            .size(16.dp)
-                                                    )
-                                                },
+                                            .background(
+                                                color = Color.Transparent,
+                                                shape = MaterialTheme.shapes.medium
+                                            ),
+                                        value = issuingOrganization,
+                                        onValueChange = {
+                                            issuingOrganization = it
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                "Enter issuing organization",
+                                                color = Color(0xFFBDBDBD),
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             )
+                                        },
+                                        textStyle = TextStyle(
+                                            textAlign = TextAlign.Start,
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            color = Color(0xFF4A4A4A)
+                                        ),
+                                        colors = TextFieldDefaults.textFieldColors(
+                                            textColor = Color(0xFF4A4A4A),
+                                            backgroundColor = Color.Transparent,
+                                            cursorColor = Color(0xFF1ED292),
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        ),
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Text,
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
+                                            }
+                                        ),
+                                    )
 
-                                            Spacer(modifier = Modifier.height(24.dp))
-                                        }
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Issue date",
+                                        color1 = Color(0xFF6A6A6A),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    DateButtonWithTrailingIcon(
+                                        LocalContext.current,
+                                        "Issue Date",
+                                        issueDate,
+                                        onDateSelected = { date ->
+                                            issueDate = date
+                                        },
+                                        onDateSelectedInYMD = { dateInYMD ->
+                                            issueDateInYMD = dateInYMD
+                                        }, false
+                                    )
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Expiration date",
+                                        color1 = if (isCredentialExpire) Color(0xFFD9D9D9) else Color(
+                                            0xFF6A6A6A
+                                        ),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    DateButtonWithTrailingIcon(
+                                        LocalContext.current,
+                                        "Expiration Date",
+                                        expireDate,
+                                        onDateSelected = { date ->
+                                            expireDate =
+                                                if (isCredentialExpire) "" else date
+                                        },
+                                        onDateSelectedInYMD = { dateInYMD ->
+                                            expireDateInYMD =
+                                                if (isCredentialExpire) "" else dateInYMD
+                                        }, false
+                                    )
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Row(
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(start = 4.dp)
+                                    ) {
+                                        Checkbox(
+                                            checked = isCredentialExpire,
+                                            onCheckedChange = { isCredentialExpire = it },
+                                            colors = CheckboxDefaults.colors(
+                                                checkedColor = Color(0xFF1ED292),
+                                                uncheckedColor = Color(0xFFE4E7ED),
+                                                checkmarkColor = Color.White
+                                            ),
+                                            modifier = Modifier.padding(end = 4.dp)
+                                        )
+
+                                        Text(
+                                            text = "This credential does not expire",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFFA7BAC5),
+                                            fontSize = 12.sp
+                                        )
                                     }
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+
+                                    MultiStyleTextForAddExperience(
+                                        text1 = "Credential URL",
+                                        color1 = Color(0xFF6A6A6A),
+                                        text2 = "",
+                                        color2 = Color(0xFF6A6A6A)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    OutlinedTextField(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(45.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFFE4E7ED),
+                                                RoundedCornerShape(4.dp)
+                                            )
+                                            .background(
+                                                color = Color.Transparent,
+                                                shape = MaterialTheme.shapes.medium
+                                            ),
+                                        value = credentialUrl,
+                                        onValueChange = {
+                                            credentialUrl = it
+                                        },
+                                        placeholder = {
+                                            Text(
+                                                "Enter credential URL",
+                                                color = Color(0xFFBDBDBD),
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            )
+                                        },
+                                        textStyle = TextStyle(
+                                            textAlign = TextAlign.Start,
+                                            fontWeight = FontWeight.W400,
+                                            fontSize = 14.sp,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            color = Color(0xFF4A4A4A)
+                                        ),
+                                        colors = TextFieldDefaults.textFieldColors(
+                                            textColor = Color(0xFF4A4A4A),
+                                            backgroundColor = Color.Transparent,
+                                            cursorColor = Color(0xFF1ED292),
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        ),
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Text,
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
+                                            }
+                                        ),
+                                        trailingIcon = {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.profile_name),
+                                                contentDescription = "URL Icon",
+                                                modifier = Modifier
+                                                    .size(16.dp)
+                                            )
+                                        },
+                                    )
+
+                                    Spacer(modifier = Modifier.height(24.dp))
                                 }
 
                                 /*Text(
@@ -2796,17 +3351,17 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             )
                                             .clickable {
 
-                                                var validate = (certificateName != "" && issuingOrganization != ""
-                                                        && issueDate != "")
+                                                var validate =
+                                                    (certificateName != "" && issuingOrganization != "" && issueDateInYMD != "")
 
                                                 if (validate) {
                                                     scope.launch {
                                                         viewModel.createCertificate(
                                                             certificateName,
                                                             issuingOrganization,
-                                                            issueDate,
-                                                            expireDate,
-                                                            if(expireDate == "") true else false,
+                                                            issueDateInYMD,
+                                                            expireDateInYMD,
+                                                            isCredentialExpire,
                                                             credentialUrl
                                                         )
                                                     }
@@ -2827,7 +3382,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                                 Toast.LENGTH_LONG
                                                             )
                                                             .show()
-                                                    } else if (issueDate == "") {
+                                                    } else if (issueDateInYMD == "") {
                                                         Toast
                                                             .makeText(
                                                                 applicationContext,
@@ -2949,7 +3504,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             Spacer(modifier = Modifier.height(24.dp))
 
                                             MultiStyleTextForAddExperience(
-                                                text1 = "Skill ${index+1}",
+                                                text1 = "Skill ${index + 1}",
                                                 color1 = Color(0xFF757575),
                                                 text2 = "",
                                                 color2 = Color(0xFF757575)
@@ -3019,9 +3574,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     fontWeight = FontWeight.W400,
                                     color = Color(0xFF1ED292),
                                     fontSize = 14.sp,
-                                    modifier = Modifier.fillMaxWidth().clickable {
-                                        addMoreSkillItem += 1
-                                    }
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            addMoreSkillItem += 1
+                                        }
                                 )
 
                                 Spacer(modifier = Modifier.height(24.dp))
@@ -3056,13 +3613,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                         )
                                                     }
                                                 } else {
-                                                        Toast
-                                                            .makeText(
-                                                                applicationContext,
-                                                                "Please add Skill Name!",
-                                                                Toast.LENGTH_LONG
-                                                            )
-                                                            .show()
+                                                    Toast
+                                                        .makeText(
+                                                            applicationContext,
+                                                            "Please add Skill Name!",
+                                                            Toast.LENGTH_LONG
+                                                        )
+                                                        .show()
                                                 }
                                             },
                                         contentAlignment = Alignment.Center,
@@ -3172,133 +3729,133 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 ) {
                                     repeat(addMoreLanguageItem) { index ->
 
-                                    Column {
-                                        Spacer(modifier = Modifier.height(24.dp))
+                                        Column {
+                                            Spacer(modifier = Modifier.height(24.dp))
 
-                                        MultiStyleTextForAddExperience(
-                                            text1 = "Language",
-                                            color1 = Color(0xFF757575),
-                                            text2 = "",
-                                            color2 = Color(0xFF757575)
-                                        )
+                                            MultiStyleTextForAddExperience(
+                                                text1 = "Language",
+                                                color1 = Color(0xFF757575),
+                                                text2 = "",
+                                                color2 = Color(0xFF757575)
+                                            )
 
-                                        Spacer(modifier = Modifier.height(4.dp))
+                                            Spacer(modifier = Modifier.height(4.dp))
 
-                                        OutlinedTextField(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(45.dp)
-                                                .border(
-                                                    1.dp,
-                                                    Color(0xFFE4E7ED),
-                                                    RoundedCornerShape(4.dp)
-                                                )
-                                                .background(
-                                                    color = Color.Transparent,
-                                                    shape = MaterialTheme.shapes.medium
-                                                ),
-                                            value = languageName,
-                                            onValueChange = {
-                                                languageName = it
-                                            },
-                                            placeholder = {
-                                                Text(
-                                                    "Enter language",
-                                                    color = Color(0xFFBDBDBD),
+                                            OutlinedTextField(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(45.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFE4E7ED),
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                value = languageName,
+                                                onValueChange = {
+                                                    languageName = it
+                                                },
+                                                placeholder = {
+                                                    Text(
+                                                        "Enter language",
+                                                        color = Color(0xFFBDBDBD),
+                                                        fontWeight = FontWeight.W400,
+                                                        fontSize = 14.sp,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    )
+                                                },
+                                                textStyle = TextStyle(
+                                                    textAlign = TextAlign.Start,
                                                     fontWeight = FontWeight.W400,
                                                     fontSize = 14.sp,
                                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                )
-                                            },
-                                            textStyle = TextStyle(
-                                                textAlign = TextAlign.Start,
-                                                fontWeight = FontWeight.W400,
-                                                fontSize = 14.sp,
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                color = Color(0xFF4A4A4A)
-                                            ),
-                                            colors = TextFieldDefaults.textFieldColors(
-                                                textColor = Color(0xFF4A4A4A),
-                                                backgroundColor = Color.Transparent,
-                                                cursorColor = Color(0xFF1ED292),
-                                                focusedIndicatorColor = Color.Transparent,
-                                                unfocusedIndicatorColor = Color.Transparent
-                                            ),
-                                            keyboardOptions = KeyboardOptions(
-                                                keyboardType = KeyboardType.Text,
-                                                imeAction = ImeAction.Done
-                                            ),
-                                            keyboardActions = KeyboardActions(
-                                                onDone = {
-                                                    keyboardController?.hide()
-                                                }
-                                            ),
-                                        )
-
-                                        Spacer(modifier = Modifier.height(24.dp))
-
-                                        MultiStyleTextForAddExperience(
-                                            text1 = "Proficiency levels",
-                                            color1 = Color(0xFF757575),
-                                            text2 = "",
-                                            color2 = Color(0xFF757575)
-                                        )
-
-                                        Spacer(modifier = Modifier.height(4.dp))
-
-                                        OutlinedTextField(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(45.dp)
-                                                .border(
-                                                    1.dp,
-                                                    Color(0xFFE4E7ED),
-                                                    RoundedCornerShape(4.dp)
-                                                )
-                                                .background(
-                                                    color = Color.Transparent,
-                                                    shape = MaterialTheme.shapes.medium
+                                                    color = Color(0xFF4A4A4A)
                                                 ),
-                                            value = languageProficiencyLevel,
-                                            onValueChange = {
-                                                languageProficiencyLevel = it
-                                            },
-                                            placeholder = {
-                                                Text(
-                                                    "Enter proficiency levels",
-                                                    color = Color(0xFFBDBDBD),
+                                                colors = TextFieldDefaults.textFieldColors(
+                                                    textColor = Color(0xFF4A4A4A),
+                                                    backgroundColor = Color.Transparent,
+                                                    cursorColor = Color(0xFF1ED292),
+                                                    focusedIndicatorColor = Color.Transparent,
+                                                    unfocusedIndicatorColor = Color.Transparent
+                                                ),
+                                                keyboardOptions = KeyboardOptions(
+                                                    keyboardType = KeyboardType.Text,
+                                                    imeAction = ImeAction.Done
+                                                ),
+                                                keyboardActions = KeyboardActions(
+                                                    onDone = {
+                                                        keyboardController?.hide()
+                                                    }
+                                                ),
+                                            )
+
+                                            Spacer(modifier = Modifier.height(24.dp))
+
+                                            MultiStyleTextForAddExperience(
+                                                text1 = "Proficiency levels",
+                                                color1 = Color(0xFF757575),
+                                                text2 = "",
+                                                color2 = Color(0xFF757575)
+                                            )
+
+                                            Spacer(modifier = Modifier.height(4.dp))
+
+                                            OutlinedTextField(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(45.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFE4E7ED),
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                value = languageProficiencyLevel,
+                                                onValueChange = {
+                                                    languageProficiencyLevel = it
+                                                },
+                                                placeholder = {
+                                                    Text(
+                                                        "Enter proficiency levels",
+                                                        color = Color(0xFFBDBDBD),
+                                                        fontWeight = FontWeight.W400,
+                                                        fontSize = 14.sp,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    )
+                                                },
+                                                textStyle = TextStyle(
+                                                    textAlign = TextAlign.Start,
                                                     fontWeight = FontWeight.W400,
                                                     fontSize = 14.sp,
                                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                )
-                                            },
-                                            textStyle = TextStyle(
-                                                textAlign = TextAlign.Start,
-                                                fontWeight = FontWeight.W400,
-                                                fontSize = 14.sp,
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                color = Color(0xFF4A4A4A)
-                                            ),
-                                            colors = TextFieldDefaults.textFieldColors(
-                                                textColor = Color(0xFF4A4A4A),
-                                                backgroundColor = Color.Transparent,
-                                                cursorColor = Color(0xFF1ED292),
-                                                focusedIndicatorColor = Color.Transparent,
-                                                unfocusedIndicatorColor = Color.Transparent
-                                            ),
-                                            keyboardOptions = KeyboardOptions(
-                                                keyboardType = KeyboardType.Text,
-                                                imeAction = ImeAction.Done
-                                            ),
-                                            keyboardActions = KeyboardActions(
-                                                onDone = {
-                                                    keyboardController?.hide()
-                                                }
-                                            ),
-                                        )
+                                                    color = Color(0xFF4A4A4A)
+                                                ),
+                                                colors = TextFieldDefaults.textFieldColors(
+                                                    textColor = Color(0xFF4A4A4A),
+                                                    backgroundColor = Color.Transparent,
+                                                    cursorColor = Color(0xFF1ED292),
+                                                    focusedIndicatorColor = Color.Transparent,
+                                                    unfocusedIndicatorColor = Color.Transparent
+                                                ),
+                                                keyboardOptions = KeyboardOptions(
+                                                    keyboardType = KeyboardType.Text,
+                                                    imeAction = ImeAction.Done
+                                                ),
+                                                keyboardActions = KeyboardActions(
+                                                    onDone = {
+                                                        keyboardController?.hide()
+                                                    }
+                                                ),
+                                            )
 
-                                        Spacer(modifier = Modifier.height(24.dp))
-                                    }
+                                            Spacer(modifier = Modifier.height(24.dp))
+                                        }
                                     }
                                 }
 
@@ -3308,9 +3865,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     fontWeight = FontWeight.W400,
                                     color = Color(0xFF1ED292),
                                     fontSize = 14.sp,
-                                    modifier = Modifier.fillMaxWidth().clickable {
-                                        addMoreLanguageItem += 1
-                                    }
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            addMoreLanguageItem += 1
+                                        }
                                 )
 
                                 Spacer(modifier = Modifier.height(24.dp))
@@ -4036,7 +4595,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             updateFieldOfStudy,
                                                             updateEduStartDateInYMD,
                                                             updateEduEndDateInYMD,
-                                                            if (updateEduEndDateInYMD == "") true else false,
+                                                            updateIsCurrentStudying,
                                                             updateEduDescription
                                                         )
                                                     }
@@ -4735,7 +5294,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             fieldOfStudy,
                                                             eduStartDateInYMD,
                                                             eduEndDateInYMD,
-                                                            if (eduEndDateInYMD == "") true else false,
+                                                            isCurrentStudying,
                                                             eduDescription
                                                         )
                                                     }
@@ -6738,6 +7297,67 @@ fun Overlap(
                 y = largePlaceable.height - smallPlaceable.height
             )
         }
+    }
+}
+
+@Composable
+fun DateButtonWithTrailingIcon(
+    context: Context,
+    label: String,
+    date: String,
+    onDateSelected: (String) -> Unit,
+    onDateSelectedInYMD: (String) -> Unit,
+    isCurrentStudying: Boolean
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    OutlinedButton(
+        onClick = {
+            showDatePicker = true
+        },
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(Color.Transparent)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
+            Text(
+                text = if (date.isEmpty()) label else date,
+                color = if (date.isEmpty()) Color(0xFFBDBDBD) else Color(0xFF4A4A4A),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W400,
+                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                painter = painterResource(id = R.drawable.calendar),
+                contentDescription = "Calendar Icon",
+                modifier = Modifier
+                    .size(18.dp)
+            )
+        }
+    }
+
+    if (showDatePicker) {
+        showDatePickerDialog(
+            context = context,
+            onDateSelected = { selectedDate ->
+                onDateSelected(selectedDate)
+                showDatePicker = false
+            },
+            onDateSelectedInYMD = { selectedDateInYMD ->
+                onDateSelectedInYMD(selectedDateInYMD)
+                showDatePicker = false
+            },
+            onDismissRequest = { showDatePicker = false }
+        )
     }
 }
 
