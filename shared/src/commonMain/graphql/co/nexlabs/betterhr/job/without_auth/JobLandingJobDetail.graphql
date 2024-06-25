@@ -14,7 +14,7 @@ query JobLandingJobDetail($job_id: String!){
         state_name
         hiring_date
         seniority_level
-#        employment_type
+        employment_type
         workplace_type
         office_address
         currency_code

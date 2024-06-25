@@ -3,7 +3,6 @@ mutation createCandidate(
     $email: String!,
     $phone: String!,
     $desired_position: String!,
-    $summary: String!
     $country_id: String!
 ) {
     createCandidate (
@@ -11,7 +10,6 @@ mutation createCandidate(
         email: $email
         phone: $phone
         desired_position: $desired_position
-        summary: $summary
         country_id: $country_id
     ) {
         id

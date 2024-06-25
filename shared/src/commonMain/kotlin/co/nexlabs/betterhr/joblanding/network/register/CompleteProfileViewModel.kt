@@ -46,6 +46,7 @@ class CompleteProfileViewModel(
     }
 
     fun getCandidateData() {
+        println("bearer>>${localStorage.bearerToken}")
         viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(

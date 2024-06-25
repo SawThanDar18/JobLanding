@@ -28,7 +28,7 @@ object CollectionJobsViewModelMapper {
             data.state_name ?: "",
             data.hiring_date ?: "",
             data.seniority_level!!.name,
-            "Full time",
+            data.employment_type!!.name,
             data.workplace_type!!.name,
             data.office_address ?: "",
             data.currency_code ?: "",

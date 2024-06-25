@@ -188,7 +188,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     ): ApolloCall<CreateCandidateMutation.Data> {
         return apolloClientWithAuthWithoutToken.mutation(
             CreateCandidateMutation(
-                name, email, phone, desiredPosition, summary, countryId
+                name, email, phone, desiredPosition, countryId
             )
         )
     }

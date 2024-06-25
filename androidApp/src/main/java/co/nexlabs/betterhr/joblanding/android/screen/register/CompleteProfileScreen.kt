@@ -1540,98 +1540,100 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             )
                                                         }
 
-                                                        var experience = experienceList[index]
+                                                        if (index >= 0 && index < experienceList.size) {
+                                                            var experience = experienceList[index]
 
-                                                        var years by remember {
-                                                            mutableStateOf(
-                                                                0
-                                                            )
-                                                        }
-                                                        var months by remember {
-                                                            mutableStateOf(
-                                                                0
-                                                            )
-                                                        }
-
-                                                        if (experience.startDate != "0000:00:00 00:00:00") {
-                                                            if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate != "") {
-                                                                val sdf = SimpleDateFormat(
-                                                                    "yyyy-MM-dd",
-                                                                    Locale.US
+                                                            var years by remember {
+                                                                mutableStateOf(
+                                                                    0
                                                                 )
-                                                                val startDate =
-                                                                    sdf.parse(experience.startDate)
-                                                                val endDate =
-                                                                    sdf.parse(experience.endDate)
+                                                            }
+                                                            var months by remember {
+                                                                mutableStateOf(
+                                                                    0
+                                                                )
+                                                            }
 
-                                                                calculateDateDifference(
-                                                                    startDate,
-                                                                    endDate
-                                                                ) { calculatedYears, calculatedMonths ->
-                                                                    years = calculatedYears
-                                                                    months = calculatedMonths
+                                                            if (experience.startDate != "0000:00:00 00:00:00") {
+                                                                if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate != "") {
+                                                                    val sdf = SimpleDateFormat(
+                                                                        "yyyy-MM-dd",
+                                                                        Locale.US
+                                                                    )
+                                                                    val startDate =
+                                                                        sdf.parse(experience.startDate)
+                                                                    val endDate =
+                                                                        sdf.parse(experience.endDate)
+
+                                                                    calculateDateDifference(
+                                                                        startDate,
+                                                                        endDate
+                                                                    ) { calculatedYears, calculatedMonths ->
+                                                                        years = calculatedYears
+                                                                        months = calculatedMonths
+                                                                    }
                                                                 }
                                                             }
-                                                        }
 
-                                                        if (experience.startDate != "0000:00:00 00:00:00") {
-                                                            if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate != "") {
-                                                                val sdf = SimpleDateFormat(
-                                                                    "yyyy-MM-dd",
-                                                                    Locale.US
-                                                                )
-                                                                val startDate =
-                                                                    sdf.parse(experience.startDate)
-                                                                val endDate =
-                                                                    sdf.parse(experience.endDate)
+                                                            if (experience.startDate != "0000:00:00 00:00:00") {
+                                                                if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate != "") {
+                                                                    val sdf = SimpleDateFormat(
+                                                                        "yyyy-MM-dd",
+                                                                        Locale.US
+                                                                    )
+                                                                    val startDate =
+                                                                        sdf.parse(experience.startDate)
+                                                                    val endDate =
+                                                                        sdf.parse(experience.endDate)
 
-                                                                calculateDateDifference(
-                                                                    startDate,
-                                                                    endDate
-                                                                ) { calculatedYears, calculatedMonths ->
-                                                                    years = calculatedYears
-                                                                    months = calculatedMonths
+                                                                    calculateDateDifference(
+                                                                        startDate,
+                                                                        endDate
+                                                                    ) { calculatedYears, calculatedMonths ->
+                                                                        years = calculatedYears
+                                                                        months = calculatedMonths
+                                                                    }
                                                                 }
-                                                            }
-                                                        } else {
-                                                            years = 0
-                                                            months = 0
-                                                        }
-
-                                                        if (experience.startDate != "0000:00:00 00:00:00") {
-                                                            if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate == "") {
-                                                                years = 1
-                                                                months = 1
-                                                            }
-                                                        } else {
-                                                            years = 0
-                                                            months = 0
-                                                        }
-
-                                                        var dateDiff =
-                                                            if (years != 0 && months == 0) {
-                                                                "$years yr"
-                                                            } else if (months != 0 && years == 0) {
-                                                                "$months mo"
-                                                            } else if (years != 0 && months != 0) {
-                                                                "$years yr $months mo"
-                                                            } else if (years == 1 && months == 1) {
-                                                                "Present"
                                                             } else {
-                                                                "--"
+                                                                years = 0
+                                                                months = 0
                                                             }
 
-                                                        Text(
-                                                            text = dateDiff,
-                                                            fontFamily = FontFamily(
-                                                                Font(
-                                                                    R.font.poppins_regular
-                                                                )
-                                                            ),
-                                                            fontWeight = FontWeight.W500,
-                                                            color = Color(0xFF757575),
-                                                            fontSize = 12.sp,
-                                                        )
+                                                            if (experience.startDate != "0000:00:00 00:00:00") {
+                                                                if (experience.endDate != "0000:00:00 00:00:00" && experience.endDate == "") {
+                                                                    years = 1
+                                                                    months = 1
+                                                                }
+                                                            } else {
+                                                                years = 0
+                                                                months = 0
+                                                            }
+
+                                                            var dateDiff =
+                                                                if (years != 0 && months == 0) {
+                                                                    "$years yr"
+                                                                } else if (months != 0 && years == 0) {
+                                                                    "$months mo"
+                                                                } else if (years != 0 && months != 0) {
+                                                                    "$years yr $months mo"
+                                                                } else if (years == 1 && months == 1) {
+                                                                    "Present"
+                                                                } else {
+                                                                    "--"
+                                                                }
+
+                                                            Text(
+                                                                text = dateDiff,
+                                                                fontFamily = FontFamily(
+                                                                    Font(
+                                                                        R.font.poppins_regular
+                                                                    )
+                                                                ),
+                                                                fontWeight = FontWeight.W500,
+                                                                color = Color(0xFF757575),
+                                                                fontSize = 12.sp,
+                                                            )
+                                                        }
                                                     }
                                                 }
                                             }
@@ -2132,7 +2134,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         Spacer(modifier = Modifier.width(8.dp))
 
                                         Row(
-                                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.edit),
@@ -2718,7 +2721,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    DateButtonWithTrailingIcon(
+                                    DateButtonWithTrailingIconForExpireDate(
                                         LocalContext.current,
                                         "Expiration Date",
                                         updateExpireDate,
@@ -2729,7 +2732,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         onDateSelectedInYMD = { dateInYMD ->
                                             updateExpireDateInYMD =
                                                 if (updateIsCredentialExpire) "" else dateInYMD
-                                        }, false
+                                        }, updateIsCredentialExpire
                                     )
 
                                     Spacer(modifier = Modifier.height(16.dp))
@@ -2739,6 +2742,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier.padding(start = 4.dp)
                                     ) {
+
                                         Checkbox(
                                             checked = updateIsCredentialExpire,
                                             onCheckedChange = { updateIsCredentialExpire = it },
@@ -2907,7 +2911,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             updateCertificateName,
                                                             updateIssuingOrganization,
                                                             updateIssueDateInYMD,
-                                                            updateExpireDateInYMD,
+                                                            if(updateIsCredentialExpire) "" else updateExpireDateInYMD,
                                                             updateIsCredentialExpire,
                                                             updateCredentialUrl
                                                         )
@@ -3203,18 +3207,16 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    DateButtonWithTrailingIcon(
+                                    DateButtonWithTrailingIconForExpireDate(
                                         LocalContext.current,
                                         "Expiration Date",
                                         expireDate,
                                         onDateSelected = { date ->
-                                            expireDate =
-                                                if (isCredentialExpire) "" else date
+                                            expireDate = date
                                         },
                                         onDateSelectedInYMD = { dateInYMD ->
-                                            expireDateInYMD =
-                                                if (isCredentialExpire) "" else dateInYMD
-                                        }, false
+                                            expireDateInYMD = dateInYMD
+                                        }, isCredentialExpire
                                     )
 
                                     Spacer(modifier = Modifier.height(16.dp))
@@ -3224,6 +3226,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier.padding(start = 4.dp)
                                     ) {
+
                                         Checkbox(
                                             checked = isCredentialExpire,
                                             onCheckedChange = { isCredentialExpire = it },
@@ -3360,7 +3363,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             certificateName,
                                                             issuingOrganization,
                                                             issueDateInYMD,
-                                                            expireDateInYMD,
+                                                            if(isCredentialExpire) "" else expireDateInYMD,
                                                             isCredentialExpire,
                                                             credentialUrl
                                                         )
@@ -4426,7 +4429,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                                     Spacer(modifier = Modifier.width(8.dp))
 
-                                    DateButton(
+                                    DateButtonForEducationEndDate(
                                         LocalContext.current,
                                         "End Date",
                                         updateEduEndDate,
@@ -4448,7 +4451,9 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 ) {
                                     Checkbox(
                                         checked = updateIsCurrentStudying,
-                                        onCheckedChange = { updateIsCurrentStudying = it },
+                                        onCheckedChange = {
+                                            updateIsCurrentStudying = it
+                                                          },
                                         colors = CheckboxDefaults.colors(
                                             checkedColor = Color(0xFF1690F3),
                                             uncheckedColor = Color(0xFFE4E7ED),
@@ -4594,7 +4599,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             updateDegree,
                                                             updateFieldOfStudy,
                                                             updateEduStartDateInYMD,
-                                                            updateEduEndDateInYMD,
+                                                            if(updateIsCurrentStudying) "" else updateEduEndDateInYMD,
                                                             updateIsCurrentStudying,
                                                             updateEduDescription
                                                         )
@@ -5157,7 +5162,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                                     Spacer(modifier = Modifier.width(8.dp))
 
-                                    DateButton(
+                                    DateButtonForEducationEndDate(
                                         LocalContext.current,
                                         "End Date",
                                         educationEndDate,
@@ -5177,6 +5182,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.padding(start = 4.dp)
                                 ) {
+
                                     Checkbox(
                                         checked = isCurrentStudying,
                                         onCheckedChange = { isCurrentStudying = it },
@@ -5293,7 +5299,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             degree,
                                                             fieldOfStudy,
                                                             eduStartDateInYMD,
-                                                            eduEndDateInYMD,
+                                                            if(isCurrentStudying) "" else eduEndDateInYMD,
                                                             isCurrentStudying,
                                                             eduDescription
                                                         )
@@ -7301,6 +7307,67 @@ fun Overlap(
 }
 
 @Composable
+fun DateButtonWithTrailingIconForExpireDate(
+    context: Context,
+    label: String,
+    date: String,
+    onDateSelected: (String) -> Unit,
+    onDateSelectedInYMD: (String) -> Unit,
+    isNotExpire: Boolean
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    OutlinedButton(
+        onClick = {
+            showDatePicker = if (isNotExpire) false else true
+        },
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(Color.Transparent)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
+            Text(
+                text = if (date.isEmpty()) label else date,
+                color = if (date.isEmpty()) Color(0xFFBDBDBD) else Color(0xFF4A4A4A),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W400,
+                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                painter = painterResource(id = R.drawable.calendar),
+                contentDescription = "Calendar Icon",
+                modifier = Modifier
+                    .size(18.dp)
+            )
+        }
+    }
+
+    if (showDatePicker) {
+        showDatePickerDialog(
+            context = context,
+            onDateSelected = { selectedDate ->
+                onDateSelected(selectedDate)
+                showDatePicker = false
+            },
+            onDateSelectedInYMD = { selectedDateInYMD ->
+                onDateSelectedInYMD(selectedDateInYMD)
+                showDatePicker = false
+            },
+            onDismissRequest = { showDatePicker = false }
+        )
+    }
+}
+
+@Composable
 fun DateButtonWithTrailingIcon(
     context: Context,
     label: String,
@@ -7341,6 +7408,64 @@ fun DateButtonWithTrailingIcon(
                 contentDescription = "Calendar Icon",
                 modifier = Modifier
                     .size(18.dp)
+            )
+        }
+    }
+
+    if (showDatePicker) {
+        showDatePickerDialog(
+            context = context,
+            onDateSelected = { selectedDate ->
+                onDateSelected(selectedDate)
+                showDatePicker = false
+            },
+            onDateSelectedInYMD = { selectedDateInYMD ->
+                onDateSelectedInYMD(selectedDateInYMD)
+                showDatePicker = false
+            },
+            onDismissRequest = { showDatePicker = false }
+        )
+    }
+}
+
+@Composable
+fun DateButtonForEducationEndDate(
+    context: Context,
+    label: String,
+    date: String,
+    onDateSelected: (String) -> Unit,
+    onDateSelectedInYMD: (String) -> Unit,
+    isPresent: Boolean
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    OutlinedButton(
+        onClick = {
+            showDatePicker = if (isPresent) false else true
+        },
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier
+            .height(40.dp)
+            .background(Color.Transparent)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.calendar),
+                contentDescription = "Calendar Icon",
+                modifier = Modifier
+                    .size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = if (date.isEmpty()) label else date,
+                color = if (date.isEmpty()) Color(0xFFBDBDBD) else Color(0xFF4A4A4A),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W400,
+                fontFamily = FontFamily(Font(R.font.poppins_regular)),
             )
         }
     }

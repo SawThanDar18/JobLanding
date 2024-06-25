@@ -14,7 +14,7 @@ query JobLandingCompanyJobs($company_id: String!, $is_paginate: Boolean!){
             city_name
             hiring_date
             seniority_level
-            #            employment_type
+            employment_type
             workplace_type
             office_address
             currency_code
