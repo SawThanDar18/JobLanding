@@ -4,7 +4,7 @@ project 'BetterJobLanding.xcodeproj'
 # platform :ios, '9.0'
 
 platform :ios, '13.5'
-target 'BetterJobLanding' do
+target 'iosApp' do
 
   use_frameworks!
 
