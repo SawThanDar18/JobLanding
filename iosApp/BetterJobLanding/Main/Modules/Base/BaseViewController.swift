@@ -8,22 +8,41 @@
 import UIKit
 
 class BaseViewController: UIViewController {
- 
+    @IBOutlet weak var backMainView: UIView!
+    @IBOutlet weak var backButton: UIButton!
+    var isPresentViewController: Bool?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+    }
 
-        // Do any additional setup after loading the view.
+    func setupUI() {
+        view.backgroundColor = .clear
+        self.navigationController?.navigationBar.isHidden = true
+        
+        // Back Button
+        backButton?.addTarget(self, action: #selector(handleBackAction), for: .touchUpInside)
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @objc func handleBackAction(_ sender: UIButton) {
+//        if isPresentViewController{
+//            navigationController?.dismiss(animated: true)
+//            return
+//        }else{
+//            if SettingInfo.shared.ifAfterMembershipFamilyMemberForm{
+//                navigationController?.popToRootViewController(animated: true)
+//                SettingInfo.shared.ifAfterMembershipFamilyMemberForm = false
+//                return
+//            }
+//            navigationController?.popViewController(animated: true)
+//        }
+        if isPresentViewController ?? true{
+            navigationController?.dismiss(animated: true)
+            return
+        }else{
+            navigationController?.popToRootViewController(animated: true)
+        }
     }
-    */
 
 }

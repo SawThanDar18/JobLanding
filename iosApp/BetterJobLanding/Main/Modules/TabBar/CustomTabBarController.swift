@@ -56,7 +56,7 @@ class CustomTabBarController: UITabBarController, UIGestureRecognizerDelegate {
                 selectedImage: UIImage(named: "interviews_fill")
             ),
             generateVC(
-                viewController: ProfileScene.create(),
+                viewController: ProfileScene.creatNav(),
                 title: "Profile",
                 image: UIImage(named: "profile"),
                 selectedImage: UIImage(named: "profile_fill")

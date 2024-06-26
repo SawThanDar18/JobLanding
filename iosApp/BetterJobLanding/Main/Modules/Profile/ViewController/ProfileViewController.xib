@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ProfileViewController" customModule="BetterJobLanding" customModuleProvider="target">
+            <connections>
+                <outlet property="profileLabel" destination="KI6-Nk-haj" id="ega-y9-7iq"/>
+                <outlet property="register" destination="6Wx-cr-taW" id="gPa-fz-Stz"/>
+                <outlet property="settingImageView" destination="5mY-ht-M09" id="2MX-yo-MNA"/>
+                <outlet property="view" destination="BfB-1S-x2R" id="0uV-vY-3rV"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="BfB-1S-x2R">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SrU-lk-jiO">
+                    <rect key="frame" x="16" y="236.66666666666663" width="361" height="404"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="registerApplyDreamJob" translatesAutoresizingMaskIntoConstraints="NO" id="5mY-ht-M09">
+                            <rect key="frame" x="21" y="0.0" width="319" height="324"/>
+                        </imageView>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Wx-cr-taW">
+                            <rect key="frame" x="157.66666666666666" y="364" width="46" height="40"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="igh-OD-nEH"/>
+                            </constraints>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Button"/>
+                            <connections>
+                                <action selector="handleRegisterAction:" destination="-1" eventType="touchUpInside" id="dSD-iB-dIv"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="6Wx-cr-taW" firstAttribute="centerX" secondItem="SrU-lk-jiO" secondAttribute="centerX" id="BNW-hH-1DW"/>
+                        <constraint firstItem="5mY-ht-M09" firstAttribute="top" secondItem="SrU-lk-jiO" secondAttribute="top" id="Nbc-b0-B4y"/>
+                        <constraint firstItem="6Wx-cr-taW" firstAttribute="top" secondItem="5mY-ht-M09" secondAttribute="bottom" constant="40" id="Oh0-3b-1LF"/>
+                        <constraint firstAttribute="trailing" secondItem="5mY-ht-M09" secondAttribute="trailing" constant="21" id="Uvp-tI-3uE"/>
+                        <constraint firstAttribute="height" constant="404" id="bKn-7x-RCe"/>
+                        <constraint firstItem="5mY-ht-M09" firstAttribute="leading" secondItem="SrU-lk-jiO" secondAttribute="leading" constant="21" id="gPB-yB-byg"/>
+                        <constraint firstAttribute="bottom" secondItem="6Wx-cr-taW" secondAttribute="bottom" id="oc3-d7-rgu"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KI6-Nk-haj">
+                    <rect key="frame" x="16" y="67" width="42" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="24" id="w1L-XR-XWE"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="setting" translatesAutoresizingMaskIntoConstraints="NO" id="xnK-cQ-3S0">
+                    <rect key="frame" x="359" y="67" width="24" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="24" id="4gp-Wp-ce5"/>
+                        <constraint firstAttribute="width" constant="24" id="pzM-zx-iyM"/>
+                    </constraints>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tGu-LN-aWP">
+                    <rect key="frame" x="337" y="59" width="40" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="40" id="CwM-JJ-45R"/>
+                        <constraint firstAttribute="width" constant="40" id="TSG-1a-4dY"/>
+                    </constraints>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Z3y-1A-N4T"/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="Z3y-1A-N4T" firstAttribute="trailing" secondItem="SrU-lk-jiO" secondAttribute="trailing" constant="16" id="7TO-po-M7R"/>
+                <constraint firstItem="Z3y-1A-N4T" firstAttribute="trailing" secondItem="xnK-cQ-3S0" secondAttribute="trailing" constant="10" id="CG9-hz-ZEe"/>
+                <constraint firstItem="Z3y-1A-N4T" firstAttribute="trailing" secondItem="tGu-LN-aWP" secondAttribute="trailing" constant="16" id="Fyy-dK-5Ic"/>
+                <constraint firstItem="tGu-LN-aWP" firstAttribute="top" secondItem="Z3y-1A-N4T" secondAttribute="top" id="IBm-d1-hBR"/>
+                <constraint firstItem="KI6-Nk-haj" firstAttribute="top" secondItem="Z3y-1A-N4T" secondAttribute="top" constant="8" id="QyF-Hs-Csi"/>
+                <constraint firstItem="SrU-lk-jiO" firstAttribute="leading" secondItem="Z3y-1A-N4T" secondAttribute="leading" constant="16" id="cgr-bs-AQd"/>
+                <constraint firstItem="KI6-Nk-haj" firstAttribute="leading" secondItem="Z3y-1A-N4T" secondAttribute="leading" constant="16" id="oDF-jh-Kl0"/>
+                <constraint firstItem="xnK-cQ-3S0" firstAttribute="top" secondItem="Z3y-1A-N4T" secondAttribute="top" constant="8" id="uPj-xs-y13"/>
+                <constraint firstItem="SrU-lk-jiO" firstAttribute="centerY" secondItem="Z3y-1A-N4T" secondAttribute="centerY" id="wZA-C2-Hh3"/>
+            </constraints>
+            <point key="canvasLocation" x="-385" y="-646"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="registerApplyDreamJob" width="285.33334350585938" height="324.33334350585938"/>
+        <image name="setting" width="24" height="24"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

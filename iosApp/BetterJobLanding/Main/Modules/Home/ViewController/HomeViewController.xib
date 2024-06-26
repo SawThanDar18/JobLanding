@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HomeViewController" customModule="BetterJobLanding" customModuleProvider="target">
+            <connections>
+                <outlet property="homeTableView" destination="kJe-4r-jt3" id="hne-9p-VCO"/>
+                <outlet property="signUpButton" destination="dw4-8j-oym" id="Rfd-Nx-U9s"/>
+                <outlet property="signUpLabel" destination="l5g-Zc-S8w" id="UgH-Gi-noD"/>
+                <outlet property="signUpMainView" destination="DKW-1Q-QTL" id="kyJ-su-cbP"/>
+                <outlet property="view" destination="46x-CU-nMk" id="CZt-uq-5c4"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="46x-CU-nMk">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vT9-FZ-X87">
+                    <rect key="frame" x="0.0" y="59" width="393" height="60"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="betterhrjob_home" translatesAutoresizingMaskIntoConstraints="NO" id="Ah6-ZB-EnF">
+                            <rect key="frame" x="16.666666666666671" y="14" width="162" height="32"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="32" id="6xY-6s-1hN"/>
+                                <constraint firstAttribute="width" constant="162" id="iFy-Qs-ZoA"/>
+                            </constraints>
+                        </imageView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="Ah6-ZB-EnF" firstAttribute="centerY" secondItem="vT9-FZ-X87" secondAttribute="centerY" id="Lvb-0L-0T3"/>
+                        <constraint firstItem="Ah6-ZB-EnF" firstAttribute="leading" secondItem="vT9-FZ-X87" secondAttribute="leading" constant="16.5" id="OHw-WW-dPq"/>
+                        <constraint firstAttribute="height" constant="60" id="hWD-05-6oe"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DKW-1Q-QTL">
+                    <rect key="frame" x="0.0" y="763" width="393" height="40"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign up with email or phone number!" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l5g-Zc-S8w">
+                            <rect key="frame" x="16" y="-0.33333333333337123" width="255" height="40.666666666666664"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dw4-8j-oym">
+                            <rect key="frame" x="284" y="7.6666666666666288" width="101" height="25"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="101" id="D7g-ay-lJr"/>
+                                <constraint firstAttribute="height" constant="25" id="Ko3-vc-90k"/>
+                            </constraints>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="SIGN UP NOW"/>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" red="0.066666666669999999" green="0.066666666669999999" blue="0.066666666669999999" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstItem="l5g-Zc-S8w" firstAttribute="centerY" secondItem="DKW-1Q-QTL" secondAttribute="centerY" id="IUZ-ka-cGC"/>
+                        <constraint firstAttribute="trailing" secondItem="dw4-8j-oym" secondAttribute="trailing" constant="8" id="ItM-ab-HUQ"/>
+                        <constraint firstAttribute="height" constant="40" id="K1z-GH-azD"/>
+                        <constraint firstItem="dw4-8j-oym" firstAttribute="leading" secondItem="l5g-Zc-S8w" secondAttribute="trailing" constant="13" id="SSc-vV-dxU"/>
+                        <constraint firstItem="l5g-Zc-S8w" firstAttribute="leading" secondItem="DKW-1Q-QTL" secondAttribute="leading" constant="16" id="cHx-rx-apz"/>
+                        <constraint firstItem="dw4-8j-oym" firstAttribute="centerY" secondItem="l5g-Zc-S8w" secondAttribute="centerY" id="kQE-SH-W1R"/>
+                    </constraints>
+                </view>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="kJe-4r-jt3">
+                    <rect key="frame" x="0.0" y="119" width="393" height="684"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                </tableView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="CKq-AP-iqA"/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="DKW-1Q-QTL" firstAttribute="leading" secondItem="CKq-AP-iqA" secondAttribute="leading" id="8Gh-S8-uhu"/>
+                <constraint firstItem="CKq-AP-iqA" firstAttribute="trailing" secondItem="vT9-FZ-X87" secondAttribute="trailing" id="8xr-aK-F1Y"/>
+                <constraint firstItem="kJe-4r-jt3" firstAttribute="top" secondItem="vT9-FZ-X87" secondAttribute="bottom" id="9lr-Ze-9Lg"/>
+                <constraint firstItem="CKq-AP-iqA" firstAttribute="bottom" secondItem="DKW-1Q-QTL" secondAttribute="bottom" constant="15" id="MYn-6x-7X3"/>
+                <constraint firstItem="CKq-AP-iqA" firstAttribute="trailing" secondItem="DKW-1Q-QTL" secondAttribute="trailing" id="Rr9-fd-Cqk"/>
+                <constraint firstItem="kJe-4r-jt3" firstAttribute="leading" secondItem="CKq-AP-iqA" secondAttribute="leading" id="ayL-BM-quh"/>
+                <constraint firstItem="CKq-AP-iqA" firstAttribute="trailing" secondItem="kJe-4r-jt3" secondAttribute="trailing" id="ea7-4b-G8U"/>
+                <constraint firstItem="CKq-AP-iqA" firstAttribute="bottom" secondItem="kJe-4r-jt3" secondAttribute="bottom" constant="15" id="ei0-E6-iZR"/>
+                <constraint firstItem="vT9-FZ-X87" firstAttribute="top" secondItem="CKq-AP-iqA" secondAttribute="top" id="ssu-uQ-J1c"/>
+                <constraint firstItem="vT9-FZ-X87" firstAttribute="leading" secondItem="CKq-AP-iqA" secondAttribute="leading" id="vLg-XX-dcC"/>
+            </constraints>
+            <point key="canvasLocation" x="-172" y="649"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="betterhrjob_home" width="162.33332824707031" height="32"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

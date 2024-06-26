@@ -1,8 +1,8 @@
 //
-//  Home.swift
+//  HomeViewController.swift
 //  BetterJobLanding
 //
-//  Created by Myint Zu on 05/06/2024.
+//  Created by Myint Zu on 24/06/2024.
 //
 
 import UIKit

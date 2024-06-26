@@ -6,16 +6,18 @@
 //
 
 import Foundation
+import UIKit
 
 protocol RegisterRouting: AnyObject {
-    func goToUploadCVAndProfile()
+    func goToCVUpload()
 }
 
 class RegisterRouter: RegisterRouting {
     weak var viewController: RegisterViewController?
     
-    func goToUploadCVAndProfile(){
+    func goToCVUpload(){
        print("GO GO GO")
+        viewController?.navigationController?.pushViewController(UIViewController(), animated: true)
         
     }
 }

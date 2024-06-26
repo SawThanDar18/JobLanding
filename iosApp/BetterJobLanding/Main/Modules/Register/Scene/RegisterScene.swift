@@ -10,8 +10,7 @@ import UIKit
 
 enum RegisterScene {
     static func create() -> UIViewController {
-        let st = UIStoryboard(name: "Register", bundle: BHRJobLandingConstants.General.bundle)
-        let destination = st.instantiateViewController(withIdentifier: "RegisterViewController") as! RegisterViewController
+        let destination = RegisterViewController(nibName: "RegisterViewController", bundle: nil)
         //let interactor = GroupListingInteractor()
         let router = RegisterRouter()
         //destination.title = "GetStarted"

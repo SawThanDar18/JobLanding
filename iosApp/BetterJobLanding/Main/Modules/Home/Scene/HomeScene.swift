@@ -10,8 +10,10 @@ import UIKit
 
 enum HomeScene {
     static func create(viewModel: HomeViewModels) -> UIViewController {
-        let st = UIStoryboard(name: "Home", bundle: BHRJobLandingConstants.General.bundle)
-        let destination = st.instantiateViewController(withIdentifier: "Home") as! HomeViewController
+        let destination = HomeViewController(nibName: "HomeViewController", bundle: nil)
+        
+//        let st = UIStoryboard(name: "Home", bundle: BHRJobLandingConstants.General.bundle)
+//        let destination = st.instantiateViewController(withIdentifier: "Home") as! HomeViewController
         //let interactor = GroupListingInteractor()
         let router = HomeRouter()
         //destination.title = "GetStarted"

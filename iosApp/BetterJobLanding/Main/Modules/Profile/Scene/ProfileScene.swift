@@ -10,8 +10,7 @@ import UIKit
 
 enum ProfileScene {
     static func create() -> UIViewController {
-        let st = UIStoryboard(name: "Profile", bundle: BHRJobLandingConstants.General.bundle)
-        let destination = st.instantiateViewController(withIdentifier: "ProfileViewController") as! ProfileViewController
+        let destination = ProfileViewController(nibName: "ProfileViewController", bundle: nil)
         //let interactor = GroupListingInteractor()
         let router = ProfileRouter()
         //destination.title = "GetStarted"
@@ -23,22 +22,10 @@ enum ProfileScene {
         return destination
     }
     
-//    static func create() -> UIViewController {
-//        let destination = ProfileViewController()
-//        let router = ProfileRouter()
-//        //destination.title = "GetStarted"
-////        destination.viewModel = viewModel
-//        destination.router = router
-//        destination.title = "Profile"
-//        router.viewController = destination
-//        destination.modalPresentationStyle = .fullScreen
-//        return destination
-//    }
-//    
-//    static func creatNav() -> UINavigationController{
-//        let nav = UINavigationController(rootViewController: ProfileScene.create())
-//        nav.isNavigationBarHidden = true
-//        return nav
-//    }
+    static func creatNav() -> UINavigationController{
+        let nav = UINavigationController(rootViewController: ProfileScene.create())
+        nav.isNavigationBarHidden = false
+        return nav
+    }
     
 }
