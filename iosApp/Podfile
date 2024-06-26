@@ -3,6 +3,5 @@ platform :ios, '11.0'
 
 target 'BetterJobLanding' do
   use_frameworks!
-  pod 'TLPhotoPicker', '2.1.1'
 end
 
