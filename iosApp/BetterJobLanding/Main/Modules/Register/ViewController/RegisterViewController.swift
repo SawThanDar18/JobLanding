@@ -19,10 +19,10 @@ class RegisterViewController: BaseViewController {
     var registerViewModel: RegisterViewModel?
     var inputPhoneNumber: String = ""
     var inputOTP: String = "" {
-            didSet {
-                print("number was set to \(inputOTP)")
-            }
+        didSet {
+            print("number was set to \(inputOTP)")
         }
+    }
     
     var clickSendOTP: Bool = false
     var secondsRemaining = 60
@@ -36,20 +36,20 @@ class RegisterViewController: BaseViewController {
     
     func sendOTPByiOS(){
         registerViewModel = DIHelperClient.shared.getRegisterViewModel()
-//        registerViewModel?.requestOTP(phoneNumber: <#T##String#>)
-//        registerViewModel.observeUiState{
-//            uiStateData in
-//            let homeUIlist : [HomeUIModel] = uiStateData.jobLandingSectionsList as [HomeUIModel] ?? []
-//            self.homeUIViewModel = homeUIlist
-//            homeUIlist.forEach{homelist in
-//                if homelist.collectionType == HomeCollectionType.jobCollection.rawValue{
-//                    self.jobsListUIModel = homelist.jobs ?? []
-//                }else if homelist.collectionType == HomeCollectionType.companyCollection.rawValue{
-//                    self.companyListModel = homelist.collectionCompanies
-//                }
-//            }
-//            self.homeTableView.reloadData()
-//        }
+        //        registerViewModel?.requestOTP(phoneNumber: <#T##String#>)
+        //        registerViewModel.observeUiState{
+        //            uiStateData in
+        //            let homeUIlist : [HomeUIModel] = uiStateData.jobLandingSectionsList as [HomeUIModel] ?? []
+        //            self.homeUIViewModel = homeUIlist
+        //            homeUIlist.forEach{homelist in
+        //                if homelist.collectionType == HomeCollectionType.jobCollection.rawValue{
+        //                    self.jobsListUIModel = homelist.jobs ?? []
+        //                }else if homelist.collectionType == HomeCollectionType.companyCollection.rawValue{
+        //                    self.companyListModel = homelist.collectionCompanies
+        //                }
+        //            }
+        //            self.homeTableView.reloadData()
+        //        }
     }
     
     private func setupRegisterTableView() {
@@ -98,28 +98,34 @@ extension RegisterViewController{
         //Send_OTP_Request
         self.clickSendOTP = true
         self.registerTableView.reloadData()
-        self.registerViewModel?.requestOTP(phoneNumber: self.inputPhoneNumber)
-    
-//        registerViewModel?.observeUiStateForRequestOTP(onChange: { uistate in
-//            print(uistate.description)
-//        })
-//        let temp = self.registerViewModel?.registerUiState
-//
-//               temp?.collect(collector: { state in
-//                   switch state {
-//                   case let success as ApiResponseStateSuccess<NSString>:
-//                       // Handle success state
-//                       let data = success.data
-//                       print("Success: \(data)")
-//                   case let error as ApiResponseStateError:
-//                       // Handle error state
-//                       let exception = error.exception
-//                       print("Error: \(exception)")
-//                   default:
-//                       break
-//                   }
-//               }) { completion in
-//                   // Handle completion if needed
-//               }
+        registerViewModel = DIHelperClient.shared.getRegisterViewModel()
+        registerViewModel?.requestOTP(phoneNumber: self.inputPhoneNumber)
+        registerViewModel?.observeUiStateForRegister { uiStateData in
+            print(uiStateData.isGetRequestOTPValue)
+            print(uiStateData.getRequestOTPValue)
+        }
+        
+        
+        //        registerViewModel?.observeUiStateForRequestOTP(onChange: { uistate in
+        //            print(uistate.description)
+        //        })
+        //        let temp = self.registerViewModel?.registerUiState
+        //
+        //               temp?.collect(collector: { state in
+        //                   switch state {
+        //                   case let success as ApiResponseStateSuccess<NSString>:
+        //                       // Handle success state
+        //                       let data = success.data
+        //                       print("Success: \(data)")
+        //                   case let error as ApiResponseStateError:
+        //                       // Handle error state
+        //                       let exception = error.exception
+        //                       print("Error: \(exception)")
+        //                   default:
+        //                       break
+        //                   }
+        //               }) { completion in
+        //                   // Handle completion if needed
+        //               }
     }
 }
