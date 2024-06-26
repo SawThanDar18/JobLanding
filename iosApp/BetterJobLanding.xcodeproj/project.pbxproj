@@ -975,7 +975,6 @@
 				AF8CF0872C0F069E005F1B58 /* Sources */,
 				AF8CF0882C0F069E005F1B58 /* Frameworks */,
 				AF8CF0892C0F069E005F1B58 /* Resources */,
-				E368E3583987906FD21FAB4D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1097,23 +1096,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\nchmod +x gradlew\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n\n";
-		};
-		E368E3583987906FD21FAB4D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
