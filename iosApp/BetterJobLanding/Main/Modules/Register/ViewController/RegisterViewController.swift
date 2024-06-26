@@ -100,9 +100,9 @@ extension RegisterViewController{
         self.registerTableView.reloadData()
         self.registerViewModel?.requestOTP(phoneNumber: self.inputPhoneNumber)
     
-        registerViewModel?.observeUiStateForRequestOTP(onChange: { uistate in
-            print(uistate.description)
-        })
+//        registerViewModel?.observeUiStateForRequestOTP(onChange: { uistate in
+//            print(uistate.description)
+//        })
 //        let temp = self.registerViewModel?.registerUiState
 //
 //               temp?.collect(collector: { state in

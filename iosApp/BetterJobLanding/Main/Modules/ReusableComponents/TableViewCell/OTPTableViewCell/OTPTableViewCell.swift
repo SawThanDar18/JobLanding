@@ -14,7 +14,7 @@ class OTPTableViewCell: UITableViewCell {
     @IBOutlet weak var getInsteadOTPCode: UIButton!
     @IBOutlet weak var secLabel: UILabel!
     let otpStackView = OTPStackView()
-    var number: Int = 0 {
+    var number: String = ""{
            didSet {
                print("number was set to \(number)")
            }
