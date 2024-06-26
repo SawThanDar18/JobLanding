@@ -1,13 +1,8 @@
 project 'BetterJobLanding.xcodeproj'
+platform :ios, '11.0'
 
-# Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
-
-platform :ios, '13.5'
-target 'iosApp' do
-
+target 'BetterJobLanding' do
   use_frameworks!
-
+  pod 'TLPhotoPicker', '2.1.1'
 end
 
-use_frameworks!
