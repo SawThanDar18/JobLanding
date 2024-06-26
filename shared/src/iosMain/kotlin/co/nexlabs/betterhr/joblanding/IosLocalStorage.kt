@@ -45,48 +45,48 @@ class IOSLocalStorage : LocalStorage {
         }
 
     override var applied: Boolean
-        get() = userDefaults.booleanForKey("applied", true)
+        get() = userDefaults.boolForKey("applied")
         set(value) {
-            userDefaults.setObject("applied", value)
+            userDefaults.setBool(value, "applied")
         }
     override var qualified: Boolean
-        get() = userDefaults.booleanForKey("qualified", true)
+        get() = userDefaults.boolForKey("qualified")
         set(value) {
-            userDefaults.setObject("qualified", value)
+            userDefaults.setBool(value, "qualified")
         }
     override var interviewing: Boolean
-        get() = userDefaults.booleanForKey("interviewing", true)
+        get() = userDefaults.boolForKey("interviewing")
         set(value) {
-            userDefaults.setObject("interviewing", value)
+            userDefaults.setBool(value, "interviewing")
         }
     override var offered: Boolean
-        get() = userDefaults.booleanForKey("offer", true)
+        get() = userDefaults.boolForKey("offer")
         set(value) {
-            userDefaults.setObject("offer", value)
+            userDefaults.setBool(value, "offer")
         }
     override var rejected: Boolean
-        get() = userDefaults.booleanForKey("rejected", true)
+        get() = userDefaults.boolForKey("rejected")
         set(value) {
-            userDefaults.setObject("rejected", value)
+            userDefaults.setBool(value, "rejected")
         }
     override var complete: Boolean
-        get() = userDefaults.booleanForKey("complete", true)
+        get() = userDefaults.boolForKey("complete")
         set(value) {
-            userDefaults.setObject("complete", value)
+            userDefaults.setBool(value, "complete")
         }
     override var pending: Boolean
-        get() = userDefaults.booleanForKey("pending", true)
+        get() = userDefaults.boolForKey("pending")
         set(value) {
-            userDefaults.setObject("pending", value)
+            userDefaults.setBool(value, "pending")
         }
     override var inboxRejected: Boolean
-        get() = userDefaults.booleanForKey("inbox-rejected", true)
+        get() = userDefaults.boolForKey("inbox-rejected")
         set(value) {
-            userDefaults.setObject("inbox-rejected", value)
+            userDefaults.setBool(value, "inbox-rejected")
         }
     override var pin: Boolean
-        get() = userDefaults.booleanForKey("pin", true)
+        get() = userDefaults.boolForKey("pin")
         set(value) {
-            userDefaults.setObject("pin", value)
+            userDefaults.setBool(value, "pin")
         }
 }
