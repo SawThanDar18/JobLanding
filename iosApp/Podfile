@@ -1,0 +1,17 @@
+project 'BetterJobLanding.xcodeproj'
+
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+platform :ios, '13.5'
+target 'BetterJobLanding' do
+
+  use_frameworks!
+
+  pod("FirebaseAuth") {
+     version = "10.16.0"
+  }
+
+end
+
+use_frameworks!

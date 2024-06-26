@@ -98,9 +98,13 @@
 		AF8CF09B2C0F069E005F1B58 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = AF8CF09A2C0F069E005F1B58 /* Base */; };
 		AFAADA3A2C185A7200CB3F26 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFAADA392C185A7200CB3F26 /* UIImage+Extension.swift */; };
 		AFAADA3C2C1865DB00CB3F26 /* UISearchBar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFAADA3B2C1865DB00CB3F26 /* UISearchBar+Extension.swift */; };
+		DA910F6D0460EB5CB0F946DC /* Pods_BetterJobLanding.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E61F3BA54DB20E95E26A259 /* Pods_BetterJobLanding.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2E61F3BA54DB20E95E26A259 /* Pods_BetterJobLanding.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BetterJobLanding.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F535F097D22FD992A0D6A36 /* Pods-BetterJobLanding.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BetterJobLanding.debug.xcconfig"; path = "Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding.debug.xcconfig"; sourceTree = "<group>"; };
+		9B877F7423806E985CDE1C9B /* Pods-BetterJobLanding.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BetterJobLanding.release.xcconfig"; path = "Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding.release.xcconfig"; sourceTree = "<group>"; };
 		AF0A099A2C19A99D00BE40C6 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		AF0A099B2C19A99D00BE40C6 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Medium.ttf"; sourceTree = "<group>"; };
 		AF0A099C2C19A99D00BE40C6 /* Poppins-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Light.ttf"; sourceTree = "<group>"; };
@@ -205,12 +209,31 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA910F6D0460EB5CB0F946DC /* Pods_BetterJobLanding.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2334E3C6B528547599DD44D7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3F535F097D22FD992A0D6A36 /* Pods-BetterJobLanding.debug.xcconfig */,
+				9B877F7423806E985CDE1C9B /* Pods-BetterJobLanding.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		8743A3F71AA93695CD3DF0FC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2E61F3BA54DB20E95E26A259 /* Pods_BetterJobLanding.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AF0A099E2C19AB4A00BE40C6 /* Register */ = {
 			isa = PBXGroup;
 			children = (
@@ -892,6 +915,8 @@
 			children = (
 				AF8CF08D2C0F069E005F1B58 /* BetterJobLanding */,
 				AF8CF08C2C0F069E005F1B58 /* Products */,
+				2334E3C6B528547599DD44D7 /* Pods */,
+				8743A3F71AA93695CD3DF0FC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -945,10 +970,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AF8CF09F2C0F069E005F1B58 /* Build configuration list for PBXNativeTarget "BetterJobLanding" */;
 			buildPhases = (
+				74698AA1F2025A47EEA8F983 /* [CP] Check Pods Manifest.lock */,
 				AF1095CE2C0F06DE007A533C /* ShellScript */,
 				AF8CF0872C0F069E005F1B58 /* Sources */,
 				AF8CF0882C0F069E005F1B58 /* Frameworks */,
 				AF8CF0892C0F069E005F1B58 /* Resources */,
+				E368E3583987906FD21FAB4D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1032,6 +1059,28 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		74698AA1F2025A47EEA8F983 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BetterJobLanding-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		AF1095CE2C0F06DE007A533C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1048,6 +1097,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\nchmod +x gradlew\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n\n";
+		};
+		E368E3583987906FD21FAB4D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1266,6 +1332,7 @@
 		};
 		AF8CF0A02C0F069E005F1B58 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3F535F097D22FD992A0D6A36 /* Pods-BetterJobLanding.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1304,6 +1371,7 @@
 		};
 		AF8CF0A12C0F069E005F1B58 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9B877F7423806E985CDE1C9B /* Pods-BetterJobLanding.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
