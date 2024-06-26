@@ -109,7 +109,6 @@ import co.nexlabs.betterhr.joblanding.android.screen.register.MultiStyleText
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.JobDetailViewModel
-import co.nexlabs.betterhr.joblanding.network.api.home.UiState
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.FetchSaveJobsUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import coil.ImageLoader
@@ -233,8 +232,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
-    val uiStateRegister = viewModel.uiStateRegister.collectAsState(initial = UiState.Loading)
-    val uiStateForVerify = viewModel.uiStateForVerify.collectAsState(initial = UiState.Loading)
+//    val uiStateRegister = viewModel.uiStateRegister.collectAsState(initial = UiState.Loading)
+//    val uiStateForVerify = viewModel.uiStateForVerify.collectAsState(initial = UiState.Loading)
 
     var text by remember { mutableStateOf("") }
     var boxColor by remember { mutableStateOf(Color(0xFFD9D9D9)) }
@@ -261,7 +260,13 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         }
     }
 
-    when (val currentState = uiStateRegister.value) {
+    LaunchedEffect(uiState.isGetRequestOTPValue) {
+        if (uiState.getRequestOTPValue != "") {
+            isTimerRunning = true
+        }
+    }
+
+    /*when (val currentState = uiStateRegister.value) {
         is UiState.Loading -> {
 
         }
@@ -273,7 +278,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         is UiState.Error -> {
             MyToast(currentState.errorMessage)
         }
-    }
+    }*/
 
     if (timer == 0) {
         isTimerRunning = false
@@ -281,7 +286,16 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         timerText = timer.toString()
     }
 
-    when (val currentState = uiStateForVerify.value) {
+    LaunchedEffect(uiState.isGetVerifyOTPValue) {
+        if (uiState.getVerifyOTPValue != "") {
+            scope.launch {
+                viewModel.updateToken(uiState.getVerifyOTPValue)
+            }
+            step = "stepTwo"
+        }
+    }
+
+    /*when (val currentState = uiStateForVerify.value) {
         is UiState.Loading -> {
         }
 
@@ -297,7 +311,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         is UiState.Error -> {
             MyToast(currentState.errorMessage)
         }
-    }
+    }*/
 
     if (uiState.isSuccessForCandidateId) {
         LaunchedEffect(Unit) {

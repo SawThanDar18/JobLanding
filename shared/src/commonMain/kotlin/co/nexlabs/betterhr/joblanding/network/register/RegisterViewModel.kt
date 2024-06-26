@@ -19,12 +19,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
+import org.koin.core.component.getScopeName
 
+/*
 sealed class UiState {
     object Loading : UiState()
     data class Success(val data: String) : UiState()
     data class Error(val errorMessage: String) : UiState()
 }
+*/
 
 class RegisterViewModel(
     private val localStorage: LocalStorage,
@@ -34,13 +37,13 @@ class RegisterViewModel(
     private val _registerUiState = MutableStateFlow(RegisterUIState())
     val registerUiState = _registerUiState.asStateFlow()
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    /*private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState
 
     private val _uiStateForVerify = MutableStateFlow<UiState>(UiState.Loading)
-    val uiStateForVerify: StateFlow<UiState> = _uiStateForVerify
+    val uiStateForVerify: StateFlow<UiState> = _uiStateForVerify*/
 
-    fun observeUiStateForRequestOTP(onChange: (UiState) -> Unit) {
+    /*fun observeUiStateForRequestOTP(onChange: (UiState) -> Unit) {
         viewModelScope.launch {
             uiState.collect { state ->
                 onChange(state)
@@ -54,9 +57,9 @@ class RegisterViewModel(
                 onChange(state)
             }
         }
-    }
+    }*/
 
-    fun observeUiStateForBearerToken(onChange: (RegisterUIState) -> Unit) {
+    fun observeUiStateForRegister(onChange: (RegisterUIState) -> Unit) {
         viewModelScope.launch {
             registerUiState.collect { state ->
                 onChange(state)
@@ -68,9 +71,58 @@ class RegisterViewModel(
         viewModelScope.launch(DispatcherProvider.io) {
             try {
                 var response = registerRepository.requestOTP(phoneNumber)
-                _uiState.value = UiState.Success(response.data.response.message ?: "")
+                //_uiState.value = UiState.Success(response.data.response.message)
+                if (response.data != null) {
+                    if (response.data!!.response != null) {
+                        if (response.data.response.message != "") {
+                            _registerUiState.update {
+                                it.copy(
+                                    isGetRequestOTPValue = true,
+                                    getRequestOTPValue = response.data.response.message,
+                                    isLoading = false,
+                                    error = UIErrorType.Nothing
+                                )
+                            }
+                        } else {
+                            _registerUiState.update {
+                                it.copy(
+                                    isGetRequestOTPValue = false,
+                                    getRequestOTPValue = "",
+                                    isLoading = true,
+                                    error = UIErrorType.Other("Data return null")
+                                )
+                            }
+                        }
+                    } else {
+                        _registerUiState.update {
+                            it.copy(
+                                isGetRequestOTPValue = false,
+                                getRequestOTPValue = "",
+                                isLoading = true,
+                                error = UIErrorType.Other("Data return null")
+                            )
+                        }
+                    }
+                } else {
+                    _registerUiState.update {
+                        it.copy(
+                            isGetRequestOTPValue = false,
+                            getRequestOTPValue = "",
+                            isLoading = true,
+                            error = UIErrorType.Other("Data return null")
+                        )
+                    }
+                }
             } catch (e: Exception) {
-                _uiState.value = UiState.Error("Error: ${e.message}")
+                //_uiState.value = UiState.Error("Error: ${e.message}")
+                    _registerUiState.update {
+                        it.copy(
+                            isGetRequestOTPValue = false,
+                            getRequestOTPValue = "",
+                            isLoading = true,
+                            error = UIErrorType.Other(e.message.toString())
+                        )
+                    }
             }
         }
     }
@@ -79,14 +131,57 @@ class RegisterViewModel(
         viewModelScope.launch(DispatcherProvider.io) {
             try {
                 var response = registerRepository.verifyOTP(code)
-                if (response.data.verifyPhoneNumber.token == null) {
-                    _uiStateForVerify.value =
-                        UiState.Error("Error: ${response.data.verifyPhoneNumber.message}")
+                if (response.data != null) {
+                    if (response.data!!.verifyPhoneNumber != null) {
+                        if (response.data.verifyPhoneNumber.token != "") {
+                            _registerUiState.update {
+                                it.copy(
+                                    isGetVerifyOTPValue = true,
+                                    getVerifyOTPValue = response.data.verifyPhoneNumber.token ?: "",
+                                    isLoading = false,
+                                    error = UIErrorType.Nothing
+                                )
+                            }
+                        } else {
+                            _registerUiState.update {
+                                it.copy(
+                                    isGetVerifyOTPValue = false,
+                                    getVerifyOTPValue = "",
+                                    isLoading = true,
+                                    error = UIErrorType.Other("Data return null")
+                                )
+                            }
+                        }
+                    } else {
+                        _registerUiState.update {
+                            it.copy(
+                                isGetVerifyOTPValue = false,
+                                getVerifyOTPValue = "",
+                                isLoading = true,
+                                error = UIErrorType.Other("Data return null")
+                            )
+                        }
+                    }
                 } else {
-                    _uiStateForVerify.value = UiState.Success(response.data.verifyPhoneNumber.token ?: "")
+                    _registerUiState.update {
+                        it.copy(
+                            isGetVerifyOTPValue = false,
+                            getVerifyOTPValue = "",
+                            isLoading = true,
+                            error = UIErrorType.Other("Data return null")
+                        )
+                    }
                 }
             } catch (e: Exception) {
-                _uiStateForVerify.value = UiState.Error("Error: ${e.message}")
+                //_uiState.value = UiState.Error("Error: ${e.message}")
+                _registerUiState.update {
+                    it.copy(
+                        isGetVerifyOTPValue = false,
+                        getVerifyOTPValue = "",
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString())
+                    )
+                }
             }
         }
     }

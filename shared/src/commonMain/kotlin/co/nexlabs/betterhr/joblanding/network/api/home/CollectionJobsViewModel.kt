@@ -4,7 +4,6 @@ import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCo
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsRepository
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIState
-import co.nexlabs.betterhr.joblanding.network.register.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionJobsViewModelMapper
 import com.apollographql.apollo3.exception.ApolloException
