@@ -11,7 +11,7 @@ import UIKit
 class BHRJobLandingColors {
     
     private enum ColorSet: String {
-        case bhrPrimary,bhrBorder,bhrGray4A,bhrGray6A,bhrGray75,bhrGrayAA,bhrGray45,bhrWarning
+        case bhrPrimary,bhrBorder,bhrGray4A,bhrGray6A,bhrGray75,bhrGrayAA,bhrGray45,bhrWarning,bhrGrayC5,bhrDisable,bhrBlueDE
     }
     
     public static let bhrBJPrimary: UIColor! = UIColor.init(named: ColorSet.bhrPrimary.rawValue)
@@ -22,4 +22,8 @@ class BHRJobLandingColors {
     public static let bhrBJGrayAA: UIColor! = UIColor.init(named: ColorSet.bhrGrayAA.rawValue)
     public static let bhrBJGray45: UIColor! = UIColor.init(named: ColorSet.bhrGray45.rawValue)
     public static let bhrBJWarningColor: UIColor! = UIColor.init(named: ColorSet.bhrWarning.rawValue)
+    public static let bhrBJGrayC5: UIColor! = UIColor.init(named: ColorSet.bhrGrayC5.rawValue)
+    public static let bhrBJDisable: UIColor! = UIColor.init(named: ColorSet.bhrDisable.rawValue)
+    public static let bhrBJBlueDE: UIColor! = UIColor.init(named: ColorSet.bhrBlueDE.rawValue)
+    
 }
