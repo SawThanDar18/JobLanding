@@ -4,7 +4,6 @@ import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCo
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionCompaniesUIState
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CollectionJobsUIModel
-import co.nexlabs.betterhr.joblanding.network.register.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionCompaniesViewModelMapper
 import co.nexlabs.betterhr.joblanding.viewmodel.CollectionJobsViewModelMapper
@@ -87,7 +86,9 @@ class CollectionCompaniesViewModel(private val collectionJobsRepository: Collect
                         )
                     }
                     if (!data.hasErrors()) {
-                        _items.value = _items.value + CollectionCompaniesViewModelMapper.mapResponseToViewModel(data.data!!)
+                        _items.value += CollectionCompaniesViewModelMapper.mapResponseToViewModel(
+                            data.data!!
+                        )
 
                         //collectionCompaniesList.addAll(CollectionCompaniesViewModelMapper.mapResponseToViewModel(data.data!!))
                         _uiState.update {

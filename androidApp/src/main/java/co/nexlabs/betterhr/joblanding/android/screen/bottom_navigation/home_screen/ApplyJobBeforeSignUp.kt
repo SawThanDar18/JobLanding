@@ -65,7 +65,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.register.MultiStyleText
 import co.nexlabs.betterhr.joblanding.android.theme.DashBorder
-import co.nexlabs.betterhr.joblanding.network.register.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

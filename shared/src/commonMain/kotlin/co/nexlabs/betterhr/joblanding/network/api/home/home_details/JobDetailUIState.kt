@@ -25,7 +25,7 @@ data class JobDetailUIState(
         "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 0.0, 0.0, "", "", "", "", "",
         0, 0, 0,
         JobDetailCompanyUIModel(
-            "", "", ""
+            "", "", "", "", ""
         )
     ),
     var fetchSaveJobs: FetchSaveJobsUIModel = FetchSaveJobsUIModel(
@@ -34,11 +34,15 @@ data class JobDetailUIState(
     val candidateData: CandidateUIModel = CandidateUIModel(
         "", "", "", "", "", "", "", "", "", "", "", "",
         FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),
-        emptyList(), emptyList()
+        emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList()
     ),
     val idFromProfileUpload: String = "",
     val idFromCreateApplication: String = "",
     val isSuccessUploadMultipleFile: Boolean = false,
     val multiFileList: List<FileUploadResponse> = ArrayList(),
-    val appliedJobStatus: String = ""
+    val appliedJobStatus: String = "",
+    val isGetRequestOTPValue: Boolean = false,
+    val getRequestOTPValue: String = "",
+    val isGetVerifyOTPValue: Boolean = false,
+    val getVerifyOTPValue: String = ""
 )

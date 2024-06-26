@@ -169,6 +169,18 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                     }
                 } else {
                     uiState.items.forEach { item ->
+
+                        var countryFlag by remember { mutableStateOf(R.drawable.country) }
+                        when (item.countryName) {
+                            "Myanmar" -> countryFlag = R.drawable.myanmar_flag
+                            "Sri Lanka" -> countryFlag = R.drawable.srilanka_flag
+                            "Cambodia" -> countryFlag = R.drawable.cambodia_flag
+                            "Vietnam" -> countryFlag = R.drawable.vietnam_flag
+                            "Thailand" -> countryFlag = R.drawable.thailand_flag
+                            "Singapore" -> countryFlag = R.drawable.singapore_flag
+                            else -> R.drawable.country
+                        }
+
                         DropdownMenuItem(
                             onClick = {
                                 selectedItem = item
@@ -185,8 +197,7 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                                 horizontalArrangement = Arrangement.Start,
                             ) {
                                 Image(
-                                    //painter = item.image,
-                                    painter = painterResource(id = R.drawable.myanmar_flag),
+                                    painter = painterResource(id = countryFlag),
                                     contentDescription = item.countryName,
                                     modifier = Modifier.size(20.dp),
                                 )
@@ -217,6 +228,7 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
                             val pageId = uiState.dynamicPageId
                             if (pageId != "") {
                                 viewModel.updateCountryId(selectedItem.id)
+                                viewModel.updateCountryName(selectedItem.countryName)
                                 viewModel.updatePageId(pageId)
                                 navController.navigate("bottom-navigation-screen/${pageId}/${"home"}")
                             } else {

@@ -36,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -52,6 +53,7 @@ import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.CollectionCompaniesViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 
 @Composable
@@ -165,12 +167,13 @@ fun CollectionCompaniesListsScreen(
                                 verticalArrangement = Arrangement.SpaceEvenly,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.aia_logo),
-                                    contentDescription = "Company Logo",
+                                AsyncImage(
                                     modifier = Modifier
-                                        .size(80.dp),
-                                    contentScale = ContentScale.Fit
+                                        .size(80.dp)
+                                        .clip(shape = RoundedCornerShape(8.dp)),
+                                    model = item.company.logo,
+                                    contentDescription = "Company Logo",
+                                    contentScale = ContentScale.Fit,
                                 )
 
                                 Text(

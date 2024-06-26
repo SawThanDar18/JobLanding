@@ -1,0 +1,7 @@
+query FetchSavedJobsIds ($page: Int!, $limit: Int!, $is_paginate: Boolean, $job_ids: [String]) {
+    saveJobs(page: $page, limit: $limit, is_paginate: $is_paginate, job_ids: $job_ids) {
+        data {
+            job_id
+        }
+    }
+}

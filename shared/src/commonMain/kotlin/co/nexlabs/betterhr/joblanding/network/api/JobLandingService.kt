@@ -5,9 +5,11 @@ import co.nexlabs.betterhr.job.with_auth.CandidateQuery
 import co.nexlabs.betterhr.job.with_auth.CheckJobIsApplyQuery
 import co.nexlabs.betterhr.job.with_auth.CreateCandidateMutation
 import co.nexlabs.betterhr.job.with_auth.CreateCertificateMutation
+import co.nexlabs.betterhr.job.with_auth.CreateCompanyMutation
 import co.nexlabs.betterhr.job.with_auth.CreateEducationMutation
 import co.nexlabs.betterhr.job.with_auth.CreateExperienceMutation
 import co.nexlabs.betterhr.job.with_auth.CreateLanguageMutation
+import co.nexlabs.betterhr.job.with_auth.CreatePositionMutation
 import co.nexlabs.betterhr.job.with_auth.CreateSkillMutation
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchApplicationQuery
@@ -15,6 +17,7 @@ import co.nexlabs.betterhr.job.with_auth.FetchInterviewQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationByIdQuery
 import co.nexlabs.betterhr.job.with_auth.FetchNotificationsQuery
 import co.nexlabs.betterhr.job.with_auth.FetchSaveJobByJobIdQuery
+import co.nexlabs.betterhr.job.with_auth.FetchSavedJobsIdsQuery
 import co.nexlabs.betterhr.job.with_auth.ResponseAssignmentMutation
 import co.nexlabs.betterhr.job.with_auth.ResponseOfferMutation
 import co.nexlabs.betterhr.job.with_auth.SaveJobMutation
@@ -38,6 +41,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingCompanyJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobDetailQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
+import co.nexlabs.betterhr.job.without_auth.JobLandingSavedJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
@@ -220,10 +224,12 @@ interface JobLandingService {
     suspend fun updateSummary(
         id: String,
         summary: String
-    ): ApolloCall<UpdateCandidateMutation.Data>
+    ): ApolloCall<UpdateSummaryMutation.Data>
+
+    suspend fun createPosition(positionName: String): ApolloCall<CreatePositionMutation.Data>
 
     suspend fun createExperience(
-        position: String,
+        positionId: String,
         candidateId: String,
         companyId: String,
         title: String,
@@ -323,5 +329,11 @@ interface JobLandingService {
     ): ApolloCall<FetchInterviewQuery.Data>
 
     suspend fun scanWebLogIn(qrToken: String): ApolloCall<ScanWebLogInMutation.Data>
+
+    suspend fun getSavedJobsIds(): ApolloCall<FetchSavedJobsIdsQuery.Data>
+
+    suspend fun getSavedJobs(jobsId: List<String>): ApolloCall<JobLandingSavedJobsQuery.Data>
+
+    suspend fun createCompany(companyName: String, candidateId: String, fileIds: String): ApolloCall<CreateCompanyMutation.Data>
 
 }

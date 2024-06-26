@@ -13,5 +13,6 @@ data class CollectionCompaniesUIModel(
 
 data class CompaniesCompanyUIModel(
     val id: String,
-    val name: String
+    val name: String,
+    val logo: String
 )

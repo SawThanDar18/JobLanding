@@ -60,7 +60,8 @@ import java.util.Locale
 fun ApplicationDetailScreen(
     viewModel: ApplicationViewModel,
     navController: NavController,
-    applicationId: String
+    applicationId: String,
+    companyName: String
 ) {
     var lineHeight by remember { mutableStateOf(0.dp) }
     var statusImage by remember { mutableStateOf(R.drawable.step) }
@@ -156,7 +157,7 @@ fun ApplicationDetailScreen(
 
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "Oway",
+                        text = companyName,
                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF4A4A4A),

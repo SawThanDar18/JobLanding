@@ -33,7 +33,7 @@ object HomeViewModelMapper {
                         it.state_name ?: "",
                         it.hiring_date ?: "",
                         it.seniority_level!!.name,
-                        "Full time",
+                        it.employment_type!!.name,
                         it.workplace_type!!.name,
                         it.office_address ?: "",
                         it.currency_code ?: "",
@@ -49,7 +49,8 @@ object HomeViewModelMapper {
                         it.last3_cv_count ?: 0,
                         CompanyUIModel(
                             it.company!!.id,
-                            it.company.name
+                            it.company.name,
+                            it.company.company_logo ?: ""
                         )
                     )
                 )
@@ -70,7 +71,8 @@ object HomeViewModelMapper {
                         it.last3_cv_count ?: 0,
                         CompanyUIModel(
                             it.company!!.id,
-                            it.company.name
+                            it.company.name,
+                            it.company.company_logo ?: ""
                         )
                     )
                 )

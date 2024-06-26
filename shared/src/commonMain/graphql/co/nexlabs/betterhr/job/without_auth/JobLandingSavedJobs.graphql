@@ -7,5 +7,12 @@ query JobLandingSavedJobs($job_ids: [String!]!){
             name
             company_logo
         }
+        title
+        created_by
+        state_name
+        hiring_date
+        min_salary
+        max_salary
+        currency_code
     }
 }

@@ -60,6 +60,7 @@ import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetai
 import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailJobUIModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
+import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 
 @Composable
@@ -128,22 +129,22 @@ fun CompanyDetailsScreen(viewModel: CompanyDetailViewModel, navController: NavCo
                     OverlapBoxes(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.yoma_cover),
-                            contentDescription = "Background Image",
+                        AsyncImage(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(160.dp),
-                            contentScale = ContentScale.FillWidth
+                                .height(150.dp),
+                            model = uiState.companyDetail.coverImage,
+                            contentDescription = "Company Logo",
+                            contentScale = ContentScale.Crop,
                         )
 
-                        Image(
-                            painter = painterResource(id = R.drawable.bank_logo),
-                            contentDescription = "Company Logo",
+                        AsyncImage(
                             modifier = Modifier
-                                .width(61.dp)
-                                .height(61.dp)
+                                .size(61.dp)
                                 .clip(CircleShape),
+                            model = uiState.companyDetail.logo,
+                            contentDescription = "Company Logo",
+                            contentScale = ContentScale.Crop,
                         )
                     }
                 }
@@ -281,12 +282,13 @@ fun JobsScreen(jobList: List<CompanyDetailJobUIModel>, navController: NavControl
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Image(
-                            painter = painterResource(id = R.drawable.company_logo),
-                            contentDescription = "Company Logo",
+                        AsyncImage(
                             modifier = Modifier
-                                .size(48.dp),
-                            contentScale = ContentScale.Fit
+                                .size(48.dp)
+                                .clip(shape = RoundedCornerShape(8.dp)),
+                            model = item.company.logo,
+                            contentDescription = "Company Logo",
+                            contentScale = ContentScale.Crop,
                         )
                     }
 

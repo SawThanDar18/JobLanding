@@ -12,6 +12,12 @@ class AndroidLocalStorageImpl(context: Context): LocalStorage {
         set(value) {
             preferences.edit().putString("country_id", value).apply()
         }
+    override var countryName: String
+        get() = preferences.getString("country_name", "") ?: ""
+        set(value) {
+            preferences.edit().putString("country_name", value).apply()
+        }
+
     override var pageId: String
         get() = preferences.getString("page_id", "") ?: ""
         set(value) {
@@ -40,5 +46,50 @@ class AndroidLocalStorageImpl(context: Context): LocalStorage {
         get() = preferences.getString("phone", "") ?: ""
         set(value) {
             preferences.edit().putString("phone", value).apply()
+        }
+    override var applied: Boolean
+        get() = preferences.getBoolean("applied", true)
+        set(value) {
+            preferences.edit().putBoolean("applied", value).apply()
+        }
+    override var qualified: Boolean
+        get() = preferences.getBoolean("qualified", true)
+        set(value) {
+            preferences.edit().putBoolean("qualified", value).apply()
+        }
+    override var interviewing: Boolean
+        get() = preferences.getBoolean("interviewing", true)
+        set(value) {
+            preferences.edit().putBoolean("interviewing", value).apply()
+        }
+    override var offered: Boolean
+        get() = preferences.getBoolean("offer", true)
+        set(value) {
+            preferences.edit().putBoolean("offer", value).apply()
+        }
+    override var rejected: Boolean
+        get() = preferences.getBoolean("rejected", true)
+        set(value) {
+            preferences.edit().putBoolean("rejected", value).apply()
+        }
+    override var complete: Boolean
+        get() = preferences.getBoolean("complete", true)
+        set(value) {
+            preferences.edit().putBoolean("complete", value).apply()
+        }
+    override var pending: Boolean
+        get() = preferences.getBoolean("pending", true)
+        set(value) {
+            preferences.edit().putBoolean("pending", value).apply()
+        }
+    override var inboxRejected: Boolean
+        get() = preferences.getBoolean("inbox-rejected", true)
+        set(value) {
+            preferences.edit().putBoolean("inbox-rejected", value).apply()
+        }
+    override var pin: Boolean
+        get() = preferences.getBoolean("pin", true)
+        set(value) {
+            preferences.edit().putBoolean("pin", value).apply()
         }
 }

@@ -25,7 +25,8 @@ data class CollectionCompaniesUIModel(
 
 data class CompanyUIModel(
     val id: String,
-    val name: String
+    val name: String,
+    val logo: String
 )
 
 data class JobsListUIModel(

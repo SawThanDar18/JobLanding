@@ -20,6 +20,7 @@ query JobLandingCollectionCompanies($collection_id: String!, $is_paginate: Boole
                 id
                 name
                 subdomain
+                company_logo
             }
         }
         paginatorInfo{

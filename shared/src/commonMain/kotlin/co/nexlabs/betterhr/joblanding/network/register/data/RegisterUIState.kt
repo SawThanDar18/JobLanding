@@ -7,4 +7,8 @@ data class RegisterUIState(
     val error: UIErrorType = UIErrorType.Nothing,
     val isSuccessForBearerToken: Boolean = false,
     val bearerToken: String = "",
+    val isGetRequestOTPValue: Boolean = false,
+    val getRequestOTPValue: String = "",
+    val isGetVerifyOTPValue: Boolean = false,
+    val getVerifyOTPValue: String = ""
 )

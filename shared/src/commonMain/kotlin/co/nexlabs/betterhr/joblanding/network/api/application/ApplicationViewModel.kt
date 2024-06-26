@@ -4,7 +4,6 @@ import co.nexlabs.betterhr.joblanding.DispatcherProvider
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationRepository
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationUIState
-import co.nexlabs.betterhr.joblanding.network.register.UiState
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
 import co.nexlabs.betterhr.joblanding.viewmodel.ApplicationByIdViewModelMapper
 import co.nexlabs.betterhr.joblanding.viewmodel.ApplicationViewModelMapper
@@ -14,6 +13,7 @@ import com.apollographql.apollo3.exception.ApolloHttpException
 import com.apollographql.apollo3.exception.ApolloNetworkException
 import com.apollographql.apollo3.exception.ApolloParseException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -124,6 +124,7 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
     }
 
     fun getCompanyInfo(ids: List<String>) {
+        println("jobids>>$ids")
         viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
@@ -252,6 +253,30 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
                         }
                     }
                 }
+        }
+    }
+
+    private val _filters = MutableStateFlow(
+        mapOf(
+            "Applied" to localStorage.applied,
+            "Qualified" to localStorage.qualified,
+            "Interviewing" to localStorage.interviewing,
+            "Offer" to localStorage.offered,
+            "Rejected" to localStorage.rejected
+        )
+    )
+    val filters: StateFlow<Map<String, Boolean>> = _filters
+
+    fun updateFilter(key: String, value: Boolean) {
+        viewModelScope.launch {
+            when (key) {
+                "Applied" -> localStorage.applied = value
+                "Qualified" -> localStorage.qualified = value
+                "Interviewing" -> localStorage.interviewing = value
+                "Offer" -> localStorage.offered = value
+                "Rejected" -> localStorage.rejected = value
+            }
+            _filters.value = _filters.value.toMutableMap().apply { this[key] = value }
         }
     }
 }

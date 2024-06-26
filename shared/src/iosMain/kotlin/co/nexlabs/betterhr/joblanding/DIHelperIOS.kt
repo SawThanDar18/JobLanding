@@ -4,6 +4,7 @@ import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
 import co.nexlabs.betterhr.joblanding.network.api.JobLandingServiceImpl
 import co.nexlabs.betterhr.joblanding.network.api.SharedViewModel
+import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationFilterViewModel
 import co.nexlabs.betterhr.joblanding.network.api.application.ApplicationViewModel
 import co.nexlabs.betterhr.joblanding.network.api.application.data.ApplicationRepository
 import co.nexlabs.betterhr.joblanding.network.api.apply_job.ApplyJobViewModel
@@ -29,7 +30,9 @@ import co.nexlabs.betterhr.joblanding.network.api.interview.data.InterviewsRepos
 import co.nexlabs.betterhr.joblanding.network.api.login.QRLogInViewModel
 import co.nexlabs.betterhr.joblanding.network.api.login.data.QRLogInRepository
 import co.nexlabs.betterhr.joblanding.network.api.screen_portal.ScreenPortalViewModel
+import co.nexlabs.betterhr.joblanding.network.api.setting.SavedJobsViewModel
 import co.nexlabs.betterhr.joblanding.network.api.setting.SettingViewModel
+import co.nexlabs.betterhr.joblanding.network.api.setting.data.SavedJobsRepository
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
 import co.nexlabs.betterhr.joblanding.network.choose_country.data.ChooseCountryRepository
 import co.nexlabs.betterhr.joblanding.network.register.CompleteProfileViewModel
@@ -105,6 +108,7 @@ actual object DIHelperClient {
                     single { InboxRepository(get()) }
                     single { InterviewsRepository(get()) }
                     single { QRLogInRepository(get()) }
+                    single { SavedJobsRepository(get()) }
                     factory { ScreenPortalViewModel(localStorage) }
                     factory { RegisterViewModel(localStorage, get()) }
                     factory { ChooseCountryViewModel(localStorage, get()) }
@@ -126,6 +130,8 @@ actual object DIHelperClient {
                     factory { InterviewViewModel(localStorage, get()) }
                     factory { QRLogInViewModel(localStorage, get()) }
                     factory { SettingViewModel(localStorage) }
+                    factory { ApplicationFilterViewModel(localStorage) }
+                    factory { SavedJobsViewModel(localStorage, get()) }
                 }
             )
         }
@@ -212,6 +218,14 @@ actual object DIHelperClient {
     }
 
     actual fun getSettingViewModel(): SettingViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getApplicationFilterViewModel(): ApplicationFilterViewModel {
+        return koinApp.koin.get()
+    }
+
+    actual fun getSavedJobsViewModel(): SavedJobsViewModel {
         return koinApp.koin.get()
     }
 }

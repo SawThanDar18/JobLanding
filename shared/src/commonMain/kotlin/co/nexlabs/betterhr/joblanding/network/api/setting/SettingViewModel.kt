@@ -14,5 +14,14 @@ class SettingViewModel(private val localStorage: LocalStorage): ViewModel() {
         localStorage.bearerToken = ""
         localStorage.candidateId = ""
         localStorage.phone = ""
+        localStorage.applied = false
+        localStorage.qualified = false
+        localStorage.interviewing = false
+        localStorage.offered = false
+        localStorage.rejected = false
+        localStorage.complete = false
+        localStorage.pending = false
+        localStorage.inboxRejected = false
+        localStorage.pin = false
     }
 }

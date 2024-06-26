@@ -7,6 +7,7 @@ query JobLandingCompany($company_id: String!){
         country_name
         name
         description
+        company_logo
         company_mail
         company_link
         jobs_count
@@ -24,7 +25,7 @@ query JobLandingCompany($company_id: String!){
 #            state_name
 #            hiring_date
 #            seniority_level
-##            employment_type
+#            employment_type
 #            workplace_type
 #            office_address
 #            currency_code

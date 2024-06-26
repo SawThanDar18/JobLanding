@@ -22,7 +22,7 @@ object CompanyDetailJobViewModelMapper {
                 it.state_name ?: "",
                 it.hiring_date ?: "",
                 it.seniority_level!!.name,
-                "Full time",
+                it.employment_type!!.name,
                 it.workplace_type!!.name,
                 it.office_address ?: "",
                 it.currency_code ?: "",
@@ -38,7 +38,8 @@ object CompanyDetailJobViewModelMapper {
                 it.last3_cv_count ?: 0,
                 CompanyDetailCompanyUIModel(
                     it.company_id ?: "",
-                    it.company_name ?: ""
+                    it.company_name ?: "",
+                    it.company!!.company_logo ?: ""
                 )
             )
         }

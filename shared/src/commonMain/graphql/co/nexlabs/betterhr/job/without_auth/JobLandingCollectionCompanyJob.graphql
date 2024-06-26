@@ -19,7 +19,7 @@ query JobLandingCollectionCompanyJob($collection_company_id: String!){
             state_name
             hiring_date
             seniority_level
-#            employment_type
+            employment_type
             workplace_type
             office_address
             currency_code
@@ -36,6 +36,9 @@ query JobLandingCollectionCompanyJob($collection_company_id: String!){
             last1_view_count
             last1_conversation_rate
             last1_cv_count
+            company {
+                company_logo
+            }
         }
     }
 }

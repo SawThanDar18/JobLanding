@@ -1,0 +1,5 @@
+mutation CreateCompany($name: String!, $candidate_id: String!, $file_id: String) {
+    createCompany(name: $name, candidate_id: $candidate_id, file_id: $file_id) {
+        id
+    }
+}

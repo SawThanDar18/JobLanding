@@ -24,11 +24,11 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-sealed class UiState {
+/*sealed class UiState {
     object Loading : UiState()
     data class Success(val data: String) : UiState()
     data class Error(val errorMessage: String) : UiState()
-}
+}*/
 
 class JobDetailViewModel(
     private val localStorage: LocalStorage,
@@ -37,7 +37,7 @@ class JobDetailViewModel(
     private val _uiState = MutableStateFlow(JobDetailUIState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiStateRegister = MutableStateFlow<UiState>(UiState.Loading)
+    /*private val _uiStateRegister = MutableStateFlow<UiState>(UiState.Loading)
     val uiStateRegister: StateFlow<UiState> = _uiStateRegister
 
     private val _uiStateForVerify = MutableStateFlow<UiState>(UiState.Loading)
@@ -57,7 +57,7 @@ class JobDetailViewModel(
                 onChange(state)
             }
         }
-    }
+    }*/
 
     fun observeUiStateForJobDetail(onChange: (JobDetailUIState) -> Unit) {
         viewModelScope.launch {
@@ -256,12 +256,22 @@ class JobDetailViewModel(
                         )
                     }
                     if (!data.hasErrors()) {
-                        _uiState.update {
-                            it.copy(
-                                appliedJobStatus = data.data!!.applicationIsApplied!!.status ?: "",
-                                isLoading = false,
-                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
-                            )
+                        if (data.data!!.applicationIsApplied != null) {
+                            _uiState.update {
+                                it.copy(
+                                    appliedJobStatus = data.data!!.applicationIsApplied!!.status ?: "",
+                                    isLoading = false,
+                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                )
+                            }
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    appliedJobStatus = "",
+                                    isLoading = false,
+                                    error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                )
+                            }
                         }
                     } else {
                         _uiState.update {
@@ -409,10 +419,59 @@ class JobDetailViewModel(
     fun requestOTP(phoneNumber: String) {
         viewModelScope.launch(DispatcherProvider.io) {
             try {
-                val response = jobDetailRepository.requestOTP(phoneNumber)
-                _uiStateRegister.value = UiState.Success(response.data.response.message)
+                var response = jobDetailRepository.requestOTP(phoneNumber)
+                //_uiState.value = UiState.Success(response.data.response.message)
+                if (response.data != null) {
+                    if (response.data!!.response != null) {
+                        if (response.data.response.message != "") {
+                            _uiState.update {
+                                it.copy(
+                                    isGetRequestOTPValue = true,
+                                    getRequestOTPValue = response.data.response.message,
+                                    isLoading = false,
+                                    error = UIErrorType.Nothing
+                                )
+                            }
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    isGetRequestOTPValue = false,
+                                    getRequestOTPValue = "",
+                                    isLoading = true,
+                                    error = UIErrorType.Other("Data return null")
+                                )
+                            }
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isGetRequestOTPValue = false,
+                                getRequestOTPValue = "",
+                                isLoading = true,
+                                error = UIErrorType.Other("Data return null")
+                            )
+                        }
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isGetRequestOTPValue = false,
+                            getRequestOTPValue = "",
+                            isLoading = true,
+                            error = UIErrorType.Other("Data return null")
+                        )
+                    }
+                }
             } catch (e: Exception) {
-                _uiStateRegister.value = UiState.Error("Error: ${e.message}")
+                //_uiState.value = UiState.Error("Error: ${e.message}")
+                _uiState.update {
+                    it.copy(
+                        isGetRequestOTPValue = false,
+                        getRequestOTPValue = "",
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString())
+                    )
+                }
             }
         }
     }
@@ -420,10 +479,58 @@ class JobDetailViewModel(
     fun verifyOTP(code: String) {
         viewModelScope.launch(DispatcherProvider.io) {
             try {
-                val response = jobDetailRepository.verifyOTP(code)
-                _uiStateForVerify.value = UiState.Success(response.data.verifyPhoneNumber.token ?: "")
+                var response = jobDetailRepository.verifyOTP(code)
+                if (response.data != null) {
+                    if (response.data!!.verifyPhoneNumber != null) {
+                        if (response.data.verifyPhoneNumber.token != "") {
+                            _uiState.update {
+                                it.copy(
+                                    isGetVerifyOTPValue = true,
+                                    getVerifyOTPValue = response.data.verifyPhoneNumber.token ?: "",
+                                    isLoading = false,
+                                    error = UIErrorType.Nothing
+                                )
+                            }
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    isGetVerifyOTPValue = false,
+                                    getVerifyOTPValue = "",
+                                    isLoading = true,
+                                    error = UIErrorType.Other("Data return null")
+                                )
+                            }
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isGetVerifyOTPValue = false,
+                                getVerifyOTPValue = "",
+                                isLoading = true,
+                                error = UIErrorType.Other("Data return null")
+                            )
+                        }
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isGetVerifyOTPValue = false,
+                            getVerifyOTPValue = "",
+                            isLoading = true,
+                            error = UIErrorType.Other("Data return null")
+                        )
+                    }
+                }
             } catch (e: Exception) {
-                _uiStateForVerify.value = UiState.Error("Error: ${e.message}")
+                //_uiState.value = UiState.Error("Error: ${e.message}")
+                _uiState.update {
+                    it.copy(
+                        isGetVerifyOTPValue = false,
+                        getVerifyOTPValue = "",
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString())
+                    )
+                }
             }
         }
     }

@@ -28,7 +28,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -49,10 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -64,59 +62,104 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
-import co.nexlabs.betterhr.joblanding.android.screen.register.Overlap
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.inbox.InboxViewModel
 import co.nexlabs.betterhr.joblanding.util.UIErrorType
-import coil.compose.rememberImagePainter
-import coil.request.ImageRequest
-import com.google.accompanist.glide.rememberGlidePainter
+import coil.compose.AsyncImage
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
-import java.util.TimeZone
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) {
 
+    var refreshing by remember { mutableStateOf(false) }
+
     var statusColor by remember { mutableStateOf(Color(0xFFFFFFFF)) }
     var searchText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    var bottomBarVisible by remember { mutableStateOf(false) }
+    var filterBottomBarVisible by remember { mutableStateOf(false) }
+    var filterIcon by remember { mutableStateOf(R.drawable.complete_filter) }
 
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
+    val filters by viewModel.filters.collectAsState()
+    var statusList: MutableList<String> = ArrayList()
 
-    scope.launch {
-        if (viewModel.getBearerToken() != "") {
-            viewModel.fetchNotification(emptyList())
+    var jobIds by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            scope.launch {
+                if (viewModel.getBearerToken() != "") {
+                    statusList.clear()
+                    if (filters.isNotEmpty()) {
+                        filters.map {
+                            if (it.value) {
+                                statusList.add(it.key.toLowerCase())
+                            }
+                        }
+                    }
+                    viewModel.fetchNotification(statusList)
+                }
+            }
+            refreshing = false
         }
     }
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-
-        AnimatedVisibility(
-            uiState.error != UIErrorType.Nothing,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            ErrorLayout(uiState.error)
+    LaunchedEffect(Unit) {
+    scope.launch {
+        if (viewModel.getBearerToken() != "") {
+                statusList.clear()
+                if (filters.isNotEmpty()) {
+                    filters.map {
+                        if (it.value) {
+                            statusList.add(it.key.toLowerCase())
+                        }
+                    }
+                }
+                viewModel.fetchNotification(statusList)
+            }
         }
+    }
 
-        AnimatedVisibility(
-            uiState.notificationList.isNotEmpty(),
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
+    LaunchedEffect (uiState.isSuccessGetInboxData) {
+            if (uiState.notificationList.isNotEmpty()) {
+                jobIds = uiState.notificationList.map {
+                    it.referenceId
+                }
+            }
+    }
+
+    LaunchedEffect (jobIds.isNotEmpty()) {
+        scope.launch {
+            viewModel.getCompanyInfo(jobIds)
+        }
+    }
+
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = refreshing),
+        onRefresh = { refreshing = true },
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+            AnimatedVisibility(
+                uiState.error != UIErrorType.Nothing,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                ErrorLayout(uiState.error)
+            }
+
             Column(
                 modifier = Modifier
                     .padding(16.dp, 16.dp, 0.dp, 0.dp)
@@ -152,13 +195,23 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                 .border(1.dp, Color(0xFFE4E7ED), RoundedCornerShape(100.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = uiState.notificationList.size.toString(),
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFFAAAAAA),
-                                fontSize = 14.sp
-                            )
+                            if (uiState.notificationList.isEmpty()) {
+                                Text(
+                                    text = "0",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFFAAAAAA),
+                                    fontSize = 14.sp
+                                )
+                            } else {
+                                Text(
+                                    text = uiState.notificationList.size.toString(),
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFFAAAAAA),
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
 
                     }
@@ -169,7 +222,7 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                         modifier = Modifier
                             .size(20.dp, 18.dp)
                             .clickable {
-                                bottomBarVisible = true
+                                filterBottomBarVisible = true
                             },
                         alignment = Alignment.Center
                     )
@@ -177,61 +230,63 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(end = 16.dp)
-                        .height(45.dp)
-                        .fillMaxWidth()
-                        .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
-                        .background(
-                            color = Color.Transparent,
-                            shape = MaterialTheme.shapes.medium
-                        ),
-                    value = searchText,
-                    onValueChange = {
-                        searchText = it
-                    },
-                    placeholder = { Text("Search", color = Color(0xFFAAAAAA)) },
-                    textStyle = TextStyle(
-                        fontWeight = FontWeight.W400,
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                        color = Color(0xFFAAAAAA)
-                    ),
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color(0xFFAAAAAA),
-                        backgroundColor = Color.Transparent,
-                        cursorColor = Color(0xFF1ED292),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                        }
-                    ),
-                    singleLine = true,
-                    leadingIcon = {
-                        Image(
-                            painter = painterResource(id = R.drawable.search),
-                            contentDescription = "Search Icon",
-                            modifier = Modifier
-                                .size(16.dp)
-                        )
-                    },
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
                 AnimatedVisibility(
-                    uiState.notificationList.isNotEmpty(),
+                    uiState.notificationList.isNotEmpty() && uiState.companyData.isNotEmpty(),
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .height(45.dp)
+                            .fillMaxWidth()
+                            .border(1.dp, Color(0xFFE1E1E1), RoundedCornerShape(8.dp))
+                            .background(
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.medium
+                            ),
+                        value = searchText,
+                        onValueChange = {
+                            searchText = it
+                        },
+                        placeholder = { Text("Search", color = Color(0xFFAAAAAA)) },
+                        textStyle = TextStyle(
+                            fontWeight = FontWeight.W400,
+                            fontSize = 13.sp,
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            color = Color(0xFFAAAAAA)
+                        ),
+                        colors = TextFieldDefaults.textFieldColors(
+                            textColor = Color(0xFFAAAAAA),
+                            backgroundColor = Color.Transparent,
+                            cursorColor = Color(0xFF1ED292),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                            }
+                        ),
+                        singleLine = true,
+                        leadingIcon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.search),
+                                contentDescription = "Search Icon",
+                                modifier = Modifier
+                                    .size(16.dp)
+                            )
+                        },
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (uiState.notificationList.isNotEmpty()) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -250,7 +305,10 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                     var item = uiState.notificationList[index]
 
                                     val dateFormat =
-                                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                        SimpleDateFormat(
+                                            "yyyy-MM-dd HH:mm:ss",
+                                            Locale.getDefault()
+                                        )
                                     val timestamp = dateFormat.parse(item.updateAt)
                                     val calendarTimestamp = Calendar.getInstance()
                                     calendarTimestamp.time = timestamp
@@ -346,12 +404,13 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.bank_logo),
-                                                contentDescription = "Company Icon",
+                                            AsyncImage(
                                                 modifier = Modifier
                                                     .size(32.dp)
-                                                    .clip(CircleShape)
+                                                    .clip(CircleShape),
+                                                model = uiState.companyData[index].company.companyLogo,
+                                                contentDescription = "Company Logo",
+                                                contentScale = ContentScale.Fit,
                                             )
 
                                             Image(
@@ -366,79 +425,112 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                             }
                         }
                     }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "There is no Notifications yet!",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF1ED292),
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(335.dp)
-            .padding(top = 50.dp)
-            .systemBarsPadding()
-    ) {
-
-        if (bottomBarVisible) {
-            ModalBottomSheetLayout(
-                sheetContent = {
-                    Column(
+    if (filterBottomBarVisible) {
+        ModalBottomSheetLayout(
+            sheetContent = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(450.dp)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 72.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = "Filter",
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W600,
-                                color = Color(0xFF6A6A6A),
-                                fontSize = 16.sp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Filter",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
 
-                            Image(
-                                painter = painterResource(id = R.drawable.x),
-                                contentDescription = "Close Icon",
-                                modifier = Modifier
-                                    .size(20.dp),
-                                alignment = Alignment.Center
-                            )
+                        Image(
+                            painter = painterResource(id = R.drawable.x),
+                            contentDescription = "Close Icon",
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable {
+                                    filterBottomBarVisible = false
+                                    statusList.clear()
+                                    if (filters.isNotEmpty()) {
+                                        filters.map {
+                                            if (it.value) {
+                                                statusList.add(it.key.toLowerCase())
+                                            }
+                                        }
+                                    }
+                                    viewModel.fetchNotification(statusList)
+                                           },
+                            alignment = Alignment.Center
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Status",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W700,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    filters.forEach { (key, isChecked) ->
+
+                        when (key) {
+                            "Complete" -> filterIcon = R.drawable.complete_filter
+                            "Pending" -> filterIcon = R.drawable.pending_filter
+                            "Rejected" -> filterIcon = R.drawable.rejected_filter
+                            "Pin" -> filterIcon = R.drawable.pin_filter
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Status",
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W700,
-                                color = Color(0xFF6A6A6A),
-                                fontSize = 16.sp
-                            )
-                        }
-
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .padding(start = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Row(
-                                modifier = Modifier.weight(1f),
                                 horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.complete_filter),
-                                    contentDescription = "Complete Filter Icon",
+                                    painter = painterResource(id = filterIcon),
+                                    contentDescription = "Filter Icon",
                                     modifier = Modifier
                                         .size(width = 4.dp, height = 21.dp),
                                     alignment = Alignment.Center
@@ -447,33 +539,70 @@ fun NotificationScreen(viewModel: InboxViewModel, navController: NavController) 
                                 Spacer(modifier = Modifier.width(8.dp))
 
                                 Text(
-                                    text = "Complete",
+                                    text = key,
                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                     fontWeight = FontWeight.W700,
                                     color = Color(0xFF6A6A6A),
                                     fontSize = 16.sp
                                 )
                             }
+
+                            Checkbox(
+                                checked = isChecked,
+                                onCheckedChange = { newChecked ->
+                                    scope.launch {
+                                        viewModel.updateFilter(key, newChecked)
+                                    }
+                                },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = Color(0xFF1ED292),
+                                    uncheckedColor = Color(0xFFA7BAC5),
+                                    checkmarkColor = Color.White
+                                )
+                            )
                         }
                     }
-                },
-                sheetState = rememberModalBottomSheetState(
-                    initialValue = ModalBottomSheetValue.Expanded
-                ),
-                sheetShape = RoundedCornerShape(
-                    bottomStart = 0.dp,
-                    bottomEnd = 0.dp,
-                    topStart = 24.dp,
-                    topEnd = 24.dp
-                ),
-                sheetElevation = 16.dp,
-                sheetBackgroundColor = Color.White,
-                sheetContentColor = contentColorFor(Color.White),
-                modifier = Modifier.fillMaxWidth(),
-                scrimColor = Color.Transparent
-            ) {
 
-            }
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Text(
+                        textAlign = TextAlign.Start,
+                        text = "Dismiss",
+                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFF1ED292),
+                        fontSize = 14.sp,
+                        modifier = Modifier.clickable {
+                            filterBottomBarVisible = false
+                            statusList.clear()
+                            if (filters.isNotEmpty()) {
+                                filters.map {
+                                    if (it.value) {
+                                        statusList.add(it.key.toLowerCase())
+                                    }
+                                }
+                            }
+                            viewModel.fetchNotification(statusList)
+                        }
+                    )
+                }
+            },
+            sheetState = rememberModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Expanded
+            ),
+            sheetShape = RoundedCornerShape(
+                bottomStart = 0.dp,
+                bottomEnd = 0.dp,
+                topStart = 24.dp,
+                topEnd = 24.dp
+            ),
+            sheetElevation = 16.dp,
+            sheetBackgroundColor = Color.White,
+            sheetContentColor = contentColorFor(Color.White),
+            modifier = Modifier.fillMaxWidth(),
+            scrimColor = Color.Transparent
+        ) {
+
         }
     }
 }

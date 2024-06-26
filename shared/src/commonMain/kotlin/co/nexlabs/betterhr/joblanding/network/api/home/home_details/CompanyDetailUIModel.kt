@@ -9,6 +9,8 @@ data class CompanyDetailUIModel(
     val companyMail: String,
     val companyLink: String,
     val jobCounts: Int,
+    val logo: String,
+    val coverImage: String
     //val jobs: List<CompanyDetailJobs>
 )
 

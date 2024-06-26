@@ -68,7 +68,6 @@ query Candidate {
                 id
                 position_id
                 candidate_id
-                company_id
                 title
                 location
                 experience_level

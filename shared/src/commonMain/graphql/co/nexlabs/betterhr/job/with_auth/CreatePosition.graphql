@@ -1,0 +1,10 @@
+mutation CreatePosition(
+    $name: String!
+) {
+    createPosition (
+        name: $name
+    ) {
+        id
+        name
+    }
+}

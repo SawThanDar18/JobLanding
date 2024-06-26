@@ -83,7 +83,7 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
                 text = "hello",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontWeight = FontWeight.W600,
-                color = Color(0xFF6A6A6A),
+                color = Color.Transparent,
                 fontSize = 14.sp,
             )
         }
@@ -105,7 +105,10 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("saved-jobs-screen")
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
@@ -144,7 +147,10 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                               navController.navigate("about-screen")
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
@@ -222,7 +228,10 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("country-screen")
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
@@ -232,7 +241,7 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
                     horizontalArrangement = Arrangement.Start,
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.language),
+                        painter = painterResource(id = R.drawable.country),
                         contentDescription = "Setting Country Icon",
                         modifier = Modifier
                             .size(24.dp)
@@ -261,7 +270,10 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("privacy-screen")
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
@@ -300,7 +312,8 @@ fun SettingScreen(navController: NavController, viewModel: SettingViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable { navController.navigate("terms-of-service-screen") },
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(

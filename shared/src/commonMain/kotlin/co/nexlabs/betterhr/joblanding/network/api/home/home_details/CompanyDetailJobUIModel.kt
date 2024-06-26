@@ -32,5 +32,6 @@ data class CompanyDetailJobUIModel(
 
 data class CompanyDetailCompanyUIModel(
     val id: String,
-    val name: String
+    val name: String,
+    val logo: String
 )

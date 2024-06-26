@@ -44,7 +44,7 @@ object JobDetailViewModelMapper {
             data.state_name ?: "",
             data.hiring_date ?: "",
             data.seniority_level!!.name,
-            "Full time",
+            data.employment_type!!.name,
             data.workplace_type!!.name,
             data.office_address ?: "",
             data.currency_code ?: "",
@@ -61,7 +61,9 @@ object JobDetailViewModelMapper {
             JobDetailCompanyUIModel(
                 data.company!!.id,
                 data.company.name,
-                data.company.subdomain
+                data.company.subdomain,
+                data.company.company_logo ?: "",
+                data.company.cover_image ?: ""
             )
         )
     }
