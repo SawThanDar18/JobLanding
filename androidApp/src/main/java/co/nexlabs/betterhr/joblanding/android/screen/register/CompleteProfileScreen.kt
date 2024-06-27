@@ -127,9 +127,9 @@ import java.util.Date
 import java.util.Locale
 
 data class AddMoreLanguageDataItem(
-    val id: String,
-    val language: String,
-    val proficiencyLevels: String
+    var id: String,
+    var language: String,
+    var proficiencyLevels: String
 )
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
@@ -149,6 +149,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var phoneNumber by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var summary by remember { mutableStateOf("") }
+    var updateSummary by remember { mutableStateOf("") }
     var companiesList: MutableList<CompaniesUIModel> = ArrayList()
     var experienceList: MutableList<ExperienceUIModel> = ArrayList()
     var educationList: MutableList<EducationUIModel> = ArrayList()
@@ -167,6 +168,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     val uiState by viewModel.uiState.collectAsState()
 
     var addSummaryVisible by remember { mutableStateOf(false) }
+    var updateSummaryVisible by remember { mutableStateOf(false) }
     var addExperienceCompanyVisible by remember { mutableStateOf(false) }
     var addExperiencePositionVisible by remember { mutableStateOf(false) }
     var updateExperiencePositionVisible by remember { mutableStateOf(false) }
@@ -237,7 +239,15 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var eduStartDateData by remember { mutableStateOf("") }
     var eduEndDateData by remember { mutableStateOf("") }
 
-    var addMoreLanguageItem by remember { mutableStateOf(1) }
+    var addMoreLanguageItem by remember { mutableStateOf(listOf(AddMoreLanguageDataItem("", "", ""))) }
+    var updateAddMoreLanguageItem by remember { mutableStateOf(listOf(AddMoreLanguageDataItem("", "", ""))) }
+
+    fun addMoreItem() {
+        val newList = addMoreLanguageItem.toMutableList()
+        newList.add(AddMoreLanguageDataItem("", "", ""))
+        addMoreLanguageItem = newList
+    }
+
     var languageName by remember { mutableStateOf("") }
     var languageProficiencyLevel by remember { mutableStateOf("") }
 
@@ -281,7 +291,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     }
 
     LaunchedEffect(uiState.isSuccessUpdateSummary) {
-        addSummaryVisible = false
+        updateSummaryVisible = false
         scope.launch {
             viewModel.getCandidateData()
         }
@@ -1050,7 +1060,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     .background(color = Color(0xFFE4E7ED))
                             )
 
-                            if ((summary == "")) {
+                            /*if ((summary == "")) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -1110,7 +1120,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             modifier = Modifier
                                                 .size(24.dp)
                                                 .clickable {
-                                                    addSummaryVisible = true
+                                                    updateSummaryVisible = true
+                                                    updateSummary = uiState.candidateData.summary
                                                 },
                                         )
 
@@ -1125,259 +1136,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp)
                                     )
-
-                                    Spacer(modifier = Modifier.height(24.dp))
-                                }
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(2.dp)
-                                    .background(color = Color(0xFFE4E7ED))
-                            )
-
-                            if (educationList.isEmpty()) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(72.dp)
-                                        .padding(horizontal = 16.dp)
-                                        .clickable {
-                                            addEducationVisible = true
-                                        },
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Education",
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W600,
-                                        color = Color(0xFF6A6A6A),
-                                        fontSize = 16.sp
-                                    )
-
-                                    Spacer(modifier = Modifier.width(8.dp))
-
-                                    Image(
-                                        painter = painterResource(id = R.drawable.plus),
-                                        contentDescription = "Plus Icon",
-                                        modifier = Modifier
-                                            .size(24.dp),
-                                        alignment = Alignment.Center
-                                    )
-
-                                }
-                            } else {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentHeight()
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(72.dp)
-                                            .padding(horizontal = 16.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "Education",
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            fontWeight = FontWeight.W600,
-                                            color = Color(0xFF6A6A6A),
-                                            fontSize = 16.sp
-                                        )
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                        Image(
-                                            painter = painterResource(id = R.drawable.plus),
-                                            contentDescription = "Plus Icon",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable {
-                                                    addEducationVisible = true
-                                                },
-                                        )
-
-                                    }
-
-                                    FlowRow(
-                                        maxItemsInEachRow = 1,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp),
-                                    ) {
-                                        repeat(educationList.size) { index ->
-                                            var education = educationList[index]
-
-                                            Column(
-                                                modifier = Modifier.fillMaxWidth(),
-                                            ) {
-                                                Row(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    horizontalArrangement = Arrangement.SpaceBetween
-                                                ) {
-                                                    Text(
-                                                        text = education.university,
-                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                        fontWeight = FontWeight.W500,
-                                                        color = Color(0xFF4A4A4A),
-                                                        fontSize = 14.sp
-                                                    )
-
-                                                    Spacer(modifier = Modifier.width(8.dp))
-
-                                                    Image(
-                                                        painter = painterResource(id = R.drawable.edit),
-                                                        contentDescription = "Edit Icon",
-                                                        modifier = Modifier
-                                                            .size(24.dp)
-                                                            .clickable {
-                                                                updateEducationVisible = true
-
-                                                                if (education.startDate != "0000-00-00 00:00:00" && (education.endDate != "0000-00-00 00:00:00" && education.endDate != "")) {
-                                                                    eduStartDateData =
-                                                                        ConvertYMDToMY(
-                                                                            education.startDate
-                                                                        )
-                                                                    eduEndDateData =
-                                                                        ConvertYMDToMY(
-                                                                            education.endDate
-                                                                        )
-                                                                }
-
-                                                                if (education.startDate != "0000-00-00 00:00:00" && education.endDate == "") {
-                                                                    eduStartDateData =
-                                                                        ConvertYMDToMY(
-                                                                            education.startDate
-                                                                        )
-                                                                    eduEndDateData = ""
-                                                                }
-
-                                                                educationId = education.id
-                                                                updateSelectedCountry =
-                                                                    education.countryName
-                                                                updateUniversity =
-                                                                    education.university
-                                                                updateSelectedEducationLevel =
-                                                                    education.educationLevel
-                                                                updateDegree = education.degree
-                                                                updateFieldOfStudy =
-                                                                    education.fieldOfStudy
-                                                                updateEduStartDate =
-                                                                    eduStartDateData
-                                                                updateEduEndDate = eduEndDateData
-                                                                updateIsCurrentStudying =
-                                                                    education.isCurrentStudying
-                                                                updateEduDescription =
-                                                                    education.description
-                                                            },
-                                                        alignment = Alignment.Center
-                                                    )
-                                                }
-
-                                                Text(
-                                                    text = "${education.degree}, ${education.fieldOfStudy}",
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W500,
-                                                    color = Color(0xFF757575),
-                                                    fontSize = 12.sp
-                                                )
-
-                                                Text(
-                                                    text = education.countryName,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W500,
-                                                    color = Color(0xFF757575),
-                                                    fontSize = 12.sp
-                                                )
-
-                                                var date by remember {
-                                                    mutableStateOf(
-                                                        ""
-                                                    )
-                                                }
-                                                if (education.startDate != "0000-00-00 00:00:00") {
-                                                    if (education.endDate != "0000-00-00 00:00:00" && education.endDate != "") {
-                                                        date = "${
-                                                            ConvertYMDToMY(
-                                                                education.startDate
-                                                            )
-                                                        } - ${
-                                                            ConvertYMDToMY(
-                                                                education.endDate
-                                                            )
-                                                        }"
-                                                    }
-                                                } else {
-                                                    date = "--"
-                                                }
-
-                                                if (education.startDate != "0000-00-00 00:00:00") {
-                                                    if (education.endDate != "0000-00-00 00:00:00" && education.endDate == "") {
-                                                        date = "${
-                                                            ConvertYMDToMY(
-                                                                education.startDate
-                                                            )
-                                                        } - Present"
-                                                    }
-                                                } else {
-                                                    date = "--"
-                                                }
-
-
-                                                Text(
-                                                    text = date,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W500,
-                                                    color = Color(0xFF757575),
-                                                    fontSize = 12.sp
-                                                )
-
-                                                Spacer(
-                                                    modifier = Modifier.height(
-                                                        4.dp
-                                                    )
-                                                )
-
-                                                Row {
-                                                    Text(
-                                                        text = "Description : ",
-                                                        fontFamily = FontFamily(
-                                                            Font(
-                                                                R.font.poppins_regular
-                                                            )
-                                                        ),
-                                                        fontWeight = FontWeight.W500,
-                                                        color = Color(0xFF4A4A4A),
-                                                        fontSize = 12.sp
-                                                    )
-
-                                                    Text(
-                                                        text = education.description,
-                                                        fontFamily = FontFamily(
-                                                            Font(
-                                                                R.font.poppins_regular
-                                                            )
-                                                        ),
-                                                        fontWeight = FontWeight.W500,
-                                                        color = Color(0xFF4A4A4A),
-                                                        fontSize = 12.sp
-                                                    )
-                                                }
-
-                                                Spacer(
-                                                    modifier = Modifier.height(
-                                                        24.dp
-                                                    )
-                                                )
-
-                                            }
-                                        }
-                                    }
 
                                     Spacer(modifier = Modifier.height(24.dp))
                                 }
@@ -1934,6 +1692,259 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     .height(2.dp)
                                     .background(color = Color(0xFFE4E7ED))
                             )
+
+                            if (educationList.isEmpty()) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(72.dp)
+                                        .padding(horizontal = 16.dp)
+                                        .clickable {
+                                            addEducationVisible = true
+                                        },
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Education",
+                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                        fontWeight = FontWeight.W600,
+                                        color = Color(0xFF6A6A6A),
+                                        fontSize = 16.sp
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    Image(
+                                        painter = painterResource(id = R.drawable.plus),
+                                        contentDescription = "Plus Icon",
+                                        modifier = Modifier
+                                            .size(24.dp),
+                                        alignment = Alignment.Center
+                                    )
+
+                                }
+                            } else {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(72.dp)
+                                            .padding(horizontal = 16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Education",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFF6A6A6A),
+                                            fontSize = 16.sp
+                                        )
+
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+                                        Image(
+                                            painter = painterResource(id = R.drawable.plus),
+                                            contentDescription = "Plus Icon",
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .clickable {
+                                                    addEducationVisible = true
+                                                },
+                                        )
+
+                                    }
+
+                                    FlowRow(
+                                        maxItemsInEachRow = 1,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp),
+                                    ) {
+                                        repeat(educationList.size) { index ->
+                                            var education = educationList[index]
+
+                                            Column(
+                                                modifier = Modifier.fillMaxWidth(),
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                ) {
+                                                    Text(
+                                                        text = education.university,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        fontWeight = FontWeight.W500,
+                                                        color = Color(0xFF4A4A4A),
+                                                        fontSize = 14.sp
+                                                    )
+
+                                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.edit),
+                                                        contentDescription = "Edit Icon",
+                                                        modifier = Modifier
+                                                            .size(24.dp)
+                                                            .clickable {
+                                                                updateEducationVisible = true
+
+                                                                if (education.startDate != "0000-00-00 00:00:00" && (education.endDate != "0000-00-00 00:00:00" && education.endDate != "")) {
+                                                                    eduStartDateData =
+                                                                        ConvertYMDToMY(
+                                                                            education.startDate
+                                                                        )
+                                                                    eduEndDateData =
+                                                                        ConvertYMDToMY(
+                                                                            education.endDate
+                                                                        )
+                                                                }
+
+                                                                if (education.startDate != "0000-00-00 00:00:00" && education.endDate == "") {
+                                                                    eduStartDateData =
+                                                                        ConvertYMDToMY(
+                                                                            education.startDate
+                                                                        )
+                                                                    eduEndDateData = ""
+                                                                }
+
+                                                                educationId = education.id
+                                                                updateSelectedCountry =
+                                                                    education.countryName
+                                                                updateUniversity =
+                                                                    education.university
+                                                                updateSelectedEducationLevel =
+                                                                    education.educationLevel
+                                                                updateDegree = education.degree
+                                                                updateFieldOfStudy =
+                                                                    education.fieldOfStudy
+                                                                updateEduStartDate =
+                                                                    eduStartDateData
+                                                                updateEduEndDate = eduEndDateData
+                                                                updateIsCurrentStudying =
+                                                                    education.isCurrentStudying
+                                                                updateEduDescription =
+                                                                    education.description
+                                                            },
+                                                        alignment = Alignment.Center
+                                                    )
+                                                }
+
+                                                Text(
+                                                    text = "${education.degree}, ${education.fieldOfStudy}",
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W500,
+                                                    color = Color(0xFF757575),
+                                                    fontSize = 12.sp
+                                                )
+
+                                                Text(
+                                                    text = education.countryName,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W500,
+                                                    color = Color(0xFF757575),
+                                                    fontSize = 12.sp
+                                                )
+
+                                                var date by remember {
+                                                    mutableStateOf(
+                                                        ""
+                                                    )
+                                                }
+                                                if (education.startDate != "0000-00-00 00:00:00") {
+                                                    if (education.endDate != "0000-00-00 00:00:00" && education.endDate != "") {
+                                                        date = "${
+                                                            ConvertYMDToMY(
+                                                                education.startDate
+                                                            )
+                                                        } - ${
+                                                            ConvertYMDToMY(
+                                                                education.endDate
+                                                            )
+                                                        }"
+                                                    }
+                                                } else {
+                                                    date = "--"
+                                                }
+
+                                                if (education.startDate != "0000-00-00 00:00:00") {
+                                                    if (education.endDate != "0000-00-00 00:00:00" && education.endDate == "") {
+                                                        date = "${
+                                                            ConvertYMDToMY(
+                                                                education.startDate
+                                                            )
+                                                        } - Present"
+                                                    }
+                                                } else {
+                                                    date = "--"
+                                                }
+
+
+                                                Text(
+                                                    text = date,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W500,
+                                                    color = Color(0xFF757575),
+                                                    fontSize = 12.sp
+                                                )
+
+                                                Spacer(
+                                                    modifier = Modifier.height(
+                                                        4.dp
+                                                    )
+                                                )
+
+                                                Row {
+                                                    Text(
+                                                        text = "Description : ",
+                                                        fontFamily = FontFamily(
+                                                            Font(
+                                                                R.font.poppins_regular
+                                                            )
+                                                        ),
+                                                        fontWeight = FontWeight.W500,
+                                                        color = Color(0xFF4A4A4A),
+                                                        fontSize = 12.sp
+                                                    )
+
+                                                    Text(
+                                                        text = education.description,
+                                                        fontFamily = FontFamily(
+                                                            Font(
+                                                                R.font.poppins_regular
+                                                            )
+                                                        ),
+                                                        fontWeight = FontWeight.W500,
+                                                        color = Color(0xFF4A4A4A),
+                                                        fontSize = 12.sp
+                                                    )
+                                                }
+
+                                                Spacer(
+                                                    modifier = Modifier.height(
+                                                        24.dp
+                                                    )
+                                                )
+
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                }
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(2.dp)
+                                    .background(color = Color(0xFFE4E7ED))
+                            )*/
 
                             if (languageList.isEmpty()) {
                                 Row(
@@ -3501,7 +3512,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 FlowRow(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    repeat(addMoreLanguageItem) { index ->
+                                    repeat(addMoreSkillItem) { index ->
 
                                         Column {
                                             Spacer(modifier = Modifier.height(24.dp))
@@ -3730,7 +3741,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 FlowRow(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    repeat(addMoreLanguageItem) { index ->
+                                    repeat(addMoreLanguageItem.size) { index ->
+
+                                        var language by remember { mutableStateOf(addMoreLanguageItem[index].language) }
+                                        var proficiencyLevels by remember { mutableStateOf(addMoreLanguageItem[index].proficiencyLevels) }
+
 
                                         Column {
                                             Spacer(modifier = Modifier.height(24.dp))
@@ -3757,9 +3772,9 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                         color = Color.Transparent,
                                                         shape = MaterialTheme.shapes.medium
                                                     ),
-                                                value = languageName,
+                                                value = language,
                                                 onValueChange = {
-                                                    languageName = it
+                                                    language = it
                                                 },
                                                 placeholder = {
                                                     Text(
@@ -3819,9 +3834,9 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                         color = Color.Transparent,
                                                         shape = MaterialTheme.shapes.medium
                                                     ),
-                                                value = languageProficiencyLevel,
+                                                value = proficiencyLevels,
                                                 onValueChange = {
-                                                    languageProficiencyLevel = it
+                                                    proficiencyLevels = it
                                                 },
                                                 placeholder = {
                                                     Text(
@@ -3871,7 +3886,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            addMoreLanguageItem += 1
+                                            addMoreItem()
                                         }
                                 )
 
@@ -3898,33 +3913,25 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             )
                                             .clickable {
 
-                                                var validate =
-                                                    (languageName != "" && languageProficiencyLevel != "")
-                                                if (validate) {
+                                                if (addMoreLanguageItem.isNotEmpty()) {
                                                     scope.launch {
-                                                        viewModel.createLanguage(
-                                                            languageName,
-                                                            languageProficiencyLevel
-                                                        )
+                                                        for (i in addMoreLanguageItem.indices) {
+                                                            if (addMoreLanguageItem[i] != null) {
+                                                                viewModel.createLanguage(
+                                                                    addMoreLanguageItem[i].language,
+                                                                    addMoreLanguageItem[i].proficiencyLevels
+                                                                )
+                                                            }
+                                                        }
                                                     }
                                                 } else {
-                                                    if (languageName == "") {
                                                         Toast
                                                             .makeText(
                                                                 applicationContext,
-                                                                "Please add Language Name!",
+                                                                "Please add Language!",
                                                                 Toast.LENGTH_LONG
                                                             )
                                                             .show()
-                                                    } else if (languageProficiencyLevel == "") {
-                                                        Toast
-                                                            .makeText(
-                                                                applicationContext,
-                                                                "Please add Language Proficiency Levels!",
-                                                                Toast.LENGTH_LONG
-                                                            )
-                                                            .show()
-                                                    }
                                                 }
                                             },
                                         contentAlignment = Alignment.Center,
@@ -6518,6 +6525,185 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             ) {
                                 Text(
                                     text = "Create",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W600,
+                                    color = Color(0xFFFFFFFF),
+                                    fontSize = 14.sp,
+                                )
+                            }
+                        }
+
+
+                    }
+                },
+                sheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                ),
+                sheetElevation = 16.dp,
+                sheetBackgroundColor = Color.White,
+                sheetContentColor = contentColorFor(Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                scrimColor = Color.Transparent
+            ) {
+
+            }
+        }
+    }
+
+    //update summary
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
+            .systemBarsPadding()
+    ) {
+
+        if (updateSummaryVisible) {
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "Let’s add your summary",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF4A4A4A),
+                                fontSize = 16.sp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        updateSummaryVisible = false
+                                    },
+                                alignment = Alignment.Center
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        MultiStyleTextForInfo(
+                            text1 = "Indicates required",
+                            color1 = Color(0xFFAAAAAA),
+                            text2 = "*",
+                            color2 = Color(0xFFffa558)
+                        )
+
+                        Text(
+                            text = "Tell employer about yourself",
+                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF6A6A6A),
+                            fontSize = 14.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(158.dp)
+                                .border(
+                                    1.dp,
+                                    Color(0xFFE4E7ED),
+                                    RoundedCornerShape(4.dp)
+                                )
+                                .background(
+                                    color = Color.Transparent,
+                                    shape = MaterialTheme.shapes.medium
+                                ),
+                            value = updateSummary,
+                            onValueChange = {
+                                updateSummary = it
+                            },
+                            placeholder = {
+                                Text(
+                                    "Type Something",
+                                    color = Color(0xFFAAAAAA),
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                )
+                            },
+                            textStyle = TextStyle(
+                                textAlign = TextAlign.Start,
+                                fontWeight = FontWeight.W400,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                color = Color(0xFF4A4A4A)
+                            ),
+                            colors = TextFieldDefaults.textFieldColors(
+                                textColor = Color(0xFF4A4A4A),
+                                backgroundColor = Color.Transparent,
+                                cursorColor = Color(0xFF1ED292),
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboardController?.hide()
+                                }
+                            ),
+                        )
+
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 72.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(40.dp)
+                                    .border(1.dp, Color(0xFF1ED292), RoundedCornerShape(8.dp))
+                                    .background(
+                                        color = Color(0xFF1ED292),
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .clickable {
+                                        if (!updateSummary.isNullOrBlank()) {
+                                            scope.launch {
+                                                viewModel.updateSummary(updateSummary)
+                                            }
+                                        } else {
+                                            Toast
+                                                .makeText(
+                                                    applicationContext,
+                                                    "Please add Summary!",
+                                                    Toast.LENGTH_LONG
+                                                )
+                                                .show()
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = "Update summary",
                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                     fontWeight = FontWeight.W600,
                                     color = Color(0xFFFFFFFF),
