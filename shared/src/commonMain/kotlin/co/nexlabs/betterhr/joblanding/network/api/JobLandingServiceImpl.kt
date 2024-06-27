@@ -70,6 +70,7 @@ import co.nexlabs.betterhr.joblanding.util.smsUrl
 import com.apollographql.apollo3.ApolloCall
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
+import com.apollographql.apollo3.exception.ApolloException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -928,6 +929,9 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         proficiencyLevel: String,
         candidateId: String
     ): ApolloCall<CreateLanguageMutation.Data> {
+        println("api>>$name")
+        println("api>>$proficiencyLevel")
+        println("api>>$candidateId")
         return apolloClientWithAuth.mutation(CreateLanguageMutation(
             Optional.present(name),
             Optional.present(proficiencyLevel),

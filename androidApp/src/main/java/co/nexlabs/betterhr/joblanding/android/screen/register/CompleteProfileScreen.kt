@@ -132,6 +132,11 @@ data class AddMoreLanguageDataItem(
     var proficiencyLevels: String
 )
 
+data class AddMoreSkillDataItem(
+    var id: String,
+    var skill: String
+)
+
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: NavController) {
@@ -239,8 +244,22 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var eduStartDateData by remember { mutableStateOf("") }
     var eduEndDateData by remember { mutableStateOf("") }
 
-    var addMoreLanguageItem by remember { mutableStateOf(listOf(AddMoreLanguageDataItem("", "", ""))) }
-    var updateAddMoreLanguageItem by remember { mutableStateOf(listOf(AddMoreLanguageDataItem("", "", ""))) }
+    var addMoreLanguageItem by remember {
+        mutableStateOf(
+            listOf(
+                AddMoreLanguageDataItem(
+                    "",
+                    "",
+                    ""
+                )
+            )
+        )
+    }
+    var updateAddMoreLanguageItem by remember {
+        mutableStateOf<List<AddMoreLanguageDataItem>>(
+            emptyList()
+        )
+    }
 
     fun addMoreItem() {
         val newList = addMoreLanguageItem.toMutableList()
@@ -248,11 +267,51 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         addMoreLanguageItem = newList
     }
 
-    var languageName by remember { mutableStateOf("") }
-    var languageProficiencyLevel by remember { mutableStateOf("") }
+    fun updateLanguageItem(index: Int, language: String, proficiencyLevels: String) {
+        val updatedList = addMoreLanguageItem.toMutableList()
+        updatedList[index] = AddMoreLanguageDataItem("", language, proficiencyLevels)
+        addMoreLanguageItem = updatedList
+    }
 
-    var skillName by remember { mutableStateOf("") }
-    var addMoreSkillItem by remember { mutableStateOf(1) }
+    fun updateLanguageItemWithId(index: Int, id: String, language: String, proficiencyLevels: String) {
+        val updatedList = updateAddMoreLanguageItem.toMutableList()
+        updatedList[index] = AddMoreLanguageDataItem(id, language, proficiencyLevels)
+        updateAddMoreLanguageItem = updatedList
+    }
+
+    var addMoreSkillItem by remember {
+        mutableStateOf(
+            listOf(
+                AddMoreSkillDataItem(
+                    "",
+                    "",
+                )
+            )
+        )
+    }
+    var updateAddMoreSkillItem by remember {
+        mutableStateOf<List<AddMoreSkillDataItem>>(
+            emptyList()
+        )
+    }
+
+    fun addMoreSkillItem() {
+        val newList = addMoreSkillItem.toMutableList()
+        newList.add(AddMoreSkillDataItem("", ""))
+        addMoreSkillItem = newList
+    }
+
+    fun updateSkillItem(index: Int, skill: String) {
+        val updatedList = addMoreSkillItem.toMutableList()
+        updatedList[index] = AddMoreSkillDataItem("", skill)
+        addMoreSkillItem = updatedList
+    }
+
+    fun updateSkillItemWithId(index: Int, id: String, skill: String) {
+        val updatedList = updateAddMoreSkillItem.toMutableList()
+        updatedList[index] = AddMoreSkillDataItem(id, skill)
+        updateAddMoreSkillItem = updatedList
+    }
 
     var certificateName by remember { mutableStateOf("") }
     var issuingOrganization by remember { mutableStateOf("") }
@@ -2011,6 +2070,16 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                     .size(24.dp)
                                                     .clickable {
                                                         updateLanguageVisible = true
+
+                                                        val updateList = updateAddMoreLanguageItem.toMutableList()
+                                                        for (i in 0 until languageList.size) {
+                                                            updateList.add(AddMoreLanguageDataItem(
+                                                                languageList[i].id,
+                                                                languageList[i].languageName,
+                                                                languageList[i].proficiencyLevel
+                                                            ))
+                                                            updateAddMoreLanguageItem = updateList
+                                                        }
                                                     },
                                             )
 
@@ -2041,13 +2110,17 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             ) {
 
                                                 if (index != 0) {
+
+                                                    Spacer(modifier = Modifier.height(16.dp))
+
                                                     Box(
                                                         modifier = Modifier
                                                             .height(1.dp)
                                                             .fillMaxWidth()
-                                                            .background(color = Color(0xFF4A4A4A))
-                                                            .padding(bottom = 16.dp)
+                                                            .background(color = Color(0xFFE4E7ED))
                                                     )
+
+                                                    Spacer(modifier = Modifier.height(16.dp))
                                                 }
 
                                                 Text(
@@ -2058,22 +2131,18 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                     fontSize = 14.sp
                                                 )
 
-                                                Spacer(modifier = Modifier.width(8.dp))
+                                                if (language.proficiencyLevel != "") {
 
-                                                Text(
-                                                    text = language.proficiencyLevel,
-                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                    fontWeight = FontWeight.W500,
-                                                    color = Color(0xFF4A4A4A),
-                                                    fontSize = 14.sp
-                                                )
+                                                    Spacer(modifier = Modifier.width(8.dp))
 
-                                                Spacer(
-                                                    modifier = Modifier.height(
-                                                        24.dp
+                                                    Text(
+                                                        text = language.proficiencyLevel,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        fontWeight = FontWeight.W500,
+                                                        color = Color(0xFF4A4A4A),
+                                                        fontSize = 14.sp
                                                     )
-                                                )
-
+                                                }
                                             }
                                         }
                                     }
@@ -2155,6 +2224,15 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                     .size(24.dp)
                                                     .clickable {
                                                         updateSkillVisible = true
+
+                                                        val updateList = updateAddMoreSkillItem.toMutableList()
+                                                        for (i in 0 until skillList.size) {
+                                                            updateList.add(AddMoreSkillDataItem(
+                                                                skillList[i].id,
+                                                                skillList[i].skillName
+                                                            ))
+                                                            updateAddMoreSkillItem = updateList
+                                                        }
                                                     },
                                             )
 
@@ -2188,7 +2266,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                     modifier = Modifier
                                                         .fillMaxWidth()
                                                         .padding(start = 16.dp),
-                                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                    verticalAlignment = Alignment.CenterVertically
                                                 ) {
                                                     Box(
                                                         modifier = Modifier
@@ -2208,14 +2287,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                         color = Color(0xFF6A6A6A),
                                                         fontSize = 14.sp
                                                     )
-
-                                                    Spacer(
-                                                        modifier = Modifier.height(
-                                                            16.dp
-                                                        )
-                                                    )
                                                 }
 
+                                                Spacer(
+                                                    modifier = Modifier.height(
+                                                        16.dp
+                                                    )
+                                                )
                                             }
                                         }
                                     }
@@ -2313,7 +2391,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                                                 if (index != 0) {
 
-                                                    Spacer (modifier = Modifier.height(16.dp))
+                                                    Spacer(modifier = Modifier.height(16.dp))
 
                                                     Box(
                                                         modifier = Modifier
@@ -2322,7 +2400,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             .background(color = Color(0xFFE4E7ED))
                                                     )
 
-                                                    Spacer (modifier = Modifier.height(16.dp))
+                                                    Spacer(modifier = Modifier.height(16.dp))
                                                 }
 
                                                 Row(
@@ -2365,12 +2443,16 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                                 }
 
                                                                 certificateId = certificate.id
-                                                                updateCertificateName = certificate.courseName
-                                                                updateIssuingOrganization = certificate.issuingOrganization
+                                                                updateCertificateName =
+                                                                    certificate.courseName
+                                                                updateIssuingOrganization =
+                                                                    certificate.issuingOrganization
                                                                 updateIssueDate = issueDateData
                                                                 updateExpireDate = expireDateData
-                                                                updateIsCredentialExpire = certificate.isExpire
-                                                                updateCredentialUrl = certificate.credentialUrl
+                                                                updateIsCredentialExpire =
+                                                                    certificate.isExpire
+                                                                updateCredentialUrl =
+                                                                    certificate.credentialUrl
                                                             },
                                                     )
                                                 }
@@ -2398,8 +2480,10 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                                                 if (certificate.issueDate != "0000-00-00 00:00:00") {
                                                     if (certificate.expireDate != "0000-00-00 00:00:00" && certificate.expireDate != "") {
-                                                        issueDateInMY = ConvertYMDToMY(certificate.issueDate)
-                                                        expireDateInMY = ConvertYMDToMY(certificate.expireDate)
+                                                        issueDateInMY =
+                                                            ConvertYMDToMY(certificate.issueDate)
+                                                        expireDateInMY =
+                                                            ConvertYMDToMY(certificate.expireDate)
                                                     }
                                                 } else {
                                                     issueDateInMY = "--"
@@ -2408,7 +2492,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                                                 if (certificate.issueDate != "0000-00-00 00:00:00") {
                                                     if (certificate.expireDate != "0000-00-00 00:00:00" && certificate.expireDate == "") {
-                                                        issueDateInMY = ConvertYMDToMY(certificate.issueDate)
+                                                        issueDateInMY =
+                                                            ConvertYMDToMY(certificate.issueDate)
                                                         expireDateInMY = "No Expiration Date"
                                                     }
                                                 } else {
@@ -2456,7 +2541,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                     )
 
                                                     Row(
-                                                        modifier = Modifier.fillMaxWidth()
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
                                                             .clickable {
                                                                 uriHandler.openUri(certificate.credentialUrl)
                                                             },
@@ -2922,7 +3008,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             updateCertificateName,
                                                             updateIssuingOrganization,
                                                             updateIssueDateInYMD,
-                                                            if(updateIsCredentialExpire) "" else updateExpireDateInYMD,
+                                                            if (updateIsCredentialExpire) "" else updateExpireDateInYMD,
                                                             updateIsCredentialExpire,
                                                             updateCredentialUrl
                                                         )
@@ -3374,7 +3460,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             certificateName,
                                                             issuingOrganization,
                                                             issueDateInYMD,
-                                                            if(isCredentialExpire) "" else expireDateInYMD,
+                                                            if (isCredentialExpire) "" else expireDateInYMD,
                                                             isCredentialExpire,
                                                             credentialUrl
                                                         )
@@ -3411,6 +3497,245 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     ) {
                                         Text(
                                             text = "Update certifications",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFFFFFFFF),
+                                            fontSize = 14.sp,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                },
+                sheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                ),
+                sheetElevation = 16.dp,
+                sheetBackgroundColor = Color.White,
+                sheetContentColor = contentColorFor(Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                scrimColor = Color.Transparent
+            ) {
+
+            }
+        }
+    }
+
+    //update skill
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
+            .systemBarsPadding()
+    ) {
+
+        if (updateSkillVisible) {
+
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "Let’s add your other skills",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF4A4A4A),
+                                fontSize = 16.sp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        updateSkillVisible = false
+                                    },
+                                alignment = Alignment.Center
+                            )
+                        }
+
+                        LazyColumn {
+                            item {
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Indicated required",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "*",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                Text(
+                                    text = "Tell employer about your other skills",
+                                    color = Color(0xFF6A6A6A),
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                )
+
+                                FlowRow(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    repeat(updateAddMoreSkillItem.size) { index ->
+
+                                        var id by remember { mutableStateOf(
+                                            updateAddMoreSkillItem[index].id
+                                        ) }
+
+                                        var skill by remember { mutableStateOf(
+                                            updateAddMoreSkillItem[index].skill
+                                        ) }
+
+                                        Column {
+                                            Spacer(modifier = Modifier.height(24.dp))
+
+                                            MultiStyleTextForAddExperience(
+                                                text1 = "Skill ${index + 1}",
+                                                color1 = Color(0xFF757575),
+                                                text2 = "",
+                                                color2 = Color(0xFF757575)
+                                            )
+
+                                            Spacer(modifier = Modifier.height(4.dp))
+
+                                            OutlinedTextField(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(45.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFE4E7ED),
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                value = skill,
+                                                onValueChange = {
+                                                    skill = it
+                                                    updateSkillItemWithId(index, id, skill)
+                                                },
+                                                placeholder = {
+                                                    Text(
+                                                        "Enter skill",
+                                                        color = Color(0xFFBDBDBD),
+                                                        fontWeight = FontWeight.W400,
+                                                        fontSize = 14.sp,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    )
+                                                },
+                                                textStyle = TextStyle(
+                                                    textAlign = TextAlign.Start,
+                                                    fontWeight = FontWeight.W400,
+                                                    fontSize = 14.sp,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    color = Color(0xFF4A4A4A)
+                                                ),
+                                                colors = TextFieldDefaults.textFieldColors(
+                                                    textColor = Color(0xFF4A4A4A),
+                                                    backgroundColor = Color.Transparent,
+                                                    cursorColor = Color(0xFF1ED292),
+                                                    focusedIndicatorColor = Color.Transparent,
+                                                    unfocusedIndicatorColor = Color.Transparent
+                                                ),
+                                                keyboardOptions = KeyboardOptions(
+                                                    keyboardType = KeyboardType.Text,
+                                                    imeAction = ImeAction.Done
+                                                ),
+                                                keyboardActions = KeyboardActions(
+                                                    onDone = {
+                                                        keyboardController?.hide()
+                                                    }
+                                                ),
+                                            )
+
+                                            Spacer(modifier = Modifier.height(24.dp))
+                                        }
+                                    }
+                                }
+
+                                /*Text(
+                                    text = "+ Add more skills",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFF1ED292),
+                                    fontSize = 14.sp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            addMoreSkillItem()
+                                        }
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))*/
+
+                                Row(
+                                    verticalAlignment = Alignment.Bottom,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(bottom = 72.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(40.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFF1ED292),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                            .background(
+                                                color = Color(0xFF1ED292),
+                                                shape = MaterialTheme.shapes.medium
+                                            )
+                                            .clickable {
+
+                                                if (updateAddMoreSkillItem.isNotEmpty()) {
+                                                    for (item in updateAddMoreSkillItem) {
+                                                        if (item.skill.isNotBlank()) {
+                                                            viewModel.updateSkill(
+                                                                item.id,
+                                                                item.skill
+                                                            )
+                                                        }
+                                                    }
+                                                } else {
+                                                    Toast
+                                                        .makeText(
+                                                            applicationContext,
+                                                            "Please add Skill Name!",
+                                                            Toast.LENGTH_LONG
+                                                        )
+                                                        .show()
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            text = "Update skills",
                                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             fontWeight = FontWeight.W600,
                                             color = Color(0xFFFFFFFF),
@@ -3512,7 +3837,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 FlowRow(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    repeat(addMoreSkillItem) { index ->
+                                    repeat(addMoreSkillItem.size) { index ->
+
+                                        var skill by remember { mutableStateOf(
+                                            addMoreSkillItem[index].skill
+                                        ) }
 
                                         Column {
                                             Spacer(modifier = Modifier.height(24.dp))
@@ -3539,9 +3868,10 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                         color = Color.Transparent,
                                                         shape = MaterialTheme.shapes.medium
                                                     ),
-                                                value = skillName,
+                                                value = skill,
                                                 onValueChange = {
-                                                    skillName = it
+                                                    skill = it
+                                                    updateSkillItem(index, skill)
                                                 },
                                                 placeholder = {
                                                     Text(
@@ -3591,7 +3921,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            addMoreSkillItem += 1
+                                            addMoreSkillItem()
                                         }
                                 )
 
@@ -3618,13 +3948,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             )
                                             .clickable {
 
-                                                var validate = (skillName != "")
-
-                                                if (validate) {
-                                                    scope.launch {
-                                                        viewModel.createSkill(
-                                                            skillName
-                                                        )
+                                                if (addMoreSkillItem.isNotEmpty()) {
+                                                    for (item in addMoreSkillItem) {
+                                                        if (item.skill.isNotBlank()) {
+                                                            viewModel.createSkill(
+                                                                item.skill
+                                                            )
+                                                        }
                                                     }
                                                 } else {
                                                     Toast
@@ -3640,6 +3970,338 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     ) {
                                         Text(
                                             text = "Update skills",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFFFFFFFF),
+                                            fontSize = 14.sp,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                },
+                sheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
+                sheetShape = RoundedCornerShape(
+                    bottomStart = 0.dp,
+                    bottomEnd = 0.dp,
+                    topStart = 24.dp,
+                    topEnd = 24.dp
+                ),
+                sheetElevation = 16.dp,
+                sheetBackgroundColor = Color.White,
+                sheetContentColor = contentColorFor(Color.White),
+                modifier = Modifier.fillMaxWidth(),
+                scrimColor = Color.Transparent
+            ) {
+
+            }
+        }
+    }
+
+    //update language
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp)
+            .systemBarsPadding()
+    ) {
+
+        if (updateLanguageVisible) {
+
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "Let’s add your language skills",
+                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                fontWeight = FontWeight.W600,
+                                color = Color(0xFF4A4A4A),
+                                fontSize = 16.sp,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Image(
+                                painter = painterResource(id = R.drawable.x),
+                                contentDescription = "X Icon",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        updateLanguageVisible = false
+                                    },
+                                alignment = Alignment.Center
+                            )
+                        }
+
+                        LazyColumn {
+                            item {
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                MultiStyleTextForAddExperience(
+                                    text1 = "Indicated required",
+                                    color1 = Color(0xFF757575),
+                                    text2 = "*",
+                                    color2 = Color(0xFF757575)
+                                )
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                Text(
+                                    text = "Tell employer about language you speak",
+                                    color = Color(0xFF6A6A6A),
+                                    fontWeight = FontWeight.W400,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                )
+
+                                FlowRow(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    repeat(updateAddMoreLanguageItem.size) { index ->
+
+                                        var id by remember {
+                                            mutableStateOf(
+                                                updateAddMoreLanguageItem[index].id
+                                            )
+                                        }
+                                        var language by remember {
+                                            mutableStateOf(
+                                                updateAddMoreLanguageItem[index].language
+                                            )
+                                        }
+                                        var proficiencyLevels by remember {
+                                            mutableStateOf(
+                                                updateAddMoreLanguageItem[index].proficiencyLevels
+                                            )
+                                        }
+
+
+                                        Column {
+                                            Spacer(modifier = Modifier.height(24.dp))
+
+                                            MultiStyleTextForAddExperience(
+                                                text1 = "Language",
+                                                color1 = Color(0xFF757575),
+                                                text2 = "",
+                                                color2 = Color(0xFF757575)
+                                            )
+
+                                            Spacer(modifier = Modifier.height(4.dp))
+
+                                            OutlinedTextField(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(45.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFE4E7ED),
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                value = language,
+                                                onValueChange = {
+                                                    language = it
+                                                    updateLanguageItemWithId(
+                                                        index,
+                                                        id,
+                                                        language,
+                                                        proficiencyLevels
+                                                    )
+                                                },
+                                                placeholder = {
+                                                    Text(
+                                                        "Enter language",
+                                                        color = Color(0xFFBDBDBD),
+                                                        fontWeight = FontWeight.W400,
+                                                        fontSize = 14.sp,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    )
+                                                },
+                                                textStyle = TextStyle(
+                                                    textAlign = TextAlign.Start,
+                                                    fontWeight = FontWeight.W400,
+                                                    fontSize = 14.sp,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    color = Color(0xFF4A4A4A)
+                                                ),
+                                                colors = TextFieldDefaults.textFieldColors(
+                                                    textColor = Color(0xFF4A4A4A),
+                                                    backgroundColor = Color.Transparent,
+                                                    cursorColor = Color(0xFF1ED292),
+                                                    focusedIndicatorColor = Color.Transparent,
+                                                    unfocusedIndicatorColor = Color.Transparent
+                                                ),
+                                                keyboardOptions = KeyboardOptions(
+                                                    keyboardType = KeyboardType.Text,
+                                                    imeAction = ImeAction.Done
+                                                ),
+                                                keyboardActions = KeyboardActions(
+                                                    onDone = {
+                                                        keyboardController?.hide()
+                                                    }
+                                                ),
+                                            )
+
+                                            Spacer(modifier = Modifier.height(24.dp))
+
+                                            MultiStyleTextForAddExperience(
+                                                text1 = "Proficiency levels",
+                                                color1 = Color(0xFF757575),
+                                                text2 = "",
+                                                color2 = Color(0xFF757575)
+                                            )
+
+                                            Spacer(modifier = Modifier.height(4.dp))
+
+                                            OutlinedTextField(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(45.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFE4E7ED),
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                value = proficiencyLevels,
+                                                onValueChange = {
+                                                    proficiencyLevels = it
+                                                    updateLanguageItemWithId(
+                                                        index,
+                                                        id,
+                                                        language,
+                                                        proficiencyLevels
+                                                    )
+                                                },
+                                                placeholder = {
+                                                    Text(
+                                                        "Enter proficiency levels",
+                                                        color = Color(0xFFBDBDBD),
+                                                        fontWeight = FontWeight.W400,
+                                                        fontSize = 14.sp,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    )
+                                                },
+                                                textStyle = TextStyle(
+                                                    textAlign = TextAlign.Start,
+                                                    fontWeight = FontWeight.W400,
+                                                    fontSize = 14.sp,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    color = Color(0xFF4A4A4A)
+                                                ),
+                                                colors = TextFieldDefaults.textFieldColors(
+                                                    textColor = Color(0xFF4A4A4A),
+                                                    backgroundColor = Color.Transparent,
+                                                    cursorColor = Color(0xFF1ED292),
+                                                    focusedIndicatorColor = Color.Transparent,
+                                                    unfocusedIndicatorColor = Color.Transparent
+                                                ),
+                                                keyboardOptions = KeyboardOptions(
+                                                    keyboardType = KeyboardType.Text,
+                                                    imeAction = ImeAction.Done
+                                                ),
+                                                keyboardActions = KeyboardActions(
+                                                    onDone = {
+                                                        keyboardController?.hide()
+                                                    }
+                                                ),
+                                            )
+
+                                            Spacer(modifier = Modifier.height(24.dp))
+                                        }
+                                    }
+                                }
+
+                                /*Text(
+                                    text = "+ Add more language",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFF1ED292),
+                                    fontSize = 14.sp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            addMoreItem()
+                                        }
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))*/
+
+                                Row(
+                                    verticalAlignment = Alignment.Bottom,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(bottom = 72.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(40.dp)
+                                            .border(
+                                                1.dp,
+                                                Color(0xFF1ED292),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                            .background(
+                                                color = Color(0xFF1ED292),
+                                                shape = MaterialTheme.shapes.medium
+                                            )
+                                            .clickable {
+
+                                                if (updateAddMoreLanguageItem.isNotEmpty()) {
+                                                    scope.launch {
+                                                        for (item in updateAddMoreLanguageItem) {
+                                                            if (item.id.isNotBlank() && (item.language.isNotBlank() || item.proficiencyLevels.isNotBlank())) {
+                                                                viewModel.updateLanguage(
+                                                                    item.id,
+                                                                    item.language,
+                                                                    item.proficiencyLevels
+                                                                )
+                                                            } else {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please add Language Name",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            }
+                                                        }
+                                                    }
+                                                } else {
+                                                    Toast
+                                                        .makeText(
+                                                            applicationContext,
+                                                            "Please add Language Name!",
+                                                            Toast.LENGTH_LONG
+                                                        )
+                                                        .show()
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        Text(
+                                            text = "Update language skills",
                                             fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                             fontWeight = FontWeight.W600,
                                             color = Color(0xFFFFFFFF),
@@ -3743,8 +4405,16 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 ) {
                                     repeat(addMoreLanguageItem.size) { index ->
 
-                                        var language by remember { mutableStateOf(addMoreLanguageItem[index].language) }
-                                        var proficiencyLevels by remember { mutableStateOf(addMoreLanguageItem[index].proficiencyLevels) }
+                                        var language by remember {
+                                            mutableStateOf(
+                                                addMoreLanguageItem[index].language
+                                            )
+                                        }
+                                        var proficiencyLevels by remember {
+                                            mutableStateOf(
+                                                addMoreLanguageItem[index].proficiencyLevels
+                                            )
+                                        }
 
 
                                         Column {
@@ -3775,6 +4445,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                 value = language,
                                                 onValueChange = {
                                                     language = it
+                                                    updateLanguageItem(
+                                                        index,
+                                                        language,
+                                                        proficiencyLevels
+                                                    )
                                                 },
                                                 placeholder = {
                                                     Text(
@@ -3837,6 +4512,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                 value = proficiencyLevels,
                                                 onValueChange = {
                                                     proficiencyLevels = it
+                                                    updateLanguageItem(
+                                                        index,
+                                                        language,
+                                                        proficiencyLevels
+                                                    )
                                                 },
                                                 placeholder = {
                                                     Text(
@@ -3915,23 +4595,31 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                                                 if (addMoreLanguageItem.isNotEmpty()) {
                                                     scope.launch {
-                                                        for (i in addMoreLanguageItem.indices) {
-                                                            if (addMoreLanguageItem[i] != null) {
+                                                        for (item in addMoreLanguageItem) {
+                                                            if (item.language.isNotBlank() || item.proficiencyLevels.isNotBlank()) {
                                                                 viewModel.createLanguage(
-                                                                    addMoreLanguageItem[i].language,
-                                                                    addMoreLanguageItem[i].proficiencyLevels
+                                                                    item.language,
+                                                                    item.proficiencyLevels
                                                                 )
+                                                            } else {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please add Language Name!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
                                                             }
                                                         }
                                                     }
                                                 } else {
-                                                        Toast
-                                                            .makeText(
-                                                                applicationContext,
-                                                                "Please add Language!",
-                                                                Toast.LENGTH_LONG
-                                                            )
-                                                            .show()
+                                                    Toast
+                                                        .makeText(
+                                                            applicationContext,
+                                                            "Please add Language!",
+                                                            Toast.LENGTH_LONG
+                                                        )
+                                                        .show()
                                                 }
                                             },
                                         contentAlignment = Alignment.Center,
@@ -4460,7 +5148,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                         checked = updateIsCurrentStudying,
                                         onCheckedChange = {
                                             updateIsCurrentStudying = it
-                                                          },
+                                        },
                                         colors = CheckboxDefaults.colors(
                                             checkedColor = Color(0xFF1690F3),
                                             uncheckedColor = Color(0xFFE4E7ED),
@@ -4606,7 +5294,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             updateDegree,
                                                             updateFieldOfStudy,
                                                             updateEduStartDateInYMD,
-                                                            if(updateIsCurrentStudying) "" else updateEduEndDateInYMD,
+                                                            if (updateIsCurrentStudying) "" else updateEduEndDateInYMD,
                                                             updateIsCurrentStudying,
                                                             updateEduDescription
                                                         )
@@ -5306,7 +5994,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                             degree,
                                                             fieldOfStudy,
                                                             eduStartDateInYMD,
-                                                            if(isCurrentStudying) "" else eduEndDateInYMD,
+                                                            if (isCurrentStudying) "" else eduEndDateInYMD,
                                                             isCurrentStudying,
                                                             eduDescription
                                                         )
