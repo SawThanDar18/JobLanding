@@ -160,6 +160,7 @@ class JobDetailViewModel(
     }
 
     fun saveJob(jobId: String) {
+        println("save>>${localStorage.candidateId}")
         viewModelScope.launch(DispatcherProvider.io) {
             jobDetailRepository.saveJob(localStorage.candidateId, jobId).toFlow()
                 .catch { e ->
@@ -218,6 +219,7 @@ class JobDetailViewModel(
     }
 
     fun checkJobIsApplied(referenceJobId: String) {
+        println("save>>jobapplied${localStorage.candidateId}")
         viewModelScope.launch(DispatcherProvider.io) {
             jobDetailRepository.checkJobIsApplied(referenceJobId, localStorage.candidateId).toFlow()
                 .catch { e ->

@@ -7,5 +7,6 @@ data class SavedJobsUIState(
     val error: UIErrorType = UIErrorType.Nothing,
     val savedJobIds: List<SaveJobsIdsUIModel> = ArrayList(),
     val isSuccessSavedJobsIds: Boolean = false,
-    val savedJobList: List<SaveJobsUIModel> = ArrayList()
+    val savedJobList: List<SaveJobsUIModel> = ArrayList(),
+    val isUnSaveJobSuccess: Boolean = false
 )

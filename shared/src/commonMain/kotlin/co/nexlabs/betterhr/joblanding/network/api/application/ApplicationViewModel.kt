@@ -40,6 +40,7 @@ class ApplicationViewModel(private val localStorage: LocalStorage, private val a
     }
 
     fun fetchApplication() {
+        println("fetchapplication>>")
         viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(

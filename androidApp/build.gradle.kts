@@ -104,4 +104,6 @@ dependencies {
     implementation("androidx.camera:camera-view:1.1.0")
     implementation("androidx.camera:camera-extensions:1.1.0")
 
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+
 }

@@ -153,4 +153,62 @@ class SavedJobsViewModel(private val localStorage: LocalStorage, private val sav
         }
     }
 
+    fun unSaveJob(id: String) {
+        viewModelScope.launch(DispatcherProvider.io) {
+            savedJobsRepository.unSaveJob(id).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isUnSaveJobSuccess = false,
+                            isLoading = true,
+                            error = UIErrorType.Other(e.message.toString())
+                        )
+                    }
+
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isUnSaveJobSuccess = false,
+                            isLoading = true,
+                            error = UIErrorType.Nothing
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isUnSaveJobSuccess = true,
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString())
+                            )
+                        }
+                    }
+                }
+        }
+    }
+
 }

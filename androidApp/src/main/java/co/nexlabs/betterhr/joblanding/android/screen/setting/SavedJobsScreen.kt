@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.setting
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -28,12 +29,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -42,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
@@ -58,21 +64,61 @@ fun SavedJobsScreen(navController: NavController, viewModel: SavedJobsViewModel)
 
     var jobIds: MutableList<String> = ArrayList()
 
-    scope.launch {
-        viewModel.fetchSavedJobsIds()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
+            }
+
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+
+            Lifecycle.State.CREATED -> {
+                scope.launch {
+                    viewModel.fetchSavedJobsIds()
+                }
+                Log.d("state>>", "created")
+            }
+
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    viewModel.fetchSavedJobsIds()
+                }
+                Log.d("state>>", "started")
+            }
+
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    viewModel.fetchSavedJobsIds()
+                }
+                Log.d("state>>", "resume")
+            }
+        }
+    }
+
+    LaunchedEffect(uiState.isUnSaveJobSuccess) {
+        if (uiState.isUnSaveJobSuccess) {
+            viewModel.fetchSavedJobsIds()
+        }
     }
 
     LaunchedEffect(uiState.isSuccessSavedJobsIds) {
-        scope.launch {
-            if (uiState.savedJobIds.isNotEmpty()) {
-                jobIds.clear()
-                uiState.savedJobIds.map {
-                    jobIds.add(it.jobId)
+        if (uiState.isSuccessSavedJobsIds) {
+            scope.launch {
+                if (uiState.savedJobIds.isNotEmpty()) {
+                    jobIds.clear()
+                    uiState.savedJobIds.map {
+                        jobIds.add(it.jobId)
+                    }
                 }
-            }
 
-            if (jobIds.isNotEmpty()) {
-                viewModel.fetchSavedJobs(jobIds)
+                if (jobIds.isNotEmpty()) {
+                    viewModel.fetchSavedJobs(jobIds)
+                }
             }
         }
     }
@@ -262,7 +308,13 @@ fun SavedJobsScreen(navController: NavController, viewModel: SavedJobsViewModel)
                                         painter = painterResource(id = R.drawable.save_selected_green_icon),
                                         contentDescription = "Save Selected Icon",
                                         modifier = Modifier
-                                            .size(11.dp, 15.dp),
+                                            .size(11.dp, 15.dp)
+                                            .clickable {
+                                                scope.launch {
+                                                    //unsave job
+                                                    //viewModel.unSaveJob(jobIds[index])
+                                                }
+                                            },
                                         contentScale = ContentScale.Fit
                                     )
 

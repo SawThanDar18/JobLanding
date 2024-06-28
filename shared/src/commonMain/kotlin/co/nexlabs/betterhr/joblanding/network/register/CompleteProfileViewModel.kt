@@ -98,6 +98,7 @@ class CompleteProfileViewModel(
                                 candidateData = CandidateViewModelMapper.mapDataToViewModel(data.data!!.me)
                             )
                         }
+                        println("Updated candidateData: ${CandidateViewModelMapper.mapDataToViewModel(data.data!!.me)}")
                     } else {
                         _uiState.update {
                             it.copy(
@@ -1140,24 +1141,35 @@ class CompleteProfileViewModel(
                 )
             }
             try {
-                completeProfileRepository.updateFile(
+                var response = completeProfileRepository.updateFile(
                     file,
                     fileName,
                     type,
                     localStorage.candidateId,
                     fileId
                 )
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = UIErrorType.Nothing,
-                    )
+                if (response.id != "") {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = UIErrorType.Nothing,
+                            getFileId = true,
+                            fileId = response.id
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = UIErrorType.Other("File id null!"),
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = true,
-                        error = UIErrorType.Other(e.message.toString()),
+                        error = UIErrorType.Other(e.message!![0].toString()),
                     )
                 }
             }

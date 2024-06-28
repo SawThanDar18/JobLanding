@@ -31,6 +31,7 @@ import co.nexlabs.betterhr.joblanding.util.baseUrlForJob
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.http.HttpHeader
 import com.apollographql.apollo3.cache.normalized.api.MemoryCacheFactory
+import com.apollographql.apollo3.cache.normalized.fetchPolicy
 import com.apollographql.apollo3.cache.normalized.normalizedCache
 import com.apollographql.apollo3.network.http.HttpNetworkTransport
 import io.ktor.client.HttpClient
@@ -108,7 +109,6 @@ fun createApolloClient(): ApolloClient {
 }
 
 fun createApolloClientWithAuth(bearerToken: String): ApolloClient {
-    print("be>>$bearerToken")
     val headers = mapOf(
         "Authorization" to "bearer $bearerToken",
     )

@@ -2,14 +2,12 @@ mutation createCandidate(
     $name: String!,
     $email: String!,
     $phone: String!,
-    $desired_position: String!,
     $country_id: String!
 ) {
     createCandidate (
         name: $name,
         email: $email
         phone: $phone
-        desired_position: $desired_position
         country_id: $country_id
     ) {
         id

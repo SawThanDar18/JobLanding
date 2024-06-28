@@ -70,6 +70,10 @@ import co.nexlabs.betterhr.joblanding.util.smsUrl
 import com.apollographql.apollo3.ApolloCall
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
+import com.apollographql.apollo3.cache.normalized.ApolloStore
+import com.apollographql.apollo3.cache.normalized.FetchPolicy
+import com.apollographql.apollo3.cache.normalized.api.MemoryCacheFactory
+import com.apollographql.apollo3.cache.normalized.fetchPolicy
 import com.apollographql.apollo3.exception.ApolloException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -86,6 +90,21 @@ import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
+
+private lateinit var apolloStore: ApolloStore
+
+fun clearApolloCache() {
+    val memoryCacheFactory = MemoryCacheFactory(maxSizeBytes = 10 * 1024 * 1024)
+    apolloStore = ApolloStore(memoryCacheFactory)
+
+    if (::apolloStore.isInitialized) {
+        apolloStore.clearAll()
+        println("Apollo cache cleared")
+    } else {
+        println("Apollo store not initialized")
+    }
+}
 
 fun initializeClientNonAuth(): HttpClient {
     return createHttpClientNonAuth()
@@ -187,11 +206,13 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         summary: String,
         countryId: String
     ): ApolloCall<CreateCandidateMutation.Data> {
+
+        clearApolloCache()
         return apolloClientWithAuthWithoutToken.mutation(
             CreateCandidateMutation(
-                name, email, phone, desiredPosition, countryId
+                name, email, phone, countryId
             )
-        )
+        ).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getBearerToken(token: String): ApolloCall<VerifySmsTokenAndAuthMutation.Data> {
@@ -203,19 +224,13 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         } catch (e: Exception) {
             println("Error: ${e.message}")
         }*/
+
         return apolloClientWithAuthWithoutToken.mutation(VerifySmsTokenAndAuthMutation(token))
     }
 
     override suspend fun getCandidateDatas(): ApolloCall<CandidateQuery.Data> {
-        /*try {
-            val response = apolloClientWithAuth.query(CandidateQuery())
-            println("mm>>${response.execute().data!!.me.id}")
-        } catch (e: ApolloException) {
-            println("ApolloClient error: ${e.message}")
-        } catch (e: Exception) {
-            println("Error: ${e.message}")
-        }*/
-        return apolloClientWithAuth.query(CandidateQuery())
+        clearApolloCache()
+        return apolloClientWithAuth.query(CandidateQuery()).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getCountriesList(): GetCountriesListResponse {
@@ -240,51 +255,64 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         } catch (e: Exception) {
             println("Error: ${e.message}")
         }*/
-        return apolloClient.query(DynamicPagesQuery(countryId, platform))
+
+        clearApolloCache()
+        return apolloClient.query(DynamicPagesQuery(countryId, platform)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getJobLandingSections(pageId: String): ApolloCall<JobLandingSectionsQuery.Data> {
-        return apolloClient.query(JobLandingSectionsQuery(pageId))
+        clearApolloCache()
+        return apolloClient.query(JobLandingSectionsQuery(pageId)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getJobLandingCollectionCompanies(
         collectionId: String,
         isPaginate: Boolean, limit: Int, page: Int
     ): ApolloCall<JobLandingCollectionCompaniesQuery.Data> {
-        return apolloClient.query(JobLandingCollectionCompaniesQuery(collectionId, isPaginate, Optional.present(limit), Optional.present(page)))
+        clearApolloCache()
+        return apolloClient.query(JobLandingCollectionCompaniesQuery(collectionId, isPaginate, Optional.present(limit), Optional.present(page))).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getJobLandingCollectionJobs(
         collectionId: String,
         isPaginate: Boolean, limit: Int, page: Int
     ): ApolloCall<JobLandingCollectionJobsQuery.Data> {
-        return apolloClient.query(JobLandingCollectionJobsQuery(collectionId, isPaginate, Optional.present(limit), Optional.present(page)))
+        clearApolloCache()
+        return apolloClient.query(JobLandingCollectionJobsQuery(collectionId, isPaginate, Optional.present(limit), Optional.present(page))).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getJobDetail(jobId: String): ApolloCall<JobLandingJobDetailQuery.Data> {
-        return apolloClient.query(JobLandingJobDetailQuery(jobId))
+        clearApolloCache()
+        return apolloClient.query(JobLandingJobDetailQuery(jobId)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getCompanyDetail(companyId: String): ApolloCall<JobLandingCompanyDetailQuery.Data> {
-        return apolloClient.query(JobLandingCompanyDetailQuery(companyId))
+        clearApolloCache()
+        return apolloClient.query(JobLandingCompanyDetailQuery(companyId)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getCompanyDetailJob(companyId: String): ApolloCall<JobLandingCompanyJobsQuery.Data> {
-        return apolloClient.query(JobLandingCompanyJobsQuery(companyId, false))
+        clearApolloCache()
+        return apolloClient.query(JobLandingCompanyJobsQuery(companyId, false)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun saveJob(
         candidateId: String,
         jobId: String
     ): ApolloCall<SaveJobMutation.Data> {
-        return apolloClientWithAuth.mutation(SaveJobMutation(candidateId, jobId))
+        clearApolloCache()
+        return apolloClientWithAuth.mutation(SaveJobMutation(candidateId, jobId)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun fetchSaveJobsById(jobId: String): ApolloCall<FetchSaveJobByJobIdQuery.Data> {
-        return apolloClientWithAuth.query(FetchSaveJobByJobIdQuery(jobId))
+
+        clearApolloCache()
+        return apolloClientWithAuth.query(FetchSaveJobByJobIdQuery(jobId)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun unSaveJob(id: String): ApolloCall<UnSaveJobMutation.Data> {
+        println("unsave>>${localStorage.bearerToken}")
+        println("unsaveid>>$id")
         return apolloClientWithAuth.mutation(UnSaveJobMutation(id))
     }
 
@@ -292,7 +320,8 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         referenceJobId: String,
         candidateId: String
     ): ApolloCall<CheckJobIsApplyQuery.Data> {
-        return apolloClientWithAuth.query(CheckJobIsApplyQuery(Optional.present(referenceJobId), Optional.present(candidateId)))
+        clearApolloCache()
+        return apolloClientWithAuth.query(CheckJobIsApplyQuery(Optional.present(referenceJobId), Optional.present(candidateId))).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun applyJob(
@@ -634,15 +663,18 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun fetchApplication(limit: Int): ApolloCall<FetchApplicationQuery.Data> {
-        return apolloClientWithAuth.query(FetchApplicationQuery( Optional.present(null), limit, Optional.present("")))
+        clearApolloCache()
+        return apolloClientWithAuth.query(FetchApplicationQuery( Optional.present(null), limit, Optional.present(""))).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getJobLandingJobList(jobIds: List<String>): ApolloCall<JobLandingJobListQuery.Data> {
-        return apolloClient.query(JobLandingJobListQuery(jobIds))
+        clearApolloCache()
+        return apolloClient.query(JobLandingJobListQuery(jobIds)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun fetchApplicationById(id: String): ApolloCall<FetchApplicationByIdQuery.Data> {
-        return apolloClientWithAuth.query(FetchApplicationByIdQuery(id))
+        clearApolloCache()
+        return apolloClientWithAuth.query(FetchApplicationByIdQuery(id)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun fetchNotification(
@@ -650,11 +682,13 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         search: String,
         limit: Int
     ): ApolloCall<FetchNotificationsQuery.Data> {
-        return apolloClientWithAuth.query(FetchNotificationsQuery(Optional.present(status), Optional.present(search), Optional.present(null), limit))
+        clearApolloCache()
+        return apolloClientWithAuth.query(FetchNotificationsQuery(Optional.present(status), Optional.present(search), Optional.present(null), limit)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun fetchNotificationById(id: String): ApolloCall<FetchNotificationByIdQuery.Data> {
-        return apolloClientWithAuth.query(FetchNotificationByIdQuery(id))
+        clearApolloCache()
+        return apolloClientWithAuth.query(FetchNotificationByIdQuery(id)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun uploadMultipleFiles(
@@ -1013,7 +1047,8 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         limit: Int,
         page: Int
     ): ApolloCall<FetchInterviewQuery.Data> {
-        return apolloClientWithAuth.query(FetchInterviewQuery(limit, Optional.present(null)))
+        clearApolloCache()
+        return apolloClientWithAuth.query(FetchInterviewQuery(limit, Optional.present(null))).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun scanWebLogIn(qrToken: String): ApolloCall<ScanWebLogInMutation.Data> {
@@ -1021,11 +1056,13 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun getSavedJobsIds(): ApolloCall<FetchSavedJobsIdsQuery.Data> {
-        return apolloClientWithAuth.query(FetchSavedJobsIdsQuery(1, 50, Optional.present(false), Optional.present(emptyList())))
+        clearApolloCache()
+        return apolloClientWithAuth.query(FetchSavedJobsIdsQuery(1, 50, Optional.present(false), Optional.present(emptyList()))).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getSavedJobs(jobsId: List<String>): ApolloCall<JobLandingSavedJobsQuery.Data> {
-        return apolloClient.query(JobLandingSavedJobsQuery(jobsId))
+        clearApolloCache()
+        return apolloClient.query(JobLandingSavedJobsQuery(jobsId)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun createCompany(

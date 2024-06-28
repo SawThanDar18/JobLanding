@@ -89,6 +89,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -101,6 +102,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.core.net.toFile
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.Lifecycle
 import co.nexlabs.betterhr.joblanding.AndroidFileUri
 import co.nexlabs.betterhr.joblanding.FileUri
 import co.nexlabs.betterhr.joblanding.android.data.CurrentDateTimeFormatted
@@ -313,8 +315,49 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         }
     }*/
 
-    if (uiState.isSuccessForCandidateId) {
-        LaunchedEffect(Unit) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
+            }
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+            Lifecycle.State.CREATED -> {
+                scope.launch {
+                    if (viewModel.getBearerToken() != "") {
+                        viewModel.getCandidateData()
+                    }
+                    viewModel.getJobDetail(jobId)
+                }
+                Log.d("state>>", "created")
+            }
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    if (viewModel.getBearerToken() != "") {
+                        viewModel.getCandidateData()
+                    }
+                    viewModel.getJobDetail(jobId)
+                }
+                Log.d("state>>", "started")
+            }
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    if (viewModel.getBearerToken() != "") {
+                        viewModel.getCandidateData()
+                    }
+                    viewModel.getJobDetail(jobId)
+                }
+                Log.d("state>>", "resume")
+            }
+        }
+    }
+
+    LaunchedEffect (uiState.isSuccessForCandidateId) {
+        if (uiState.isSuccessForCandidateId) {
             scope.launch {
                 viewModel.updateCandidateId(uiState.candidateId)
                 viewModel.getBearerTokenFromAPI(viewModel.getToken())
@@ -324,12 +367,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
 
     var isSaveItem by remember { mutableStateOf(false) }
 
-    scope.launch {
-        viewModel.getJobDetail(jobId)
-    }
-
-    if (uiState.isSuccessGetJobDetail) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect (uiState.isSuccessGetJobDetail) {
+        if (uiState.isSuccessGetJobDetail) {
             scope.launch {
                 if (viewModel.getBearerToken() != "") {
                     viewModel.fetchSaveJobsById(jobId)
@@ -346,20 +385,25 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         isSaveItem = false
     }
 
-    if (uiState.isUnSaveJobSuccess) {
-        isSaveItem = false
-        LaunchedEffect(Unit) {
+    LaunchedEffect (uiState.isUnSaveJobSuccess) {
+        if (uiState.isUnSaveJobSuccess) {
+            isSaveItem = false
             viewModel.fetchSaveJobsById(jobId)
         }
     }
 
-    if (uiState.isSaveJobSuccess) {
-        isSaveItem = true
-        LaunchedEffect(Unit) {
+    LaunchedEffect (uiState.isSaveJobSuccess) {
+        if (uiState.isSaveJobSuccess) {
+            isSaveItem = true
             viewModel.fetchSaveJobsById(jobId)
         }
     }
 
+    if (uiState.candidateData != null) {
+        scope.launch {
+            viewModel.updateCandidateId(uiState.candidateData.id)
+        }
+    }
 
     /* if (uiState.isBearerTokenExist) {
          LaunchedEffect(Unit) {
@@ -387,8 +431,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
     }*/
 
 
-    if (uiState.isSuccessCreateApplication) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect (uiState.isSuccessCreateApplication) {
+        if (uiState.isSuccessCreateApplication) {
             isJobApplied = true
             step = if (bottomBarVisibleAfterSignUp) {
                 "stepThree"
@@ -428,8 +472,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
          }
      }*/
 
-    if (uiState.isApplyJobSuccess) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect (uiState.isApplyJobSuccess) {
+        if (uiState.isApplyJobSuccess) {
             step = if (bottomBarVisibleAfterSignUp) {
                 "stepThree"
             } else {
@@ -505,8 +549,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
         }
     }
 
-    if (uiState.isSuccessForBearerToken) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect (uiState.isSuccessForBearerToken) {
+        if (uiState.isSuccessForBearerToken) {
             scope.launch {
                 viewModel.updateBearerToken(uiState.bearerToken)
                 selectedImageUri?.let { uri ->
@@ -517,8 +561,8 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                         "profile"
                     )
                 }
+                step = "stepThree"
             }
-            step = "stepThree"
         }
     }
 
@@ -1187,7 +1231,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                         scope.launch {
                             if (viewModel.getBearerToken() != "") {
                                 bottomBarVisibleAfterSignUp = true
-                                viewModel.getCandidateData()
+                                //viewModel.getCandidateData()
                             } else {
                                 bottomBarVisible = true
                             }

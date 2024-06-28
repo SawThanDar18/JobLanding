@@ -81,6 +81,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -97,6 +98,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.AndroidFileUri
 import co.nexlabs.betterhr.joblanding.android.R
@@ -336,99 +338,38 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
     var uriHandler = LocalUriHandler.current
 
-    LaunchedEffect(refreshing) {
-        if (refreshing) {
-            scope.launch {
-                viewModel.getCandidateData()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
             }
-            refreshing = false
-        }
-    }
-
-    scope.launch {
-        viewModel.getCandidateData()
-    }
-
-    LaunchedEffect(uiState.isSuccessUpdateSummary) {
-        updateSummaryVisible = false
-        scope.launch {
-            viewModel.getCandidateData()
-        }
-    }
-
-    LaunchedEffect(uiState.getPositionId) {
-        if (uiState.positionId != "") {
-            viewModel.createExperience(
-                uiState.positionId,
-                companyIdForAddExperience,
-                position,
-                "",
-                experienceLevel,
-                selectedJobType,
-                startDateInYMD, endDateInYMD,
-                if (endDate == "") true else false,
-                description
-            )
-        }
-    }
-
-    LaunchedEffect(uiState.isSuccessUpdateCertificate) {
-        updateCertificateVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessCreateCertificate) {
-        addCertificateVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessUpdateSkill) {
-        updateSkillVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessCreateSkill) {
-        addSkillVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessUpdateLanguage) {
-        updateLanguageVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessCreateLanguage) {
-        addLanguageVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessUpdateEducation) {
-        updateEducationVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessCreateEducation) {
-        addEducationVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessCreateExperience) {
-        addExperiencePositionVisible = false
-    }
-
-    LaunchedEffect(uiState.isSuccessUpdateExperience) {
-        updateExperiencePositionVisible = false
-    }
-
-    LaunchedEffect(uiState.getFileId) {
-        if (bottomBarVisible) {
-            bottomBarVisible = false
-        }
-
-        if (addExperienceCompanyVisible) {
-            if (uiState.fileId != "") {
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+            Lifecycle.State.CREATED -> {
                 scope.launch {
-                    viewModel.createCompany(companyName, uiState.fileId)
+                    viewModel.getCandidateData()
                 }
+                Log.d("state>>", "created")
+            }
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    viewModel.getCandidateData()
+                }
+                Log.d("state>>", "started")
+            }
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    viewModel.getCandidateData()
+                }
+                Log.d("state>>", "resume")
             }
         }
     }
 
-    LaunchedEffect(uiState.isSuccessCreateCompany) {
-        addExperienceCompanyVisible = false
-    }
 
     if (uiState.candidateData != null) {
         scope.launch {
@@ -510,20 +451,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                         it.experience
                     )
                 )
-
-                /*if (it.experience.isNotEmpty()) {
-                    it.experience.map {
-                        experienceList.add(
-                            ExperienceUIModel(
-                                it.id, it.positionId, it.candidateId,
-                                it.title, it.location, it.experienceLevel,
-                                it.employmentType, it.startDate, it.endDate,
-                                it.isCurrentJob, it.description, it.companyId,
-                                PositionUIModel(it.position.id, it.position.name)
-                            )
-                        )
-                    }
-                }*/
             }
         }
 
@@ -537,6 +464,132 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
         if (uiState.candidateData.coverLetter != null) {
             coverLetterName = uiState.candidateData.coverLetter.name
+        }
+    }
+
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            scope.launch {
+                viewModel.getCandidateData()
+            }
+            refreshing = false
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessUpdateSummary) {
+        scope.launch {
+            updateSummaryVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.getPositionId) {
+        if (uiState.positionId != "") {
+            viewModel.createExperience(
+                uiState.positionId,
+                companyIdForAddExperience,
+                position,
+                "",
+                experienceLevel,
+                selectedJobType,
+                startDateInYMD, endDateInYMD,
+                if (endDate == "") true else false,
+                description
+            )
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessUpdateCertificate) {
+        scope.launch {
+            updateCertificateVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessCreateCertificate) {
+        scope.launch {
+            addCertificateVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessUpdateSkill) {
+        scope.launch {
+            updateSkillVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessCreateSkill) {
+        scope.launch {
+            addSkillVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessUpdateLanguage) {
+        scope.launch {
+            updateLanguageVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessCreateLanguage) {
+        scope.launch {
+            addLanguageVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessUpdateEducation) {
+        scope.launch {
+            updateEducationVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessCreateEducation) {
+        scope.launch {
+            addEducationVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessCreateExperience) {
+        scope.launch {
+            addExperiencePositionVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessUpdateExperience) {
+        scope.launch {
+            updateExperiencePositionVisible = false
+            viewModel.getCandidateData()
+        }
+    }
+
+    LaunchedEffect(uiState.getFileId) {
+        if (bottomBarVisible) {
+            scope.launch {
+                bottomBarVisible = false
+                viewModel.getCandidateData()
+            }
+        }
+
+        if (addExperienceCompanyVisible) {
+            if (uiState.fileId != "") {
+                scope.launch {
+                    viewModel.createCompany(companyName, uiState.fileId)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessCreateCompany) {
+        scope.launch {
+            addExperienceCompanyVisible = false
+            viewModel.getCandidateData()
         }
     }
 
@@ -1119,7 +1172,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     .background(color = Color(0xFFE4E7ED))
                             )
 
-                            /*if ((summary == "")) {
+                            if (summary == "") {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -1180,7 +1233,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                 .size(24.dp)
                                                 .clickable {
                                                     updateSummaryVisible = true
-                                                    updateSummary = uiState.candidateData.summary
+                                                    updateSummary = summary
                                                 },
                                         )
 
@@ -1206,6 +1259,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     .height(2.dp)
                                     .background(color = Color(0xFFE4E7ED))
                             )
+
+                            /*
 
                             if (companiesList.isEmpty()) {
                                 Row(
