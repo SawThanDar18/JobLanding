@@ -119,6 +119,15 @@
 		AF8CF0962C0F069E005F1B58 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = AF8CF0952C0F069E005F1B58 /* Base */; };
 		AF8CF0982C0F069E005F1B58 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AF8CF0972C0F069E005F1B58 /* Assets.xcassets */; };
 		AF8CF09B2C0F069E005F1B58 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = AF8CF09A2C0F069E005F1B58 /* Base */; };
+		AFCD62BA2C2C190900EC096B /* RegisterUploadFileViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFCD62B92C2C190900EC096B /* RegisterUploadFileViewController.xib */; };
+		AFCD62BB2C2C190900EC096B /* RegisterUploadFileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCD62B82C2C190900EC096B /* RegisterUploadFileViewController.swift */; };
+		AFCD62BD2C2C191900EC096B /* RegisterUploadFileScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCD62BC2C2C191900EC096B /* RegisterUploadFileScene.swift */; };
+		AFCD62BF2C2C192E00EC096B /* RegisterUploadFileRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCD62BE2C2C192E00EC096B /* RegisterUploadFileRouter.swift */; };
+		AFCD62C62C2C1CDA00EC096B /* RegisterUploadFileViewController+UITableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCD62C52C2C1CDA00EC096B /* RegisterUploadFileViewController+UITableView.swift */; };
+		AFCD62C92C2C1D2B00EC096B /* UploadProfileTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFCD62C82C2C1D2B00EC096B /* UploadProfileTableViewCell.xib */; };
+		AFCD62CA2C2C1D2B00EC096B /* UploadProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCD62C72C2C1D2B00EC096B /* UploadProfileTableViewCell.swift */; };
+		AFCD62E32C2D67DD00EC096B /* InputTextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCD62E12C2D67DD00EC096B /* InputTextFieldTableViewCell.swift */; };
+		AFCD62E42C2D67DD00EC096B /* InputTextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFCD62E22C2D67DD00EC096B /* InputTextFieldTableViewCell.xib */; };
 		AFE768862C2C0EB500FFF4FD /* SettingInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE768832C2C0EB500FFF4FD /* SettingInfo.swift */; };
 		AFE768882C2C0EBE00FFF4FD /* HomeCollectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE768872C2C0EBE00FFF4FD /* HomeCollectionType.swift */; };
 		DA910F6D0460EB5CB0F946DC /* Pods_BetterJobLanding.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E61F3BA54DB20E95E26A259 /* Pods_BetterJobLanding.framework */; };
@@ -240,6 +249,15 @@
 		AF8CF0972C0F069E005F1B58 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AF8CF09A2C0F069E005F1B58 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AF8CF09C2C0F069E005F1B58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AFCD62B82C2C190900EC096B /* RegisterUploadFileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterUploadFileViewController.swift; sourceTree = "<group>"; };
+		AFCD62B92C2C190900EC096B /* RegisterUploadFileViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RegisterUploadFileViewController.xib; sourceTree = "<group>"; };
+		AFCD62BC2C2C191900EC096B /* RegisterUploadFileScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterUploadFileScene.swift; sourceTree = "<group>"; };
+		AFCD62BE2C2C192E00EC096B /* RegisterUploadFileRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterUploadFileRouter.swift; sourceTree = "<group>"; };
+		AFCD62C52C2C1CDA00EC096B /* RegisterUploadFileViewController+UITableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RegisterUploadFileViewController+UITableView.swift"; sourceTree = "<group>"; };
+		AFCD62C72C2C1D2B00EC096B /* UploadProfileTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadProfileTableViewCell.swift; sourceTree = "<group>"; };
+		AFCD62C82C2C1D2B00EC096B /* UploadProfileTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UploadProfileTableViewCell.xib; sourceTree = "<group>"; };
+		AFCD62E12C2D67DD00EC096B /* InputTextFieldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputTextFieldTableViewCell.swift; sourceTree = "<group>"; };
+		AFCD62E22C2D67DD00EC096B /* InputTextFieldTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InputTextFieldTableViewCell.xib; sourceTree = "<group>"; };
 		AFE2852D2C22776900621C1C /* LandingCountryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingCountryViewModel.swift; sourceTree = "<group>"; };
 		AFE768832C2C0EB500FFF4FD /* SettingInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingInfo.swift; sourceTree = "<group>"; };
 		AFE768872C2C0EBE00FFF4FD /* HomeCollectionType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCollectionType.swift; sourceTree = "<group>"; };
@@ -401,6 +419,7 @@
 		AF1A25492C0F11E2007E1A93 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				AFCD62B42C2C18DC00EC096B /* RegisterUploadFile */,
 				AF4B079C2C2A88BE00D33D8B /* OTP */,
 				AF0A099E2C19AB4A00BE40C6 /* Register */,
 				AF603FC72C11AF6900831668 /* ReusableComponents */,
@@ -478,6 +497,10 @@
 		AF358E092C12B2190017DA42 /* TableViewCell */ = {
 			isa = PBXGroup;
 			children = (
+				AFCD62E02C2D67C500EC096B /* InputTextFieldTableViewCell */,
+				AFCD62C42C2C1C5700EC096B /* FileAttachmentsFileUploadTableViewCell */,
+				AFCD62C32C2C1C4000EC096B /* ResumeFileUploadTableViewCell */,
+				AFCD62C02C2C1BB500EC096B /* UploadProfileTableViewCell */,
 				AF5442C92C29167200703AC3 /* OTPTableViewCell */,
 				AF5442C82C29166600703AC3 /* PhoneNumberTableViewCell */,
 				AF4A5D212C16B98D008CDA8C /* CellStyleHeaderTableViewCell */,
@@ -1061,6 +1084,74 @@
 			path = DeviceLocation;
 			sourceTree = "<group>";
 		};
+		AFCD62B42C2C18DC00EC096B /* RegisterUploadFile */ = {
+			isa = PBXGroup;
+			children = (
+				AFCD62B72C2C18F100EC096B /* ViewController */,
+				AFCD62B62C2C18ED00EC096B /* Scene */,
+				AFCD62B52C2C18E900EC096B /* Router */,
+			);
+			path = RegisterUploadFile;
+			sourceTree = "<group>";
+		};
+		AFCD62B52C2C18E900EC096B /* Router */ = {
+			isa = PBXGroup;
+			children = (
+				AFCD62BE2C2C192E00EC096B /* RegisterUploadFileRouter.swift */,
+			);
+			path = Router;
+			sourceTree = "<group>";
+		};
+		AFCD62B62C2C18ED00EC096B /* Scene */ = {
+			isa = PBXGroup;
+			children = (
+				AFCD62BC2C2C191900EC096B /* RegisterUploadFileScene.swift */,
+			);
+			path = Scene;
+			sourceTree = "<group>";
+		};
+		AFCD62B72C2C18F100EC096B /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				AFCD62B82C2C190900EC096B /* RegisterUploadFileViewController.swift */,
+				AFCD62B92C2C190900EC096B /* RegisterUploadFileViewController.xib */,
+				AFCD62C52C2C1CDA00EC096B /* RegisterUploadFileViewController+UITableView.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		AFCD62C02C2C1BB500EC096B /* UploadProfileTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				AFCD62C72C2C1D2B00EC096B /* UploadProfileTableViewCell.swift */,
+				AFCD62C82C2C1D2B00EC096B /* UploadProfileTableViewCell.xib */,
+			);
+			path = UploadProfileTableViewCell;
+			sourceTree = "<group>";
+		};
+		AFCD62C32C2C1C4000EC096B /* ResumeFileUploadTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ResumeFileUploadTableViewCell;
+			sourceTree = "<group>";
+		};
+		AFCD62C42C2C1C5700EC096B /* FileAttachmentsFileUploadTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = FileAttachmentsFileUploadTableViewCell;
+			sourceTree = "<group>";
+		};
+		AFCD62E02C2D67C500EC096B /* InputTextFieldTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				AFCD62E12C2D67DD00EC096B /* InputTextFieldTableViewCell.swift */,
+				AFCD62E22C2D67DD00EC096B /* InputTextFieldTableViewCell.xib */,
+			);
+			path = InputTextFieldTableViewCell;
+			sourceTree = "<group>";
+		};
 		AFE2852C2C22775500621C1C /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -1097,6 +1188,7 @@
 				AF8CF0872C0F069E005F1B58 /* Sources */,
 				AF8CF0882C0F069E005F1B58 /* Frameworks */,
 				AF8CF0892C0F069E005F1B58 /* Resources */,
+				F6725306D84529EE1E2A0C4D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1153,6 +1245,7 @@
 				AF4B07962C2A886800D33D8B /* Poppins-Regular.ttf in Resources */,
 				AF5442CD2C29171600703AC3 /* PhoneNumberTableViewCell.xib in Resources */,
 				AF8CF0982C0F069E005F1B58 /* Assets.xcassets in Resources */,
+				AFCD62E42C2D67DD00EC096B /* InputTextFieldTableViewCell.xib in Resources */,
 				AF5442D12C29173400703AC3 /* OTPTableViewCell.xib in Resources */,
 				AF603FCC2C11B05200831668 /* SearchTextFieldTableViewCell.xib in Resources */,
 				AF358E5C2C15F6570017DA42 /* CellStyleSixTableViewCell.xib in Resources */,
@@ -1163,7 +1256,9 @@
 				AF4B07972C2A886800D33D8B /* Poppins-SemiBold.ttf in Resources */,
 				AF4A5D192C16A99E008CDA8C /* CellStyleSevenTableViewCell.xib in Resources */,
 				AF54431E2C2977A000703AC3 /* HomeViewController.xib in Resources */,
+				AFCD62BA2C2C190900EC096B /* RegisterUploadFileViewController.xib in Resources */,
 				AF54431A2C2974C300703AC3 /* RegisterViewController.xib in Resources */,
+				AFCD62C92C2C1D2B00EC096B /* UploadProfileTableViewCell.xib in Resources */,
 				AF358E3F2C15E38D0017DA42 /* CellStyleFourTableViewCell.xib in Resources */,
 				AF1A25542C0F11E2007E1A93 /* ScreenPortal.storyboard in Resources */,
 				AF603FB12C11978000831668 /* Interviews.storyboard in Resources */,
@@ -1225,6 +1320,23 @@
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\nchmod +x gradlew\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n\n";
 		};
+		F6725306D84529EE1E2A0C4D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BetterJobLanding/Pods-BetterJobLanding-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1238,6 +1350,7 @@
 				AF4B07912C2A886800D33D8B /* UISearchBar+Extension.swift in Sources */,
 				AF603FD22C11BBD400831668 /* HomeViewModels.swift in Sources */,
 				AF358E512C15F3770017DA42 /* CellStyleFiveCollectionViewCell.swift in Sources */,
+				AFCD62C62C2C1CDA00EC096B /* RegisterUploadFileViewController+UITableView.swift in Sources */,
 				AF4B078C2C2A886800D33D8B /* AllExtensions.swift in Sources */,
 				AF603F822C10688100831668 /* DeviceLocation.swift in Sources */,
 				AF1A25552C0F11E2007E1A93 /* ScreenPortal.swift in Sources */,
@@ -1258,6 +1371,7 @@
 				AF358E4C2C15F1A20017DA42 /* CellStyleFourTableViewCell+CollectionView.swift in Sources */,
 				AF603FB72C1197AD00831668 /* InterviewsRouter.swift in Sources */,
 				AF4B07982C2A886800D33D8B /* AppFonts.swift in Sources */,
+				AFCD62BB2C2C190900EC096B /* RegisterUploadFileViewController.swift in Sources */,
 				AF358E5F2C15F6DC0017DA42 /* CellStyleSixTableViewCell+CollectionView.swift in Sources */,
 				AF603F8F2C10738100831668 /* HomeRouter.swift in Sources */,
 				AF358E342C15D4970017DA42 /* CellStyleTwoTableViewCell+CollectionView.swift in Sources */,
@@ -1279,15 +1393,18 @@
 				AF358E4A2C15E87F0017DA42 /* CellStyleThreeTableViewCell+CollectionView.swift in Sources */,
 				AF358E242C12F3600017DA42 /* CellStyleOneTableViewCell+CollectionView.swift in Sources */,
 				AF5442D52C292E6100703AC3 /* RegisterViewController+UITableView.swift in Sources */,
+				AFCD62BF2C2C192E00EC096B /* RegisterUploadFileRouter.swift in Sources */,
 				AF4B07992C2A886800D33D8B /* InputValidator.swift in Sources */,
 				AF4B07902C2A886800D33D8B /* UIImage+Extension.swift in Sources */,
 				AF4A5D1E2C16AAEB008CDA8C /* CellStyleSevenCollectionViewCell.swift in Sources */,
 				AFE768862C2C0EB500FFF4FD /* SettingInfo.swift in Sources */,
 				AF1A25562C0F11E2007E1A93 /* ScreenPortalScene.swift in Sources */,
 				AF603FA72C1195C200831668 /* InboxViewController.swift in Sources */,
+				AFCD62BD2C2C191900EC096B /* RegisterUploadFileScene.swift in Sources */,
 				AF603FC12C11984200831668 /* ProfileScene.swift in Sources */,
 				AF54431D2C2977A000703AC3 /* HomeViewController.swift in Sources */,
 				AF358E482C15E3D20017DA42 /* CellStyleThreeCollectionViewCell.swift in Sources */,
+				AFCD62CA2C2C1D2B00EC096B /* UploadProfileTableViewCell.swift in Sources */,
 				AF4B07932C2A886800D33D8B /* UIViewController+Extension.swift in Sources */,
 				AF083C162C22D8F300364749 /* BuildFile in Sources */,
 				AF358E222C12EA160017DA42 /* CellStyleOneCollectionViewCell.swift in Sources */,
@@ -1298,6 +1415,7 @@
 				AF603FC32C11984A00831668 /* ProfileRouter.swift in Sources */,
 				AFE768882C2C0EBE00FFF4FD /* HomeCollectionType.swift in Sources */,
 				AF358E5D2C15F6570017DA42 /* CellStyleSixTableViewCell.swift in Sources */,
+				AFCD62E32C2D67DD00EC096B /* InputTextFieldTableViewCell.swift in Sources */,
 				AF1A254C2C0F11E2007E1A93 /* LandingCountryRouter.swift in Sources */,
 				AF358E642C15F7100017DA42 /* CellStyleSixCollectionViewCell.swift in Sources */,
 				AF0A09A82C19AB9C00BE40C6 /* RegisterScene.swift in Sources */,

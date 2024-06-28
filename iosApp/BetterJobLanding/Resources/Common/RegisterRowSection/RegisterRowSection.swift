@@ -25,3 +25,23 @@ enum RegisterFormFields {
     }
 }
 
+//Register
+enum RegisterUploadFileFormFields {
+    case profileUpload, fullName, emailAddress, resumeUpload, filesAttachmentsUpload
+    var info: (name:String,cellType:FormCellType) {
+        switch self {
+        case .profileUpload:
+            return ("",.profileUpload)
+        case .fullName:
+            return ("",.inputTextfield)
+        case .emailAddress:
+            return ("",.inputTextfield)
+        case .resumeUpload:
+            return ("",.resumeUpload)
+        case .filesAttachmentsUpload:
+            return ("", .filesAttachments)
+        }
+    }
+}
+
+
