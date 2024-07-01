@@ -1175,4 +1175,77 @@ class CompleteProfileViewModel(
             }
         }
     }
+
+    fun updateCandidate(
+        name: String,
+        position: String,
+        phoneNumber: String,
+        email: String
+    ) {
+        viewModelScope.launch(DispatcherProvider.io) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    isSuccessUpdateCandidate = false
+                )
+            }
+
+            completeProfileRepository.updateCandidate(localStorage.candidateId, name, position, phoneNumber, email, localStorage.countryId).toFlow()
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = if ((e as ApolloException).suppressedExceptions.map { it as ApolloException }
+                                    .any { it is ApolloNetworkException || it is ApolloParseException })
+                                UIErrorType.Network else UIErrorType.Other(e.message ?: "Something went wrong!"),
+                            isSuccessUpdateCandidate = false
+                        )
+                    }
+                    when (e) {
+                        is ApolloHttpException -> {
+                            println("HTTP error: ${e.message}")
+                        }
+
+                        is ApolloNetworkException -> {
+                            println("Network error: ${e.message}")
+                        }
+
+                        is ApolloParseException -> {
+                            println("Parse error: ${e.message}")
+                        }
+
+                        else -> {
+                            println("An error occurred: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                }.collectLatest { data ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            error = UIErrorType.Nothing,
+                            isSuccessUpdateCandidate = false
+                        )
+                    }
+                    if (!data.hasErrors()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = if (data.data == null) UIErrorType.Other("API returned empty list") else UIErrorType.Nothing,
+                                isSuccessUpdateCandidate = true
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true,
+                                error = UIErrorType.Other(data.errors.toString()),
+                                isSuccessUpdateCandidate = false
+                            )
+                        }
+                    }
+                }
+        }
+    }
 }

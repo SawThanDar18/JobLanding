@@ -142,6 +142,8 @@ data class AddMoreSkillDataItem(
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: NavController) {
+    var applicationContext = LocalContext.current.applicationContext
+
     var refreshing by remember { mutableStateOf(false) }
 
     var companyName by remember { mutableStateOf("") }
@@ -150,6 +152,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var cvFileName by remember { mutableStateOf("") }
     var coverLetterName by remember { mutableStateOf("") }
     var bottomBarVisible by remember { mutableStateOf(false) }
+
+    var updateName by remember { mutableStateOf("") }
+    var updateDesiredPosition by remember { mutableStateOf("") }
+    var updatePhoneNumber by remember { mutableStateOf("") }
+    var updateEmail by remember { mutableStateOf("") }
 
     var name by remember { mutableStateOf("") }
     var candidatePosition by remember { mutableStateOf("") }
@@ -275,7 +282,12 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         addMoreLanguageItem = updatedList
     }
 
-    fun updateLanguageItemWithId(index: Int, id: String, language: String, proficiencyLevels: String) {
+    fun updateLanguageItemWithId(
+        index: Int,
+        id: String,
+        language: String,
+        proficiencyLevels: String
+    ) {
         val updatedList = updateAddMoreLanguageItem.toMutableList()
         updatedList[index] = AddMoreLanguageDataItem(id, language, proficiencyLevels)
         updateAddMoreLanguageItem = updatedList
@@ -346,21 +358,25 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
             Lifecycle.State.DESTROYED -> {
                 Log.d("state>>", "destroyed")
             }
+
             Lifecycle.State.INITIALIZED -> {
                 Log.d("state>>", "initialized")
             }
+
             Lifecycle.State.CREATED -> {
                 scope.launch {
                     viewModel.getCandidateData()
                 }
                 Log.d("state>>", "created")
             }
+
             Lifecycle.State.STARTED -> {
                 scope.launch {
                     viewModel.getCandidateData()
                 }
                 Log.d("state>>", "started")
             }
+
             Lifecycle.State.RESUMED -> {
                 scope.launch {
                     viewModel.getCandidateData()
@@ -476,6 +492,15 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         }
     }
 
+    LaunchedEffect(uiState.isSuccessUpdateCandidate) {
+        if (uiState.isSuccessUpdateCandidate) {
+            scope.launch {
+                bottomBarVisible = false
+                viewModel.getCandidateData()
+            }
+        }
+    }
+
     LaunchedEffect(uiState.isSuccessUpdateSummary) {
         scope.launch {
             updateSummaryVisible = false
@@ -571,9 +596,23 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
     LaunchedEffect(uiState.getFileId) {
         if (bottomBarVisible) {
-            scope.launch {
-                bottomBarVisible = false
-                viewModel.getCandidateData()
+            if (updateName == "") {
+                Toast
+                    .makeText(
+                        applicationContext,
+                        "Please fill Name!",
+                        Toast.LENGTH_LONG
+                    )
+                    .show()
+            } else {
+                scope.launch {
+                    viewModel.updateCandidate(
+                        updateName,
+                        updateDesiredPosition,
+                        updatePhoneNumber,
+                        updateEmail
+                    )
+                }
             }
         }
 
@@ -593,7 +632,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
         }
     }
 
-    var applicationContext = LocalContext.current.applicationContext
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var selectedFileName by remember { mutableStateOf("") }
     var fileToUpload: File? by remember { mutableStateOf(null) }
@@ -741,7 +779,12 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             .fillMaxWidth()
                                             .clickable {
                                                 bottomBarVisible = true
-                                                //navController.navigate("profile-edit-detail-screen")
+
+                                                updateName = uiState.candidateData.name
+                                                updateDesiredPosition =
+                                                    uiState.candidateData.desiredPosition
+                                                updatePhoneNumber = uiState.candidateData.phone
+                                                updateEmail = uiState.candidateData.email
                                             },
                                         horizontalArrangement = Arrangement.Start,
                                         verticalAlignment = Alignment.CenterVertically
@@ -2126,13 +2169,16 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                     .clickable {
                                                         updateLanguageVisible = true
 
-                                                        val updateList = updateAddMoreLanguageItem.toMutableList()
+                                                        val updateList =
+                                                            updateAddMoreLanguageItem.toMutableList()
                                                         for (i in 0 until languageList.size) {
-                                                            updateList.add(AddMoreLanguageDataItem(
-                                                                languageList[i].id,
-                                                                languageList[i].languageName,
-                                                                languageList[i].proficiencyLevel
-                                                            ))
+                                                            updateList.add(
+                                                                AddMoreLanguageDataItem(
+                                                                    languageList[i].id,
+                                                                    languageList[i].languageName,
+                                                                    languageList[i].proficiencyLevel
+                                                                )
+                                                            )
                                                             updateAddMoreLanguageItem = updateList
                                                         }
                                                     },
@@ -2280,12 +2326,15 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                     .clickable {
                                                         updateSkillVisible = true
 
-                                                        val updateList = updateAddMoreSkillItem.toMutableList()
+                                                        val updateList =
+                                                            updateAddMoreSkillItem.toMutableList()
                                                         for (i in 0 until skillList.size) {
-                                                            updateList.add(AddMoreSkillDataItem(
-                                                                skillList[i].id,
-                                                                skillList[i].skillName
-                                                            ))
+                                                            updateList.add(
+                                                                AddMoreSkillDataItem(
+                                                                    skillList[i].id,
+                                                                    skillList[i].skillName
+                                                                )
+                                                            )
                                                             updateAddMoreSkillItem = updateList
                                                         }
                                                     },
@@ -3655,13 +3704,17 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 ) {
                                     repeat(updateAddMoreSkillItem.size) { index ->
 
-                                        var id by remember { mutableStateOf(
-                                            updateAddMoreSkillItem[index].id
-                                        ) }
+                                        var id by remember {
+                                            mutableStateOf(
+                                                updateAddMoreSkillItem[index].id
+                                            )
+                                        }
 
-                                        var skill by remember { mutableStateOf(
-                                            updateAddMoreSkillItem[index].skill
-                                        ) }
+                                        var skill by remember {
+                                            mutableStateOf(
+                                                updateAddMoreSkillItem[index].skill
+                                            )
+                                        }
 
                                         Column {
                                             Spacer(modifier = Modifier.height(24.dp))
@@ -3894,9 +3947,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 ) {
                                     repeat(addMoreSkillItem.size) { index ->
 
-                                        var skill by remember { mutableStateOf(
-                                            addMoreSkillItem[index].skill
-                                        ) }
+                                        var skill by remember {
+                                            mutableStateOf(
+                                                addMoreSkillItem[index].skill
+                                            )
+                                        }
 
                                         Column {
                                             Spacer(modifier = Modifier.height(24.dp))
@@ -7698,7 +7753,39 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 modifier = Modifier
                                     .size(24.dp)
                                     .clickable {
-                                        if (uiState.candidateData != null) {
+
+                                        if (selectedImageUri != null) {
+                                            selectedImageUri?.let { uri ->
+                                                val fileUri = AndroidFileUri(uri)
+                                                viewModel.uploadFile(
+                                                    fileUri,
+                                                    selectedFileName,
+                                                    "profile"
+                                                )
+                                            }
+                                        } else {
+                                            if (updateName == "") {
+                                                Toast
+                                                    .makeText(
+                                                        applicationContext,
+                                                        "Please fill Name!",
+                                                        Toast.LENGTH_LONG
+                                                    )
+                                                    .show()
+                                            } else {
+                                                scope.launch {
+                                                    viewModel.updateCandidate(
+                                                        updateName,
+                                                        updateDesiredPosition,
+                                                        updatePhoneNumber,
+                                                        updateEmail
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        /*if (uiState.candidateData != null) {
+                                            //need to fix
                                             if (uiState.candidateData.profile != null) {
                                                 selectedImageUri?.let { uri ->
                                                     val fileUri = AndroidFileUri(uri)
@@ -7719,7 +7806,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                                     )
                                                 }
                                             }
-                                        }
+                                        }*/
                                     },
                                 alignment = Alignment.Center
                             )
@@ -7836,11 +7923,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     color = Color.Transparent,
                                     shape = MaterialTheme.shapes.medium
                                 ),
-                            value = name,
+                            value = updateName,
                             onValueChange = {
-                                name = it
+                                updateName = it
                             },
-                            placeholder = { Text(name, color = Color(0xFF4A4A4A)) },
+                            placeholder = { Text(updateName, color = Color(0xFF4A4A4A)) },
                             textStyle = TextStyle(
                                 fontWeight = FontWeight.W400,
                                 fontSize = 14.sp,
@@ -7897,11 +7984,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     color = Color.Transparent,
                                     shape = MaterialTheme.shapes.medium
                                 ),
-                            value = position,
+                            value = updatePosition,
                             onValueChange = {
-                                position = it
+                                updatePosition = it
                             },
-                            placeholder = { Text(position, color = Color(0xFF4A4A4A)) },
+                            placeholder = { Text(updatePosition, color = Color(0xFF4A4A4A)) },
                             textStyle = TextStyle(
                                 fontWeight = FontWeight.W400,
                                 fontSize = 14.sp,
@@ -7958,11 +8045,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     color = Color.Transparent,
                                     shape = MaterialTheme.shapes.medium
                                 ),
-                            value = phoneNumber,
+                            value = updatePhoneNumber,
                             onValueChange = {
-                                phoneNumber = it
+                                updatePhoneNumber = it
                             },
-                            placeholder = { Text(phoneNumber, color = Color(0xFF4A4A4A)) },
+                            placeholder = { Text(updatePhoneNumber, color = Color(0xFF4A4A4A)) },
                             textStyle = TextStyle(
                                 fontWeight = FontWeight.W400,
                                 fontSize = 14.sp,
@@ -8019,11 +8106,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     color = Color.Transparent,
                                     shape = MaterialTheme.shapes.medium
                                 ),
-                            value = email,
+                            value = updateEmail,
                             onValueChange = {
-                                email = it
+                                updateEmail = it
                             },
-                            placeholder = { Text(email, color = Color(0xFF4A4A4A)) },
+                            placeholder = { Text(updateEmail, color = Color(0xFF4A4A4A)) },
                             textStyle = TextStyle(
                                 fontWeight = FontWeight.W400,
                                 fontSize = 14.sp,
@@ -8038,8 +8125,8 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 unfocusedIndicatorColor = Color.Transparent
                             ),
                             keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Phone,
-                                imeAction = ImeAction.Next
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Done
                             ),
                             keyboardActions = KeyboardActions(
                                 onDone = {

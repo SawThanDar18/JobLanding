@@ -336,4 +336,6 @@ interface JobLandingService {
 
     suspend fun createCompany(companyName: String, candidateId: String, fileIds: String): ApolloCall<CreateCompanyMutation.Data>
 
+    suspend fun updateCandidate(candidateId: String, name: String, positionName: String, phone: String, email: String, countryId: String): ApolloCall<UpdateCandidateMutation.Data>
+
 }

@@ -27,5 +27,6 @@ data class CompleteProfileUIState(
     val isSuccessCreateSkill: Boolean = false,
     val isSuccessUpdateSkill: Boolean = false,
     val isSuccessCreateCertificate: Boolean = false,
-    val isSuccessUpdateCertificate: Boolean = false
+    val isSuccessUpdateCertificate: Boolean = false,
+    val isSuccessUpdateCandidate: Boolean = false
 )

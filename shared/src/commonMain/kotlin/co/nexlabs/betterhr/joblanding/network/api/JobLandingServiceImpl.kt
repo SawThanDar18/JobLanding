@@ -1072,6 +1072,17 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     ): ApolloCall<CreateCompanyMutation.Data> {
         return apolloClientWithAuth.mutation(CreateCompanyMutation(companyName, candidateId, Optional.present(fileIds)))
     }
+
+    override suspend fun updateCandidate(
+        candidateId: String,
+        name: String,
+        positionName: String,
+        phone: String,
+        email: String,
+        countryId: String
+    ): ApolloCall<UpdateCandidateMutation.Data> {
+        return apolloClientWithAuth.mutation(UpdateCandidateMutation(candidateId, Optional.present(name), Optional.present(email), Optional.present(phone), Optional.present(positionName), Optional.present(countryId)))
+    }
 }
 
 

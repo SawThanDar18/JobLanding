@@ -129,4 +129,8 @@ class CompleteProfileRepository(private val jobLandingService: JobLandingService
         credentialUrl: String
     ) = jobLandingService.updateCertification(id, courseName, issuingOrganization, issueDate, expireDate, isExpire, credentialUrl)
 
+    suspend fun updateCandidate(
+        candidateId: String, name: String, positionName: String, phone: String, email: String, countryId: String
+    ) = jobLandingService.updateCandidate(candidateId, name, positionName, phone, email, countryId)
+
 }
