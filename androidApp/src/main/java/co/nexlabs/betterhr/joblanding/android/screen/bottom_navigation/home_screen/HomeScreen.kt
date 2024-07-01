@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
@@ -89,11 +91,45 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController, pageId: S
         }
     }
 
-    scope.launch {
-        if (pageId != null && pageId != "") {
-            viewModel.getJobLandingSections(pageId)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
+            }
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+            Lifecycle.State.CREATED -> {
+                scope.launch {
+                    if (pageId != null && pageId != "") {
+                        viewModel.getJobLandingSections(pageId)
+                    }
+                    bearerToken = viewModel.getBearerToken()
+                }
+                Log.d("state>>", "created")
+            }
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    if (pageId != null && pageId != "") {
+                        viewModel.getJobLandingSections(pageId)
+                    }
+                    bearerToken = viewModel.getBearerToken()
+                }
+                Log.d("state>>", "started")
+            }
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    if (pageId != null && pageId != "") {
+                        viewModel.getJobLandingSections(pageId)
+                    }
+                    bearerToken = viewModel.getBearerToken()
+                }
+                Log.d("state>>", "resume")
+            }
         }
-        bearerToken = viewModel.getBearerToken()
     }
 
     var style by remember { mutableStateOf("style-7") }

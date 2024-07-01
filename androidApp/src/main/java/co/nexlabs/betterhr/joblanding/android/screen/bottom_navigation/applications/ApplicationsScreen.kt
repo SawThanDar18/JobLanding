@@ -83,6 +83,7 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
     val filters by viewModel.filters.collectAsState()
+    var statusList: MutableList<String> = ArrayList()
 
     var jobIds by remember { mutableStateOf<List<String>>(emptyList()) }
 
@@ -90,7 +91,21 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
         if (refreshing) {
             scope.launch {
                 if (viewModel.getBearerToken() != "") {
-                    viewModel.fetchApplication()
+                    statusList.clear()
+                    if (filters.isNotEmpty()) {
+                        filters.map {
+                            if (it.value) {
+                                statusList.add(it.key.toLowerCase())
+                            }
+                        }
+                    }
+                    viewModel.fetchApplication(statusList)
+
+                    if (jobIds.isNotEmpty()) {
+                        scope.launch {
+                            viewModel.getCompanyInfo(jobIds)
+                        }
+                    }
                 }
             }
             refreshing = false
@@ -111,7 +126,20 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
             Lifecycle.State.CREATED -> {
                 scope.launch {
                     if (viewModel.getBearerToken() != "") {
-                        viewModel.fetchApplication()
+                        statusList.clear()
+                        if (filters.isNotEmpty()) {
+                            filters.map {
+                                if (it.value) {
+                                    statusList.add(it.key.toLowerCase())
+                                }
+                            }
+                        }
+                        viewModel.fetchApplication(statusList)
+                        if (jobIds.isNotEmpty()) {
+                            scope.launch {
+                                viewModel.getCompanyInfo(jobIds)
+                            }
+                        }
                     }
                 }
                 Log.d("state>>", "created")
@@ -119,7 +147,21 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
             Lifecycle.State.STARTED -> {
                 scope.launch {
                     if (viewModel.getBearerToken() != "") {
-                        viewModel.fetchApplication()
+                        statusList.clear()
+                        if (filters.isNotEmpty()) {
+                            filters.map {
+                                if (it.value) {
+                                    statusList.add(it.key.toLowerCase())
+                                }
+                            }
+                        }
+                        viewModel.fetchApplication(statusList)
+
+                        if (jobIds.isNotEmpty()) {
+                            scope.launch {
+                                viewModel.getCompanyInfo(jobIds)
+                            }
+                        }
                     }
                 }
                 Log.d("state>>", "started")
@@ -127,7 +169,21 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
             Lifecycle.State.RESUMED -> {
                 scope.launch {
                     if (viewModel.getBearerToken() != "") {
-                        viewModel.fetchApplication()
+                        statusList.clear()
+                        if (filters.isNotEmpty()) {
+                            filters.map {
+                                if (it.value) {
+                                    statusList.add(it.key.toLowerCase())
+                                }
+                            }
+                        }
+                        viewModel.fetchApplication(statusList)
+
+                        if (jobIds.isNotEmpty()) {
+                            scope.launch {
+                                viewModel.getCompanyInfo(jobIds)
+                            }
+                        }
                     }
                 }
                 Log.d("state>>", "resume")
@@ -142,12 +198,6 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                     it.referenceJobId
                 }
             }
-        }
-    }
-
-    if (jobIds.isNotEmpty()) {
-        scope.launch {
-            viewModel.getCompanyInfo(jobIds)
         }
     }
 
@@ -434,7 +484,15 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                                 .size(20.dp)
                                 .clickable {
                                     filterBottomBarVisible = false
-                                    //update localstorage
+                                    statusList.clear()
+                                    if (filters.isNotEmpty()) {
+                                        filters.map {
+                                            if (it.value) {
+                                                statusList.add(it.key.toLowerCase())
+                                            }
+                                        }
+                                    }
+                                    viewModel.fetchApplication(statusList)
                                 },
                             alignment = Alignment.Center
                         )
@@ -494,7 +552,18 @@ fun ApplicationsScreen(viewModel: ApplicationViewModel, navController: NavContro
                         fontWeight = FontWeight.W400,
                         color = Color(0xFF1ED292),
                         fontSize = 14.sp,
-                        modifier = Modifier.clickable { filterBottomBarVisible = false }
+                        modifier = Modifier.clickable {
+                            filterBottomBarVisible = false
+                            statusList.clear()
+                            if (filters.isNotEmpty()) {
+                                filters.map {
+                                    if (it.value) {
+                                        statusList.add(it.key.toLowerCase())
+                                    }
+                                }
+                            }
+                            viewModel.fetchApplication(statusList)
+                        }
                     )
                 }
             },

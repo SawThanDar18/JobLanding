@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.choose_country
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -26,6 +27,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -45,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.network.choose_country.ChooseCountryViewModel
@@ -70,8 +74,40 @@ fun ChooseCountryScreen(viewModel: ChooseCountryViewModel, navController: NavCon
 
     var expanded by remember { mutableStateOf(false) }
 
-    scope.launch {
-        viewModel.getCountriesList()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
+            }
+
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+
+            Lifecycle.State.CREATED -> {
+                scope.launch {
+                    viewModel.getCountriesList()
+                }
+                Log.d("state>>", "created")
+            }
+
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    viewModel.getCountriesList()
+                }
+                Log.d("state>>", "started")
+            }
+
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    viewModel.getCountriesList()
+                }
+                Log.d("state>>", "resume")
+            }
+        }
     }
 
     Column(

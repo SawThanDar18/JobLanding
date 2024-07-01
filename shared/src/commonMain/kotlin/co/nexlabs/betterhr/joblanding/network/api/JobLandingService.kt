@@ -156,7 +156,7 @@ interface JobLandingService {
     ): FileUploadResponse
 
     suspend fun fetchApplication(
-        limit: Int
+        limit: Int, status: List<String>
     ): ApolloCall<FetchApplicationQuery.Data>
 
     suspend fun getJobLandingJobList(jobIds: List<String>): ApolloCall<JobLandingJobListQuery.Data>

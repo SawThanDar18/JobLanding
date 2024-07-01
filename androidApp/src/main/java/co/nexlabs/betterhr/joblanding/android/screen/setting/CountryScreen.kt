@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.setting
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -36,12 +37,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
@@ -58,13 +61,43 @@ fun CountryScreen(viewModel: ChooseCountryViewModel, navController: NavControlle
     var selectedCountryId by remember { mutableStateOf("") }
     var selectedCountryName by remember { mutableStateOf("") }
 
-    if (uiState.countries.isEmpty()) {
-        scope.launch {
-            viewModel.getCountriesList()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
+            }
+
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+
+            Lifecycle.State.CREATED -> {
+                scope.launch {
+                    viewModel.getCountriesList()
+                }
+                Log.d("state>>", "created")
+            }
+
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    viewModel.getCountriesList()
+                }
+                Log.d("state>>", "started")
+            }
+
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    viewModel.getCountriesList()
+                }
+                Log.d("state>>", "resume")
+            }
         }
     }
 
-    LaunchedEffect (viewModel.getCountryId() != "" && viewModel.getCountryName() != "") {
+    if (viewModel.getCountryId() != "" && viewModel.getCountryName() != "") {
         selectedCountryId = viewModel.getCountryId()
         selectedCountryName = viewModel.getCountryName()
     }

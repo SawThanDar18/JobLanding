@@ -10,6 +10,7 @@ data class JobDetailUIState(
     val isSuccessGetJobDetail: Boolean = false,
     val isBearerTokenExist: Boolean = false,
     val isSuccessUpdateApplication: Boolean = false,
+    val isLoadingForApplyJob: Boolean = false,
     val isSuccessCreateApplication: Boolean = false,
     val isSuccessForCandidateId: Boolean = false,
     val isSuccessForBearerToken: Boolean = false,

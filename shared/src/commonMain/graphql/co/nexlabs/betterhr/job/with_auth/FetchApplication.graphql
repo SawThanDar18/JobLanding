@@ -1,4 +1,4 @@
-query FetchApplication ($updated_at: String, $limit: Int!, $status: String) {
+query FetchApplication ($updated_at: String, $limit: Int!, $status: [String]) {
     applications(updated_at: $updated_at, limit: $limit, status: $status) {
         id
         subdomain

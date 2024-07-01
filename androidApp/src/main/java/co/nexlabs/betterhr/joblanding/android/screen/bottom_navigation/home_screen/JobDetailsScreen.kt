@@ -1231,7 +1231,6 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                         scope.launch {
                             if (viewModel.getBearerToken() != "") {
                                 bottomBarVisibleAfterSignUp = true
-                                //viewModel.getCandidateData()
                             } else {
                                 bottomBarVisible = true
                             }
@@ -2179,216 +2178,86 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                             }
 
                             "stepTwo" -> {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(
-                                            start = 16.dp,
-                                            end = 16.dp,
-                                            top = 24.dp,
-                                            bottom = 24.dp
-                                        )
-                                        .fillMaxSize(),
-                                    verticalArrangement = Arrangement.Top,
-                                    horizontalAlignment = Alignment.Start
-                                ) {
-
-                                    Row(
-                                        modifier = Modifier
-                                            .padding(bottom = 8.dp)
-                                            .fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                    ) {
-                                        androidx.compose.material.Text(
-                                            text = "Application Process",
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            fontWeight = FontWeight.W600,
-                                            color = Color(0xFF4A4A4A),
-                                            fontSize = 16.sp
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-
-                                        Image(
-                                            painter = painterResource(id = R.drawable.x),
-                                            contentDescription = "X Icon",
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clickable {
-                                                    bottomBarVisibleAfterSignUp = false
-                                                },
-                                            alignment = Alignment.Center
+                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    if(uiState.isLoadingForApplyJob) {
+                                        CircularProgressIndicator(
+                                            color = Color(0xFF1ED292)
                                         )
                                     }
 
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    ApplyJobStateProgressBar(steps = stepTwoAfterSignUp)
-
-                                    Spacer(modifier = Modifier.height(24.dp))
-
-                                    Text(
-                                        text = "Your Work Experience",
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W600,
-                                        color = Color(0xFF6A6A6A),
-                                        fontSize = 24.sp,
+                                    Column(
                                         modifier = Modifier
-                                            .fillMaxWidth(),
-                                    )
-
-                                    Spacer(modifier = Modifier.height(24.dp))
-
-                                    Text(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        text = "Current Job Title",
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFF4A4A4A),
-                                        fontSize = 14.sp
-                                    )
-
-                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                    OutlinedTextField(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(45.dp)
-                                            .border(
-                                                1.dp,
-                                                Color(0xFFA7BAC5),
-                                                RoundedCornerShape(4.dp)
+                                            .padding(
+                                                start = 16.dp,
+                                                end = 16.dp,
+                                                top = 24.dp,
+                                                bottom = 24.dp
                                             )
-                                            .background(
-                                                color = Color.Transparent,
-                                                shape = MaterialTheme.shapes.medium
-                                            ),
-                                        value = jobTitle,
-                                        onValueChange = {
-                                            jobTitle = it
-                                        },
-                                        placeholder = {
-                                            Text(
-                                                "Enter your current job title",
-                                                fontWeight = FontWeight.W400,
-                                                fontSize = 14.sp,
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                color = Color(0xFFAAAAAA)
-                                            )
-                                        },
-                                        textStyle = TextStyle(
-                                            fontWeight = FontWeight.W400,
-                                            fontSize = 14.sp,
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            color = Color(0xFFAAAAAA)
-                                        ),
-                                        colors = TextFieldDefaults.textFieldColors(
-                                            textColor = Color(0xFFAAAAAA),
-                                            backgroundColor = Color.Transparent,
-                                            cursorColor = Color(0xFF1ED292),
-                                            focusedIndicatorColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Text,
-                                            imeAction = ImeAction.Next
-                                        ),
-                                        keyboardActions = KeyboardActions(
-                                            onDone = {
-                                                keyboardController?.hide()
-                                            }
-                                        ),
-                                        singleLine = true,
-                                    )
-
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    Text(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        text = "Current company name",
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFF4A4A4A),
-                                        fontSize = 14.sp
-                                    )
-
-                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                    OutlinedTextField(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(45.dp)
-                                            .border(
-                                                1.dp,
-                                                Color(0xFFA7BAC5),
-                                                RoundedCornerShape(4.dp)
-                                            )
-                                            .background(
-                                                color = Color.Transparent,
-                                                shape = MaterialTheme.shapes.medium
-                                            ),
-                                        value = companyName,
-                                        onValueChange = {
-                                            companyName = it
-                                        },
-                                        placeholder = {
-                                            Text(
-                                                "Enter your current company name",
-                                                fontWeight = FontWeight.W400,
-                                                fontSize = 14.sp,
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                color = Color(0xFFAAAAAA)
-                                            )
-                                        },
-                                        textStyle = TextStyle(
-                                            fontWeight = FontWeight.W400,
-                                            fontSize = 14.sp,
-                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                            color = Color(0xFFAAAAAA)
-                                        ),
-                                        colors = TextFieldDefaults.textFieldColors(
-                                            textColor = Color(0xFFAAAAAA),
-                                            backgroundColor = Color.Transparent,
-                                            cursorColor = Color(0xFF1ED292),
-                                            focusedIndicatorColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Text,
-                                            imeAction = ImeAction.Next
-                                        ),
-                                        keyboardActions = KeyboardActions(
-                                            onDone = {
-                                                keyboardController?.hide()
-                                            }
-                                        ),
-                                        singleLine = true,
-                                    )
-
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    Text(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        text = "Working Since",
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFF4A4A4A),
-                                        fontSize = 14.sp
-                                    )
-
-                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            .fillMaxSize(),
+                                        verticalArrangement = Arrangement.Top,
+                                        horizontalAlignment = Alignment.Start
                                     ) {
-                                        Box(
+
+                                        Row(
                                             modifier = Modifier
-                                                .weight(1f)
+                                                .padding(bottom = 8.dp)
+                                                .fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                        ) {
+                                            androidx.compose.material.Text(
+                                                text = "Application Process",
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                fontWeight = FontWeight.W600,
+                                                color = Color(0xFF4A4A4A),
+                                                fontSize = 16.sp
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+
+                                            Image(
+                                                painter = painterResource(id = R.drawable.x),
+                                                contentDescription = "X Icon",
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .clickable {
+                                                        bottomBarVisibleAfterSignUp = false
+                                                    },
+                                                alignment = Alignment.Center
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        ApplyJobStateProgressBar(steps = stepTwoAfterSignUp)
+
+                                        Spacer(modifier = Modifier.height(24.dp))
+
+                                        Text(
+                                            text = "Your Work Experience",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W600,
+                                            color = Color(0xFF6A6A6A),
+                                            fontSize = 24.sp,
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                        )
+
+                                        Spacer(modifier = Modifier.height(24.dp))
+
+                                        Text(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = "Current Job Title",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFF4A4A4A),
+                                            fontSize = 14.sp
+                                        )
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        OutlinedTextField(
+                                            modifier = Modifier
                                                 .fillMaxWidth()
                                                 .height(45.dp)
-                                                .clickable {
-                                                    monthDropDownExpanded = true
-                                                }
                                                 .border(
                                                     1.dp,
                                                     Color(0xFFA7BAC5),
@@ -2398,50 +2267,187 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     color = Color.Transparent,
                                                     shape = MaterialTheme.shapes.medium
                                                 ),
-                                            contentAlignment = Alignment.CenterStart
-                                        ) {
-                                            Text(
-                                                text = selectedItemMonth,
-                                                modifier = Modifier.padding(start = 8.dp),
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            value = jobTitle,
+                                            onValueChange = {
+                                                jobTitle = it
+                                            },
+                                            placeholder = {
+                                                Text(
+                                                    "Enter your current job title",
+                                                    fontWeight = FontWeight.W400,
+                                                    fontSize = 14.sp,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    color = Color(0xFFAAAAAA)
+                                                )
+                                            },
+                                            textStyle = TextStyle(
                                                 fontWeight = FontWeight.W400,
-                                                color = Color(0xFFAAAAAA),
                                                 fontSize = 14.sp,
-                                            )
-                                        }
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                color = Color(0xFFAAAAAA)
+                                            ),
+                                            colors = TextFieldDefaults.textFieldColors(
+                                                textColor = Color(0xFFAAAAAA),
+                                                backgroundColor = Color.Transparent,
+                                                cursorColor = Color(0xFF1ED292),
+                                                focusedIndicatorColor = Color.Transparent,
+                                                unfocusedIndicatorColor = Color.Transparent
+                                            ),
+                                            keyboardOptions = KeyboardOptions(
+                                                keyboardType = KeyboardType.Text,
+                                                imeAction = ImeAction.Next
+                                            ),
+                                            keyboardActions = KeyboardActions(
+                                                onDone = {
+                                                    keyboardController?.hide()
+                                                }
+                                            ),
+                                            singleLine = true,
+                                        )
 
-                                        DropdownMenu(
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        Text(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = "Current company name",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFF4A4A4A),
+                                            fontSize = 14.sp
+                                        )
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        OutlinedTextField(
                                             modifier = Modifier
-                                                .padding(horizontal = 16.dp)
-                                                .background(color = Color.Transparent)
                                                 .fillMaxWidth()
+                                                .height(45.dp)
                                                 .border(
                                                     1.dp,
-                                                    Color(0xFFE4E7ED),
-                                                    RoundedCornerShape(8.dp)
+                                                    Color(0xFFA7BAC5),
+                                                    RoundedCornerShape(4.dp)
+                                                )
+                                                .background(
+                                                    color = Color.Transparent,
+                                                    shape = MaterialTheme.shapes.medium
                                                 ),
-                                            expanded = monthDropDownExpanded,
-                                            onDismissRequest = { monthDropDownExpanded = false }
+                                            value = companyName,
+                                            onValueChange = {
+                                                companyName = it
+                                            },
+                                            placeholder = {
+                                                Text(
+                                                    "Enter your current company name",
+                                                    fontWeight = FontWeight.W400,
+                                                    fontSize = 14.sp,
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    color = Color(0xFFAAAAAA)
+                                                )
+                                            },
+                                            textStyle = TextStyle(
+                                                fontWeight = FontWeight.W400,
+                                                fontSize = 14.sp,
+                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                color = Color(0xFFAAAAAA)
+                                            ),
+                                            colors = TextFieldDefaults.textFieldColors(
+                                                textColor = Color(0xFFAAAAAA),
+                                                backgroundColor = Color.Transparent,
+                                                cursorColor = Color(0xFF1ED292),
+                                                focusedIndicatorColor = Color.Transparent,
+                                                unfocusedIndicatorColor = Color.Transparent
+                                            ),
+                                            keyboardOptions = KeyboardOptions(
+                                                keyboardType = KeyboardType.Text,
+                                                imeAction = ImeAction.Next
+                                            ),
+                                            keyboardActions = KeyboardActions(
+                                                onDone = {
+                                                    keyboardController?.hide()
+                                                }
+                                            ),
+                                            singleLine = true,
+                                        )
+
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        Text(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = "Working Since",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFF4A4A4A),
+                                            fontSize = 14.sp
+                                        )
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
-                                            monthList.forEach { month ->
-                                                DropdownMenuItem(
-                                                    modifier = Modifier.fillMaxSize(),
-                                                    onClick = {
-                                                        selectedItemMonth = month
-                                                        monthDropDownExpanded = false
+                                            Box(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .fillMaxWidth()
+                                                    .height(45.dp)
+                                                    .clickable {
+                                                        monthDropDownExpanded = true
                                                     }
-                                                ) {
-                                                    Text(
-                                                        text = month,
-                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                        fontWeight = FontWeight.W400,
-                                                        color = Color(0xFFAAAAAA),
-                                                        fontSize = 14.sp,
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFA7BAC5),
+                                                        RoundedCornerShape(4.dp)
                                                     )
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                contentAlignment = Alignment.CenterStart
+                                            ) {
+                                                Text(
+                                                    text = selectedItemMonth,
+                                                    modifier = Modifier.padding(start = 8.dp),
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W400,
+                                                    color = Color(0xFFAAAAAA),
+                                                    fontSize = 14.sp,
+                                                )
+                                            }
+
+                                            DropdownMenu(
+                                                modifier = Modifier
+                                                    .padding(horizontal = 16.dp)
+                                                    .background(color = Color.Transparent)
+                                                    .fillMaxWidth()
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFE4E7ED),
+                                                        RoundedCornerShape(8.dp)
+                                                    ),
+                                                expanded = monthDropDownExpanded,
+                                                onDismissRequest = { monthDropDownExpanded = false }
+                                            ) {
+                                                monthList.forEach { month ->
+                                                    DropdownMenuItem(
+                                                        modifier = Modifier.fillMaxSize(),
+                                                        onClick = {
+                                                            selectedItemMonth = month
+                                                            monthDropDownExpanded = false
+                                                        }
+                                                    ) {
+                                                        Text(
+                                                            text = month,
+                                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                            fontWeight = FontWeight.W400,
+                                                            color = Color(0xFFAAAAAA),
+                                                            fontSize = 14.sp,
+                                                        )
+                                                    }
                                                 }
                                             }
-                                        }
-                                        /*OutlinedTextField(
+                                            /*OutlinedTextField(
                                     modifier = Modifier
                                         .weight(1f)
                                         .fillMaxWidth()
@@ -2490,254 +2496,257 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                     singleLine = true,
                                 )*/
 
-                                        OutlinedTextField(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .fillMaxWidth()
-                                                .height(45.dp)
-                                                .border(
-                                                    1.dp,
-                                                    Color(0xFFA7BAC5),
-                                                    RoundedCornerShape(4.dp)
-                                                )
-                                                .background(
-                                                    color = Color.Transparent,
-                                                    shape = MaterialTheme.shapes.medium
-                                                ),
-                                            value = startYear,
-                                            onValueChange = {
-                                                startYear = it
-                                            },
-                                            placeholder = {
-                                                Text(
-                                                    "Start year",
+                                            OutlinedTextField(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .fillMaxWidth()
+                                                    .height(45.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFFA7BAC5),
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .background(
+                                                        color = Color.Transparent,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                value = startYear,
+                                                onValueChange = {
+                                                    startYear = it
+                                                },
+                                                placeholder = {
+                                                    Text(
+                                                        "Start year",
+                                                        fontWeight = FontWeight.W400,
+                                                        fontSize = 14.sp,
+                                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                        color = Color(0xFFAAAAAA)
+                                                    )
+                                                },
+                                                textStyle = TextStyle(
                                                     fontWeight = FontWeight.W400,
                                                     fontSize = 14.sp,
                                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                                     color = Color(0xFFAAAAAA)
-                                                )
-                                            },
-                                            textStyle = TextStyle(
-                                                fontWeight = FontWeight.W400,
-                                                fontSize = 14.sp,
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                color = Color(0xFFAAAAAA)
-                                            ),
-                                            colors = TextFieldDefaults.textFieldColors(
-                                                textColor = Color(0xFFAAAAAA),
-                                                backgroundColor = Color.Transparent,
-                                                cursorColor = Color(0xFF1ED292),
-                                                focusedIndicatorColor = Color.Transparent,
-                                                unfocusedIndicatorColor = Color.Transparent
-                                            ),
-                                            keyboardOptions = KeyboardOptions(
-                                                keyboardType = KeyboardType.Number,
-                                                imeAction = ImeAction.Done
-                                            ),
-                                            keyboardActions = KeyboardActions(
-                                                onDone = {
-                                                    keyboardController?.hide()
-                                                }
-                                            ),
-                                            singleLine = true,
-                                        )
-                                    }
-
-                                    Row(
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.Bottom,
-                                        modifier = Modifier
-                                            .fillMaxSize(),
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .clickable {
-                                                    var files: MutableList<FileUri?> = ArrayList()
-                                                    var fileNames: MutableList<String?> =
-                                                        ArrayList()
-                                                    var fileIds: MutableList<String> =
-                                                        ArrayList()
-                                                    var fileTypes: MutableList<String> = ArrayList()
-                                                    var existingFileIds: MutableList<String> =
-                                                        ArrayList()
-
-                                                    existingFileIds.clear()
-                                                    fileNames.clear()
-                                                    fileTypes.clear()
-                                                    files.clear()
-
-                                                    if (cvFile != null) {
-                                                        val fileUri = AndroidFileUri(cvFile!!)
-                                                        files.add(fileUri)
-                                                        fileNames.add(cvFileName)
-                                                        fileTypes.add("cv")
-                                                    } else {
-                                                        if (uiState.candidateData.cv != null) {
-                                                            existingFileIds.add(uiState.candidateData.cv.id)
-                                                            fileTypes.add("cv")
-                                                        }
+                                                ),
+                                                colors = TextFieldDefaults.textFieldColors(
+                                                    textColor = Color(0xFFAAAAAA),
+                                                    backgroundColor = Color.Transparent,
+                                                    cursorColor = Color(0xFF1ED292),
+                                                    focusedIndicatorColor = Color.Transparent,
+                                                    unfocusedIndicatorColor = Color.Transparent
+                                                ),
+                                                keyboardOptions = KeyboardOptions(
+                                                    keyboardType = KeyboardType.Number,
+                                                    imeAction = ImeAction.Done
+                                                ),
+                                                keyboardActions = KeyboardActions(
+                                                    onDone = {
+                                                        keyboardController?.hide()
                                                     }
+                                                ),
+                                                singleLine = true,
+                                            )
+                                        }
 
-                                                    if (coverLetterFileList.isNotEmpty()) {
-                                                        coverLetterFileList.let { file ->
-                                                            file.map {
-                                                                val fileUri = AndroidFileUri(it.uri)
-                                                                files.add(fileUri)
-                                                                fileNames.add(it.fileName)
+                                        Row(
+                                            horizontalArrangement = Arrangement.Center,
+                                            verticalAlignment = Alignment.Bottom,
+                                            modifier = Modifier
+                                                .fillMaxSize(),
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .clickable {
+                                                        var files: MutableList<FileUri?> =
+                                                            ArrayList()
+                                                        var fileNames: MutableList<String?> =
+                                                            ArrayList()
+                                                        var fileIds: MutableList<String> =
+                                                            ArrayList()
+                                                        var fileTypes: MutableList<String> =
+                                                            ArrayList()
+                                                        var existingFileIds: MutableList<String> =
+                                                            ArrayList()
+
+                                                        existingFileIds.clear()
+                                                        fileNames.clear()
+                                                        fileTypes.clear()
+                                                        files.clear()
+
+                                                        if (cvFile != null) {
+                                                            val fileUri = AndroidFileUri(cvFile!!)
+                                                            files.add(fileUri)
+                                                            fileNames.add(cvFileName)
+                                                            fileTypes.add("cv")
+                                                        } else {
+                                                            if (uiState.candidateData.cv != null) {
+                                                                existingFileIds.add(uiState.candidateData.cv.id)
+                                                                fileTypes.add("cv")
+                                                            }
+                                                        }
+
+                                                        if (coverLetterFileList.isNotEmpty()) {
+                                                            coverLetterFileList.let { file ->
+                                                                file.map {
+                                                                    val fileUri =
+                                                                        AndroidFileUri(it.uri)
+                                                                    files.add(fileUri)
+                                                                    fileNames.add(it.fileName)
+                                                                    fileTypes.add("cover_letter")
+                                                                }
+                                                            }
+                                                        } else {
+                                                            if (uiState.candidateData.coverLetter != null) {
+                                                                existingFileIds.add(uiState.candidateData.coverLetter.id)
                                                                 fileTypes.add("cover_letter")
                                                             }
                                                         }
-                                                    } else {
-                                                        if (uiState.candidateData.coverLetter != null) {
-                                                            existingFileIds.add(uiState.candidateData.coverLetter.id)
-                                                            fileTypes.add("cover_letter")
-                                                        }
-                                                    }
 
-                                                    Log.d("files>>>", files.toString())
-                                                    Log.d("files>>>name", fileNames.toString())
-                                                    Log.d("files>>>type", fileTypes.toString())
-                                                    Log.d(
-                                                        "files>>>existing",
-                                                        existingFileIds.toString()
-                                                    )
+                                                        Log.d("files>>>", files.toString())
+                                                        Log.d("files>>>name", fileNames.toString())
+                                                        Log.d("files>>>type", fileTypes.toString())
+                                                        Log.d(
+                                                            "files>>>existing",
+                                                            existingFileIds.toString()
+                                                        )
 
-                                                    val validate =
-                                                        (jobTitle.isNotBlank() && companyName.isNotBlank() && selectedItemMonth.isNotBlank() && startYear.isNotBlank())
+                                                        val validate =
+                                                            (jobTitle.isNotBlank() && companyName.isNotBlank() && selectedItemMonth.isNotBlank() && startYear.isNotBlank())
 
-                                                    if (!validate) {
+                                                        if (!validate) {
 
-                                                        if (jobTitle.isNullOrBlank()) {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Please Fill Job Title!",
-                                                                    Toast.LENGTH_LONG
-                                                                )
-                                                                .show()
-                                                        }
+                                                            if (jobTitle.isNullOrBlank()) {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please Fill Job Title!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            }
 
-                                                        if (companyName.isNullOrBlank()) {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Please Fill Company Name!",
-                                                                    Toast.LENGTH_LONG
-                                                                )
-                                                                .show()
-                                                        }
+                                                            if (companyName.isNullOrBlank()) {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please Fill Company Name!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            }
 
-                                                        if (selectedItemMonth.isNullOrBlank()) {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Please Choose Working Month!",
-                                                                    Toast.LENGTH_LONG
-                                                                )
-                                                                .show()
-                                                        }
+                                                            if (selectedItemMonth.isNullOrBlank()) {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please Choose Working Month!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            }
 
-                                                        if (startYear.isNullOrBlank()) {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Please Choose Working Year!",
-                                                                    Toast.LENGTH_LONG
-                                                                )
-                                                                .show()
-                                                        }
-                                                    } else {
-                                                        if (existingFileIds.isNotEmpty()) {
-                                                            scope.launch {
-                                                                viewModel.createApplication(
-                                                                    uiState.jobDetail.id,
-                                                                    uiState.jobDetail.company.subDomain,
-                                                                    uiState.jobDetail.position,
-                                                                    formattedDateTime,
-                                                                    jobTitle,
-                                                                    companyName,
-                                                                    convertDate("$selectedItemMonth $startYear"),
+                                                            if (startYear.isNullOrBlank()) {
+                                                                Toast
+                                                                    .makeText(
+                                                                        applicationContext,
+                                                                        "Please Choose Working Year!",
+                                                                        Toast.LENGTH_LONG
+                                                                    )
+                                                                    .show()
+                                                            }
+                                                        } else {
+                                                            if (existingFileIds.isNotEmpty()) {
+                                                                scope.launch {
+                                                                    viewModel.createApplication(
+                                                                        uiState.jobDetail.id,
+                                                                        uiState.jobDetail.company.subDomain,
+                                                                        uiState.jobDetail.position,
+                                                                        formattedDateTime,
+                                                                        jobTitle,
+                                                                        companyName,
+                                                                        convertDate("$selectedItemMonth $startYear"),
 //                                                                    fileNames,
 //                                                                    files,
 //                                                                    fileTypes,
-                                                                    existingFileIds
-                                                                )
-                                                            }
-                                                        } else {
-                                                            fileIds.clear()
-
-                                                            scope.launch {
-                                                                val filesUri: MutableList<FileUri?> =
-                                                                    ArrayList()
-                                                                if (files.isNotEmpty()) {
-                                                                    files.map {
-                                                                        filesUri.add(it)
-                                                                    }
-                                                                }
-                                                                viewModel.uploadMultipleFiles(
-                                                                    filesUri, fileNames, fileTypes
-                                                                )
-
-                                                                if (uiState.isSuccessUploadMultipleFile) {
-                                                                    Log.d(
-                                                                        "toast>>",
-                                                                        "isSuccessUploadMultipleFile"
+                                                                        existingFileIds
                                                                     )
-                                                                    if (uiState.multiFileList.isNotEmpty()) {
-                                                                        uiState.multiFileList.map {
-                                                                            fileIds.add(it.id)
+                                                                }
+                                                            } else {
+                                                                fileIds.clear()
+
+                                                                scope.launch {
+                                                                    val filesUri: MutableList<FileUri?> =
+                                                                        ArrayList()
+                                                                    if (files.isNotEmpty()) {
+                                                                        files.map {
+                                                                            filesUri.add(it)
                                                                         }
                                                                     }
-                                                                }
-
-                                                                if (fileIds.isNotEmpty()) {
-                                                                    Log.d(
-                                                                        "toast>>",
-                                                                        "file ids not empty"
+                                                                    viewModel.uploadMultipleFiles(
+                                                                        filesUri,
+                                                                        fileNames,
+                                                                        fileTypes
                                                                     )
-                                                                    scope.launch {
-                                                                        viewModel.createApplication(
-                                                                            uiState.jobDetail.id,
-                                                                            uiState.jobDetail.company.subDomain,
-                                                                            uiState.jobDetail.position,
-                                                                            formattedDateTime,
-                                                                            jobTitle,
-                                                                            companyName,
-                                                                            convertDate("$selectedItemMonth $startYear"),
+
+                                                                    if (uiState.isSuccessUploadMultipleFile) {
+                                                                        if (uiState.multiFileList.isNotEmpty()) {
+                                                                            uiState.multiFileList.map {
+                                                                                fileIds.add(it.id)
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    if (fileIds.isNotEmpty()) {
+                                                                        Log.d(
+                                                                            "toast>>",
+                                                                            "file ids not empty"
+                                                                        )
+                                                                        scope.launch {
+                                                                            viewModel.createApplication(
+                                                                                uiState.jobDetail.id,
+                                                                                uiState.jobDetail.company.subDomain,
+                                                                                uiState.jobDetail.position,
+                                                                                formattedDateTime,
+                                                                                jobTitle,
+                                                                                companyName,
+                                                                                convertDate("$selectedItemMonth $startYear"),
 //                                                                        fileNames,
 //                                                                        files,
 //                                                                        fileTypes,
-                                                                            fileIds
-                                                                        )
+                                                                                fileIds
+                                                                            )
+                                                                        }
                                                                     }
-                                                                }
 
+                                                                }
                                                             }
                                                         }
                                                     }
-                                                }
-                                                .fillMaxWidth()
-                                                .height(40.dp)
-                                                .border(
-                                                    1.dp,
-                                                    Color(0xFF1ED292),
-                                                    RoundedCornerShape(8.dp)
+                                                    .fillMaxWidth()
+                                                    .height(40.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFF1ED292),
+                                                        RoundedCornerShape(8.dp)
+                                                    )
+                                                    .background(
+                                                        color = Color(0xFF1ED292),
+                                                        shape = MaterialTheme.shapes.medium
+                                                    ),
+                                                contentAlignment = Alignment.Center,
+                                            ) {
+                                                Text(
+                                                    text = "Submit",
+                                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                                    fontWeight = FontWeight.W600,
+                                                    color = Color(0xFFFFFFFF),
+                                                    fontSize = 14.sp,
                                                 )
-                                                .background(
-                                                    color = Color(0xFF1ED292),
-                                                    shape = MaterialTheme.shapes.medium
-                                                ),
-                                            contentAlignment = Alignment.Center,
-                                        ) {
-                                            Text(
-                                                text = "Submit",
-                                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                                fontWeight = FontWeight.W600,
-                                                color = Color(0xFFFFFFFF),
-                                                fontSize = 14.sp,
-                                            )
+                                            }
                                         }
                                     }
+
                                 }
                             }
 

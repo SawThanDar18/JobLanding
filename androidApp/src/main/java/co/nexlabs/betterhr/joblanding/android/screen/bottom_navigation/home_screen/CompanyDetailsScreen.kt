@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -52,9 +53,11 @@ import co.nexlabs.betterhr.joblanding.android.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.Lifecycle
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
 import co.nexlabs.betterhr.joblanding.network.api.home.home_details.CompanyDetailUIModel
 import co.nexlabs.betterhr.joblanding.network.api.home.CompanyDetailViewModel
@@ -76,14 +79,50 @@ fun CompanyDetailsScreen(viewModel: CompanyDetailViewModel, navController: NavCo
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
-    scope.launch {
-        if (companyId != null && companyId != "") {
-            viewModel.getCompanyDetail(companyId)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
+            }
+
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+
+            Lifecycle.State.CREATED -> {
+                scope.launch {
+                    if (companyId != null && companyId != "") {
+                        viewModel.getCompanyDetail(companyId)
+                    }
+                }
+                Log.d("state>>", "created")
+            }
+
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    if (companyId != null && companyId != "") {
+                        viewModel.getCompanyDetail(companyId)
+                    }
+                }
+                Log.d("state>>", "started")
+            }
+
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    if (companyId != null && companyId != "") {
+                        viewModel.getCompanyDetail(companyId)
+                    }
+                }
+                Log.d("state>>", "resume")
+            }
         }
     }
 
-    if (uiState.isSuccessGetCompanyDetail) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect (uiState.isSuccessGetCompanyDetail) {
+        if (uiState.isSuccessGetCompanyDetail) {
             scope.launch {
                 if (companyId != null && companyId != "") {
                     viewModel.getCompanyDetailJob(companyId)

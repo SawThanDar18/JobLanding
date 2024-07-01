@@ -1,5 +1,6 @@
 package co.nexlabs.betterhr.joblanding.android.screen.bottom_navigation.home_screen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -44,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
@@ -64,8 +67,40 @@ fun CollectionJobsListsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val items = viewModel.items.collectAsState().value
 
-    scope.launch {
-        viewModel.loadMoreItems(collectionId)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
+            }
+
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+
+            Lifecycle.State.CREATED -> {
+                scope.launch {
+                    viewModel.loadMoreItems(collectionId)
+                }
+                Log.d("state>>", "created")
+            }
+
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    viewModel.loadMoreItems(collectionId)
+                }
+                Log.d("state>>", "started")
+            }
+
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    viewModel.loadMoreItems(collectionId)
+                }
+                Log.d("state>>", "resume")
+            }
+        }
     }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

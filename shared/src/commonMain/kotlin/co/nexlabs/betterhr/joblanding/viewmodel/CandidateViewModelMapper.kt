@@ -241,7 +241,7 @@ object CandidateViewModelMapper {
         return CandidateUIModel(
             data.id ?: "",
             data.name,
-            data.email,
+            data.email ?: "",
             data.phone,
             data.summary ?: "",
             data.desired_position ?: "",

@@ -662,9 +662,9 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         return response.body()
     }
 
-    override suspend fun fetchApplication(limit: Int): ApolloCall<FetchApplicationQuery.Data> {
+    override suspend fun fetchApplication(limit: Int, status: List<String>): ApolloCall<FetchApplicationQuery.Data> {
         clearApolloCache()
-        return apolloClientWithAuth.query(FetchApplicationQuery( Optional.present(null), limit, Optional.present(""))).fetchPolicy(FetchPolicy.NetworkOnly)
+        return apolloClientWithAuth.query(FetchApplicationQuery( Optional.present(null), limit, Optional.present(status))).fetchPolicy(FetchPolicy.NetworkOnly)
     }
 
     override suspend fun getJobLandingJobList(jobIds: List<String>): ApolloCall<JobLandingJobListQuery.Data> {

@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import co.nexlabs.betterhr.joblanding.android.R
 import co.nexlabs.betterhr.joblanding.android.screen.ErrorLayout
@@ -90,9 +92,41 @@ fun InterviewsScreen(viewModel: InterviewViewModel, navController: NavController
         }
     }
 
-    scope.launch {
-        if (viewModel.getBearerToken() != "") {
-            viewModel.fetchInterviews()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {
+                Log.d("state>>", "destroyed")
+            }
+            Lifecycle.State.INITIALIZED -> {
+                Log.d("state>>", "initialized")
+            }
+            Lifecycle.State.CREATED -> {
+                scope.launch {
+                    if (viewModel.getBearerToken() != "") {
+                        viewModel.fetchInterviews()
+                    }
+                }
+                Log.d("state>>", "created")
+            }
+            Lifecycle.State.STARTED -> {
+                scope.launch {
+                    if (viewModel.getBearerToken() != "") {
+                        viewModel.fetchInterviews()
+                    }
+                }
+                Log.d("state>>", "started")
+            }
+            Lifecycle.State.RESUMED -> {
+                scope.launch {
+                    if (viewModel.getBearerToken() != "") {
+                        viewModel.fetchInterviews()
+                    }
+                }
+                Log.d("state>>", "resume")
+            }
         }
     }
 

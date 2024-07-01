@@ -4,8 +4,8 @@ import co.nexlabs.betterhr.joblanding.network.api.JobLandingService
 
 class ApplicationRepository(private val jobLandingService: JobLandingService) {
     suspend fun fetchApplication(
-        limit: Int
-    ) = jobLandingService.fetchApplication(limit)
+        limit: Int, status: List<String>
+    ) = jobLandingService.fetchApplication(limit, status)
 
     suspend fun getJobLandingJobList(jobIds: List<String>) = jobLandingService.getJobLandingJobList(jobIds)
 

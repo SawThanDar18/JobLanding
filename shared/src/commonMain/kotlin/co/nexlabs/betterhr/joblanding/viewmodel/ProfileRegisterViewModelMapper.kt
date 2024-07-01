@@ -12,7 +12,7 @@ object ProfileRegisterViewModelMapper {
                 AccountCreationCandidateDataUIModel(
                     data.createCandidate!!.id ?: "",
                     data.createCandidate.name,
-                    data.createCandidate.email
+                    data.createCandidate.email ?: ""
                 )
             )
         )

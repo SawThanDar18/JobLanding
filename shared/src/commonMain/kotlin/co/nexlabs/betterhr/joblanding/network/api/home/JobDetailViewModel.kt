@@ -612,9 +612,9 @@ class JobDetailViewModel(
         viewModelScope.launch(DispatcherProvider.io) {
             _uiState.update {
                 it.copy(
-                    isLoading = true,
+                    isLoadingForApplyJob = true,
                     error = UIErrorType.Nothing,
-                    isSuccessUploadMultipleFile = false
+                    isSuccessUploadMultipleFile = false,
                 )
             }
             try {
@@ -622,7 +622,7 @@ class JobDetailViewModel(
                 if (response.isNotEmpty()) {
                     _uiState.update {
                         it.copy(
-                            isLoading = false,
+                            isLoadingForApplyJob = false,
                             error = UIErrorType.Nothing,
                             isSuccessUploadMultipleFile = true,
                             multiFileList = response
@@ -632,7 +632,7 @@ class JobDetailViewModel(
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        isLoading = true,
+                        isLoadingForApplyJob = true,
                         error = UIErrorType.Other(e.message.toString()),
                         isSuccessUploadMultipleFile = false
                     )
@@ -658,7 +658,7 @@ class JobDetailViewModel(
             _uiState.update {
                 it.copy(
                     isSuccessCreateApplication = false,
-                    isLoading = true,
+                    isLoadingForApplyJob = true,
                     error = UIErrorType.Nothing,
                     idFromCreateApplication = ""
                 )
@@ -679,7 +679,7 @@ class JobDetailViewModel(
                 _uiState.update {
                     it.copy(
                         isSuccessCreateApplication = true,
-                        isLoading = true,
+                        isLoadingForApplyJob = true,
                         error = UIErrorType.Nothing,
                         idFromCreateApplication = response.id
                     )
@@ -688,7 +688,7 @@ class JobDetailViewModel(
                 _uiState.update {
                     it.copy(
                         isSuccessCreateApplication = false,
-                        isLoading = true,
+                        isLoadingForApplyJob = true,
                         error = UIErrorType.Other(e.message.toString()),
                         idFromCreateApplication = ""
                     )
