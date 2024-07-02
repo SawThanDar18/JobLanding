@@ -102,7 +102,7 @@ class CollectionCompaniesViewModel(private val collectionJobsRepository: Collect
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }

@@ -127,7 +127,7 @@ class ProfileRegisterViewModel(
                                 isSuccessForCandidateId = false,
                                 isSuccessForBearerToken = false,
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -222,7 +222,7 @@ class ProfileRegisterViewModel(
                                 isSuccessForCandidateId = false,
                                 isSuccessForBearerToken = false,
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }

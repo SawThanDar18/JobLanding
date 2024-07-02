@@ -49,6 +49,7 @@ import co.nexlabs.betterhr.joblanding.createApolloClientWithAuth
 import co.nexlabs.betterhr.joblanding.createApolloClientWithAuthWithoutToken
 import co.nexlabs.betterhr.joblanding.createHttpClientNonAuth
 import co.nexlabs.betterhr.joblanding.local_storage.LocalStorage
+import co.nexlabs.betterhr.joblanding.network.api.request_response.EmailVerificationResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.ExistingFileIdTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileTypeObject
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileUploadResponse
@@ -65,6 +66,7 @@ import co.nexlabs.betterhr.joblanding.util.baseUrlForCreateApplication
 import co.nexlabs.betterhr.joblanding.util.baseUrlForMultipleUploadFile
 import co.nexlabs.betterhr.joblanding.util.baseUrlForMultipleUploadFileForCreateApplication
 import co.nexlabs.betterhr.joblanding.util.baseUrlForUploadFile
+import co.nexlabs.betterhr.joblanding.util.emailVerifyUrl
 import co.nexlabs.betterhr.joblanding.util.getCountriesUrl
 import co.nexlabs.betterhr.joblanding.util.smsUrl
 import com.apollographql.apollo3.ApolloCall
@@ -305,7 +307,6 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
     }
 
     override suspend fun fetchSaveJobsById(jobId: String): ApolloCall<FetchSaveJobByJobIdQuery.Data> {
-
         clearApolloCache()
         return apolloClientWithAuth.query(FetchSaveJobByJobIdQuery(jobId)).fetchPolicy(FetchPolicy.NetworkOnly)
     }
@@ -1082,6 +1083,23 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         countryId: String
     ): ApolloCall<UpdateCandidateMutation.Data> {
         return apolloClientWithAuth.mutation(UpdateCandidateMutation(candidateId, Optional.present(name), Optional.present(email), Optional.present(phone), Optional.present(positionName)))
+    }
+
+    override suspend fun emailVerification(candidateId: String): String {
+        val formData = formData {
+            append("id", candidateId)
+        }
+
+        val response = client.submitFormWithBinaryData(
+            url = emailVerifyUrl,
+            formData = formData,
+        ) {
+            headers {
+                append("Authorization", "bearer ${localStorage.bearerToken}")
+            }
+        }
+
+        return response.body<EmailVerificationResponse>().status.toString()
     }
 }
 

@@ -8,6 +8,7 @@ object SavedJobsIdsViewModelMapper {
     fun mapDataToViewModel(data: FetchSavedJobsIdsQuery.Data): List<SaveJobsIdsUIModel> {
         return data.saveJobs.data.map {
             SaveJobsIdsUIModel(
+                it.id ?: "",
                 it.job_id ?: "",
             )
         }

@@ -394,7 +394,7 @@ fun ProfileRegisterScreen(viewModel: ProfileRegisterViewModel, navController: Na
                         ),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Next
+                            imeAction = ImeAction.Done
                         ),
                         keyboardActions = KeyboardActions(
                             onDone = {

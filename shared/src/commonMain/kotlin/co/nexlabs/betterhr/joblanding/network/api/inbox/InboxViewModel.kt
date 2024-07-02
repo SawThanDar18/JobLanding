@@ -103,7 +103,7 @@ class InboxViewModel(private val localStorage: LocalStorage, private val inboxRe
                             it.copy(
                                 isSuccessGetInboxData = false,
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }

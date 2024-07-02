@@ -146,7 +146,7 @@ class SubmitAssignmentViewModel(private val localStorage: LocalStorage, private 
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isAssignmentResponseSuccess = false
                             )
                         }
@@ -220,7 +220,7 @@ class SubmitAssignmentViewModel(private val localStorage: LocalStorage, private 
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccess = false
                             )
                         }

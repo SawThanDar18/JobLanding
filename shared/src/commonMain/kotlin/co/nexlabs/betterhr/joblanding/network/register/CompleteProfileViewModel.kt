@@ -103,7 +103,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -169,7 +169,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessUpdateSummary = false
                             )
                         }
@@ -279,7 +279,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessCreateCompany = false
                             )
                         }
@@ -368,7 +368,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 getPositionId = false
                             )
                         }
@@ -447,7 +447,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessCreateExperience = false
                             )
                         }
@@ -526,7 +526,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessUpdateExperience = false
                             )
                         }
@@ -604,7 +604,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessCreateEducation = false
                             )
                         }
@@ -683,7 +683,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessUpdateEducation = false
                             )
                         }
@@ -754,7 +754,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessCreateLanguage = false
                             )
                         }
@@ -826,7 +826,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessUpdateLanguage = false
                             )
                         }
@@ -896,7 +896,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessCreateSkill = false
                             )
                         }
@@ -967,7 +967,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessUpdateSkill = false
                             )
                         }
@@ -1042,7 +1042,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessCreateCertificate = false
                             )
                         }
@@ -1118,7 +1118,7 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessUpdateCertificate = false
                             )
                         }
@@ -1169,7 +1169,7 @@ class CompleteProfileViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = true,
-                        error = UIErrorType.Other(e.message!![0].toString()),
+                        error = UIErrorType.Other(e.message.toString()),
                     )
                 }
             }
@@ -1240,12 +1240,52 @@ class CompleteProfileViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessUpdateCandidate = false
                             )
                         }
                     }
                 }
+        }
+    }
+
+    fun emailVerify() {
+        viewModelScope.launch(DispatcherProvider.io) {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    error = UIErrorType.Nothing,
+                    isSuccessEmailVerify = false
+                )
+            }
+            try {
+                var response = completeProfileRepository.emailVerify(localStorage.candidateId)
+                if (response == "true") {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = UIErrorType.Nothing,
+                            isSuccessEmailVerify = true
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = UIErrorType.Other("File id null!"),
+                            isSuccessEmailVerify = false
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = true,
+                        error = UIErrorType.Other(e.message.toString()),
+                        isSuccessEmailVerify = false
+                    )
+                }
+            }
         }
     }
 }

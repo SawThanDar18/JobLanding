@@ -115,7 +115,7 @@ class QRLogInViewModel(private val localStorage: LocalStorage, private val qrLog
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessQRLogIn = false
                             )
                         }

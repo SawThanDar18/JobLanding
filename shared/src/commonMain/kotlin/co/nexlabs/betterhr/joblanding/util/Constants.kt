@@ -11,6 +11,7 @@ val baseUrlForMultipleUploadFile = "https://dev.betterjobs.co/api/api/user/file-
 val baseUrlForMultipleUploadFileForCreateApplication = "https://dev.betterjobs.co/api/api/application/file-upload-multiple"
 val smsUrl = "/graphql"
 val getCountriesUrl = "https://cmsdev.betterjobs.co/portal/api/get/countries"
+val emailVerifyUrl = "https://dev.betterjobs.co/api/api/send-verify-email"
 
 val API_KEY = "api"
 val API_VALUE = "GETCOUNTRIESSTATESCITIESDATA@BetterHR20240228"

@@ -158,6 +158,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
     var updatePhoneNumber by remember { mutableStateOf("") }
     var updateEmail by remember { mutableStateOf("") }
 
+    var emailVerifiedAt by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var candidatePosition by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -392,6 +393,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
             viewModel.updateCandidateId(uiState.candidateData.id)
             viewModel.updatePhone(uiState.candidateData.phone)
         }
+        emailVerifiedAt = uiState.candidateData.emailVerifiedAt
         name = uiState.candidateData.name
         candidatePosition = uiState.candidateData.desiredPosition
         phoneNumber = uiState.candidateData.phone
@@ -480,6 +482,16 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
         if (uiState.candidateData.coverLetter != null) {
             coverLetterName = uiState.candidateData.coverLetter.name
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccessEmailVerify) {
+        if (uiState.isSuccessEmailVerify) {
+            Toast.makeText(
+                applicationContext,
+                "Email verification was sent to your mail! Please verify!",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -757,20 +769,22 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     verticalArrangement = Arrangement.Center
                                 ) {
                                     Text(
-                                        text = uiState.candidateData.name,
+                                        text = name,
                                         fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                         fontWeight = FontWeight.W600,
                                         color = Color(0xFF6A6A6A),
                                         fontSize = 14.sp
                                     )
 
-                                    Text(
-                                        text = uiState.candidateData.desiredPosition,
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFF6A6A6A),
-                                        fontSize = 14.sp
-                                    )
+                                    if (candidatePosition != "") {
+                                        Text(
+                                            text = candidatePosition,
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFF6A6A6A),
+                                            fontSize = 14.sp
+                                        )
+                                    }
 
                                     Spacer(modifier = Modifier.height(2.dp))
 
@@ -779,8 +793,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             .fillMaxWidth()
                                             .clickable {
                                                 bottomBarVisible = true
-                                                Log.d("posi>>", candidatePosition)
-                                                Log.d("posi>>", uiState.candidateData.desiredPosition)
 
                                                 updateName = name
                                                 updateDesiredPosition = candidatePosition
@@ -826,7 +838,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 Spacer(modifier = Modifier.width(8.dp))
 
                                 Text(
-                                    text = uiState.candidateData.phone,
+                                    text = phoneNumber,
                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                     fontWeight = FontWeight.W400,
                                     color = Color(0xFF6A6A6A),
@@ -854,7 +866,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 Spacer(modifier = Modifier.width(8.dp))
 
                                 Text(
-                                    text = uiState.candidateData.email,
+                                    text = email,
                                     fontFamily = FontFamily(Font(R.font.poppins_regular)),
                                     fontWeight = FontWeight.W400,
                                     color = Color(0xFF6A6A6A),
@@ -862,60 +874,66 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            if (email != "" && emailVerifiedAt == "") {
 
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .height(30.dp)
-                                    .border(1.dp, Color(0xFFFDEDEC), RoundedCornerShape(4.dp))
-                                    .background(
-                                        color = Color(0xFFFDEDEC),
-                                        shape = MaterialTheme.shapes.medium
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                    horizontalArrangement = Arrangement.Start,
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                        .height(30.dp)
+                                        .border(1.dp, Color(0xFFFDEDEC), RoundedCornerShape(4.dp))
+                                        .background(
+                                            color = Color(0xFFFDEDEC),
+                                            shape = MaterialTheme.shapes.medium
+                                        ),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.warning),
-                                        contentDescription = "Warning Icon",
+                                    Row(
                                         modifier = Modifier
-                                            .size(13.33.dp),
-                                        alignment = Alignment.Center
-                                    )
+                                            .fillMaxSize()
+                                            .padding(8.dp)
+                                            .clickable {
+                                                viewModel.emailVerify()
+                                            },
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.warning),
+                                            contentDescription = "Warning Icon",
+                                            modifier = Modifier
+                                                .size(13.33.dp),
+                                            alignment = Alignment.Center
+                                        )
 
-                                    Text(
-                                        text = " Need Verification. ",
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFFEE4744),
-                                        fontSize = 12.sp
-                                    )
+                                        Text(
+                                            text = " Need Verification. ",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFFEE4744),
+                                            fontSize = 12.sp
+                                        )
 
-                                    Text(
-                                        modifier = Modifier.drawBehind {
-                                            val strokeWidthPx = 1.dp.toPx()
-                                            val verticalOffset = size.height - 2.sp.toPx()
-                                            drawLine(
-                                                color = Color(0xFFEE4744),
-                                                strokeWidth = strokeWidthPx,
-                                                start = Offset(0f, verticalOffset),
-                                                end = Offset(size.width, verticalOffset)
-                                            )
-                                        },
-                                        text = "Click here to verify your email.",
-                                        fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                        fontWeight = FontWeight.W400,
-                                        color = Color(0xFFEE4744),
-                                        fontSize = 12.sp
-                                    )
+                                        Text(
+                                            modifier = Modifier.drawBehind {
+                                                val strokeWidthPx = 1.dp.toPx()
+                                                val verticalOffset = size.height - 2.sp.toPx()
+                                                drawLine(
+                                                    color = Color(0xFFEE4744),
+                                                    strokeWidth = strokeWidthPx,
+                                                    start = Offset(0f, verticalOffset),
+                                                    end = Offset(size.width, verticalOffset)
+                                                )
+                                            },
+                                            text = "Click here to verify your email.",
+                                            fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                            fontWeight = FontWeight.W400,
+                                            color = Color(0xFFEE4744),
+                                            fontSize = 12.sp
+                                        )
+                                    }
                                 }
                             }
 
@@ -7988,7 +8006,12 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                             onValueChange = {
                                 updateDesiredPosition = it
                             },
-                            placeholder = { Text(updateDesiredPosition, color = Color(0xFF4A4A4A)) },
+                            placeholder = {
+                                Text(
+                                    updateDesiredPosition,
+                                    color = Color(0xFF4A4A4A)
+                                )
+                            },
                             textStyle = TextStyle(
                                 fontWeight = FontWeight.W400,
                                 fontSize = 14.sp,
@@ -8146,36 +8169,40 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.warning),
-                                contentDescription = "Warning Icon",
+                        if (email != "" && emailVerifiedAt == "") {
+                            Row(
                                 modifier = Modifier
-                                    .size(13.33.dp)
-                            )
+                                    .fillMaxWidth()
+                                    .clickable { viewModel.emailVerify() },
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.warning),
+                                    contentDescription = "Warning Icon",
+                                    modifier = Modifier
+                                        .size(13.33.dp)
+                                )
 
-                            Text(
-                                modifier = Modifier.drawBehind {
-                                    val strokeWidthPx = 1.dp.toPx()
-                                    val verticalOffset = size.height - 2.sp.toPx()
-                                    drawLine(
-                                        color = Color(0xFFEE4744),
-                                        strokeWidth = strokeWidthPx,
-                                        start = Offset(0f, verticalOffset),
-                                        end = Offset(size.width, verticalOffset)
-                                    )
-                                },
-                                textAlign = TextAlign.Start,
-                                text = "Verify Email",
-                                fontFamily = FontFamily(Font(R.font.poppins_regular)),
-                                fontWeight = FontWeight.W400,
-                                color = Color(0xFFEE4744),
-                                fontSize = 12.sp
-                            )
+                                Text(
+                                    modifier = Modifier.drawBehind {
+                                        val strokeWidthPx = 1.dp.toPx()
+                                        val verticalOffset = size.height - 2.sp.toPx()
+                                        drawLine(
+                                            color = Color(0xFFEE4744),
+                                            strokeWidth = strokeWidthPx,
+                                            start = Offset(0f, verticalOffset),
+                                            end = Offset(size.width, verticalOffset)
+                                        )
+                                    },
+                                    textAlign = TextAlign.Start,
+                                    text = "Verify Email",
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontWeight = FontWeight.W400,
+                                    color = Color(0xFFEE4744),
+                                    fontSize = 12.sp
+                                )
+                            }
                         }
 
 

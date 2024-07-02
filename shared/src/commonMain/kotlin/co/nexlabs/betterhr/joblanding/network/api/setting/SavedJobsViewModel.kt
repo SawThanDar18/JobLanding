@@ -86,7 +86,7 @@ class SavedJobsViewModel(private val localStorage: LocalStorage, private val sav
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessSavedJobsIds = false
                             )
                         }
@@ -145,7 +145,7 @@ class SavedJobsViewModel(private val localStorage: LocalStorage, private val sav
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                             )
                         }
                     }
@@ -203,7 +203,7 @@ class SavedJobsViewModel(private val localStorage: LocalStorage, private val sav
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }

@@ -1,5 +1,6 @@
 query Candidate {
     me {
+        email_verified_at
         id
         name
         email

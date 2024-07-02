@@ -100,7 +100,7 @@ class CollectionJobsViewModel(private val collectionJobsRepository: CollectionJo
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }

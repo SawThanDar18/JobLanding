@@ -85,7 +85,7 @@ class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailR
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isSuccessGetCompanyDetail = false
                             )
                         }
@@ -144,7 +144,7 @@ class CompanyDetailViewModel(private val companyDetailRepository: CompanyDetailR
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }

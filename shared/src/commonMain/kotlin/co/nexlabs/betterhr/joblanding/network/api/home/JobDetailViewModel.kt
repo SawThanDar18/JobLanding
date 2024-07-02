@@ -151,7 +151,7 @@ class JobDetailViewModel(
                             it.copy(
                                 isSuccessGetJobDetail = false,
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -210,7 +210,7 @@ class JobDetailViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -280,7 +280,7 @@ class JobDetailViewModel(
                             it.copy(
                                 appliedJobStatus = "",
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -352,7 +352,7 @@ class JobDetailViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -410,7 +410,7 @@ class JobDetailViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -596,7 +596,7 @@ class JobDetailViewModel(
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -817,7 +817,7 @@ class JobDetailViewModel(
                             it.copy(
                                 isSuccessUpdateApplication = false,
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -976,7 +976,7 @@ class JobDetailViewModel(
                                 isSuccessForCandidateId = false,
                                 isSuccessForBearerToken = false,
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -1044,7 +1044,7 @@ class JobDetailViewModel(
                             it.copy(
                                 isApplyJobSuccess = false,
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }
@@ -1123,7 +1123,7 @@ class JobDetailViewModel(
                                 isSuccessForCandidateId = false,
                                 isSuccessForBearerToken = false,
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString())
+                                error = UIErrorType.Other(data.errors!![0].toString())
                             )
                         }
                     }

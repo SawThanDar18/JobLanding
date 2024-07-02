@@ -1,6 +1,7 @@
 package co.nexlabs.betterhr.joblanding.network.api.bottom_navigation.data
 
 data class CandidateUIModel(
+    val emailVerifiedAt: String,
     val id: String,
     val name: String,
     val email: String,

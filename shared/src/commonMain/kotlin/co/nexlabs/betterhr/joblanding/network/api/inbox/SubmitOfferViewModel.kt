@@ -139,7 +139,7 @@ class SubmitOfferViewModel(private val localStorage: LocalStorage, private val i
                         _uiState.update {
                             it.copy(
                                 isLoading = true,
-                                error = UIErrorType.Other(data.errors.toString()),
+                                error = UIErrorType.Other(data.errors!![0].toString()),
                                 isOfferResponseSuccess = false
                             )
                         }

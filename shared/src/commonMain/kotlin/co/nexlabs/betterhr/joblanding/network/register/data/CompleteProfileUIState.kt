@@ -8,7 +8,7 @@ data class CompleteProfileUIState(
     val isLoading: Boolean = true,
     val error: UIErrorType = UIErrorType.Nothing,
     val candidateData: CandidateUIModel = CandidateUIModel(
-        "", "", "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "", "", "", "",
         FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),
         emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList()
     ),
@@ -28,5 +28,6 @@ data class CompleteProfileUIState(
     val isSuccessUpdateSkill: Boolean = false,
     val isSuccessCreateCertificate: Boolean = false,
     val isSuccessUpdateCertificate: Boolean = false,
-    val isSuccessUpdateCandidate: Boolean = false
+    val isSuccessUpdateCandidate: Boolean = false,
+    val isSuccessEmailVerify: Boolean = false
 )

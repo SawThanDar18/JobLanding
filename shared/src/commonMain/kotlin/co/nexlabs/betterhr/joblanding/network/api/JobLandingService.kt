@@ -44,6 +44,7 @@ import co.nexlabs.betterhr.job.without_auth.JobLandingJobListQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSavedJobsQuery
 import co.nexlabs.betterhr.job.without_auth.JobLandingSectionsQuery
 import co.nexlabs.betterhr.joblanding.FileUri
+import co.nexlabs.betterhr.joblanding.network.api.request_response.EmailVerificationResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileRequest
 import co.nexlabs.betterhr.joblanding.network.api.request_response.FileUploadResponse
 import co.nexlabs.betterhr.joblanding.network.api.request_response.GetCountriesListResponse
@@ -337,5 +338,7 @@ interface JobLandingService {
     suspend fun createCompany(companyName: String, candidateId: String, fileIds: String): ApolloCall<CreateCompanyMutation.Data>
 
     suspend fun updateCandidate(candidateId: String, name: String, positionName: String, phone: String, email: String, countryId: String): ApolloCall<UpdateCandidateMutation.Data>
+
+    suspend fun emailVerification(candidateId: String): String
 
 }

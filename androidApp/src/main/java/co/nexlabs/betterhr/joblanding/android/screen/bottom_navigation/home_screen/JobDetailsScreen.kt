@@ -328,30 +328,39 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
             }
             Lifecycle.State.CREATED -> {
                 scope.launch {
+                    viewModel.getJobDetail(jobId)
                     if (viewModel.getBearerToken() != "") {
                         viewModel.getCandidateData()
                     }
-                    viewModel.getJobDetail(jobId)
                 }
                 Log.d("state>>", "created")
             }
             Lifecycle.State.STARTED -> {
                 scope.launch {
+                    viewModel.getJobDetail(jobId)
                     if (viewModel.getBearerToken() != "") {
                         viewModel.getCandidateData()
                     }
-                    viewModel.getJobDetail(jobId)
                 }
                 Log.d("state>>", "started")
             }
             Lifecycle.State.RESUMED -> {
                 scope.launch {
+                    viewModel.getJobDetail(jobId)
                     if (viewModel.getBearerToken() != "") {
                         viewModel.getCandidateData()
                     }
-                    viewModel.getJobDetail(jobId)
                 }
                 Log.d("state>>", "resume")
+            }
+        }
+    }
+
+    if (uiState.candidateData != null) {
+        if (uiState.candidateData.id != "") {
+            scope.launch {
+                viewModel.updateCandidateId(uiState.candidateData.id)
+                viewModel.checkJobIsApplied(jobId)
             }
         }
     }
@@ -372,7 +381,6 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
             scope.launch {
                 if (viewModel.getBearerToken() != "") {
                     viewModel.fetchSaveJobsById(jobId)
-                    viewModel.checkJobIsApplied(jobId)
                 }
             }
         }
@@ -1436,7 +1444,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                             .graphicsLayer {
                                                                 shape = CircleShape
                                                             },
-                                                        contentScale = ContentScale.Fit
+                                                        contentScale = ContentScale.Crop
                                                     )
                                                 } else {
                                                     if (uiState.candidateData != null) {
@@ -1449,7 +1457,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 modifier = Modifier
                                                                     .size(84.dp)
                                                                     .clip(CircleShape),
-                                                                contentScale = ContentScale.Fit
+                                                                contentScale = ContentScale.Crop
                                                             )
                                                         } else {
                                                             Image(
@@ -1458,7 +1466,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                                 modifier = Modifier
                                                                     .size(84.dp)
                                                                     .clip(CircleShape),
-                                                                contentScale = ContentScale.Fit
+                                                                contentScale = ContentScale.Crop
                                                             )
                                                         }
                                                     } else {
@@ -1468,7 +1476,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                             modifier = Modifier
                                                                 .size(84.dp)
                                                                 .clip(CircleShape),
-                                                            contentScale = ContentScale.Fit
+                                                            contentScale = ContentScale.Crop
                                                         )
                                                     }
                                                 }
@@ -3399,7 +3407,7 @@ fun JobDetailsScreen(viewModel: JobDetailViewModel, navController: NavController
                                                     modifier = Modifier
                                                         .size(84.dp)
                                                         .clip(CircleShape),
-                                                    contentScale = ContentScale.Fit
+                                                    contentScale = ContentScale.Crop
                                                 )
                                             }
                                         }

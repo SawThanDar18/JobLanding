@@ -33,8 +33,11 @@ data class JobDetailUIState(
         data = FetchSaveJobDatUIModel("", "", "")
     ),
     val candidateData: CandidateUIModel = CandidateUIModel(
-        "", "", "", "", "", "", "", "", "", "", "", "",
-        FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),FilesUIModel("", "", "", ""),
+        "", "", "", "", "", "", "", "",
+        "", "", "", "", "",
+        FilesUIModel("", "", "", ""),
+        FilesUIModel("", "", "", ""),
+        FilesUIModel("", "", "", ""),
         emptyList(), emptyList(), emptyList(), emptyList(), emptyList(), emptyList()
     ),
     val idFromProfileUpload: String = "",

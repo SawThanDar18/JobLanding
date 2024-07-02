@@ -229,7 +229,7 @@ object CandidateViewModelMapper {
             CertificateUIModel(
                 certificate.id ?: "",
                 certificate.candidate_id ?: "",
-                certificate.course_name ?: "",
+                certificate.course_name,
                 certificate.issuing_organization ?: "",
                 certificate.issue_date ?: "",
                 certificate.expire_date ?: "",
@@ -239,6 +239,7 @@ object CandidateViewModelMapper {
         }
 
         return CandidateUIModel(
+            data.email_verified_at ?: "",
             data.id ?: "",
             data.name,
             data.email ?: "",

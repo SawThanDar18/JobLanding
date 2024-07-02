@@ -133,4 +133,6 @@ class CompleteProfileRepository(private val jobLandingService: JobLandingService
         candidateId: String, name: String, positionName: String, phone: String, email: String, countryId: String
     ) = jobLandingService.updateCandidate(candidateId, name, positionName, phone, email, countryId)
 
+    suspend fun emailVerify(candidateId: String) = jobLandingService.emailVerification(candidateId)
+
 }
