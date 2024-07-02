@@ -779,12 +779,13 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                             .fillMaxWidth()
                                             .clickable {
                                                 bottomBarVisible = true
+                                                Log.d("posi>>", candidatePosition)
+                                                Log.d("posi>>", uiState.candidateData.desiredPosition)
 
-                                                updateName = uiState.candidateData.name
-                                                updateDesiredPosition =
-                                                    uiState.candidateData.desiredPosition
-                                                updatePhoneNumber = uiState.candidateData.phone
-                                                updateEmail = uiState.candidateData.email
+                                                updateName = name
+                                                updateDesiredPosition = candidatePosition
+                                                updatePhoneNumber = phoneNumber
+                                                updateEmail = email
                                             },
                                         horizontalArrangement = Arrangement.Start,
                                         verticalAlignment = Alignment.CenterVertically
@@ -1303,7 +1304,6 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     .background(color = Color(0xFFE4E7ED))
                             )
 
-                            /*
 
                             if (companiesList.isEmpty()) {
                                 Row(
@@ -2101,7 +2101,7 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     .fillMaxWidth()
                                     .height(2.dp)
                                     .background(color = Color(0xFFE4E7ED))
-                            )*/
+                            )
 
                             if (languageList.isEmpty()) {
                                 Row(
@@ -7984,11 +7984,11 @@ fun CompleteProfileScreen(viewModel: CompleteProfileViewModel, navController: Na
                                     color = Color.Transparent,
                                     shape = MaterialTheme.shapes.medium
                                 ),
-                            value = updatePosition,
+                            value = updateDesiredPosition,
                             onValueChange = {
-                                updatePosition = it
+                                updateDesiredPosition = it
                             },
-                            placeholder = { Text(updatePosition, color = Color(0xFF4A4A4A)) },
+                            placeholder = { Text(updateDesiredPosition, color = Color(0xFF4A4A4A)) },
                             textStyle = TextStyle(
                                 fontWeight = FontWeight.W400,
                                 fontSize = 14.sp,

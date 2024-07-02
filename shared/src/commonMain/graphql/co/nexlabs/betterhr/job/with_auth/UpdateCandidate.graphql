@@ -3,15 +3,13 @@ mutation UpdateCandidate(
     $name: String,
     $email: String,
     $phone: String,
-    $desired_position: String,
-    $country_id: String) {
+    $desired_position: String) {
     updateCandidate (
         id: $id
         name: $name,
         email: $email
         phone: $phone
         desired_position: $desired_position
-        country_id: $country_id
     ) {
         id
         name

@@ -1081,7 +1081,7 @@ class JobLandingServiceImpl(private val localStorage: LocalStorage, private val 
         email: String,
         countryId: String
     ): ApolloCall<UpdateCandidateMutation.Data> {
-        return apolloClientWithAuth.mutation(UpdateCandidateMutation(candidateId, Optional.present(name), Optional.present(email), Optional.present(phone), Optional.present(positionName), Optional.present(countryId)))
+        return apolloClientWithAuth.mutation(UpdateCandidateMutation(candidateId, Optional.present(name), Optional.present(email), Optional.present(phone), Optional.present(positionName)))
     }
 }
 
